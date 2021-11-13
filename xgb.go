@@ -2,6 +2,7 @@ package xgb
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -16,8 +17,8 @@ type LoggerType interface {
 }
 
 // NewLogger returns a simple LoggerType instance, uses log.Logger
-func NewLogger(w io.Writer) LoggerType {
-	return log.New(w, "XGB: ", log.Lshortfile)
+func NewLogger(pref string, w io.Writer) LoggerType {
+	return log.New(w, fmt.Sprintf("[%s] ", pref), log.Lshortfile)
 }
 
 // NoopLogger returns a no-op logger
@@ -32,7 +33,7 @@ func (l *noopLogger) Printf(string, ...interface{}) {}
 
 // Where to log error-messages. Defaults to stderr.
 // To disable logging, just set this to NoopLogger()
-var Logger = NewLogger(os.Stderr)
+var Logger = NewLogger("xgb", os.Stderr)
 
 const (
 	// cookieBuffer represents the queue size of cookies existing at any
