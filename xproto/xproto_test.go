@@ -1,4 +1,4 @@
-package xproto
+package xproto_test
 
 /*
 	Tests for XGB.
@@ -27,10 +27,11 @@ import (
 	"time"
 
 	"codeberg.org/gruf/go-xgb"
+	"codeberg.org/gruf/go-xgb/xproto"
 )
 
 // The X connection used throughout testing.
-var X *xgb.Conn
+var X *xgb.XConn
 
 // init initializes the X connection, seeds the RNG and starts waiting
 // for events.
@@ -65,7 +66,7 @@ func TestSynchronousError(t *testing.T) {
 // TestAsynchronousError does the same thing as TestSynchronousError, but
 // grabs the error asynchronously instead.
 func TestAsynchronousError(t *testing.T) {
-	MapWindow(X, 0) // resource id 0 is always invalid
+	xproto.MapWindow(X, 0) // resource id 0 is always invalid
 
 	evOrErr := waitForEvent(t, 5)
 	if evOrErr.ev != nil {
@@ -94,8 +95,10 @@ func TestCookieBuffer(t *testing.T) {
 func TestSequenceWrap(t *testing.T) {
 	n := (1 << 16) + 10
 	for i := 0; i < n; i++ {
-		_, err := InternAtom(X, false, 5, "RANDO").Reply()
+		cookie, err := xproto.InternAtom(X, false, 5, "RANDO")
 		if err != nil {
+			t.Fatalf("InternAtom: %s", err)
+		} else if _, err := cookie.Reply(); err != nil {
 			t.Fatalf("InternAtom: %s", err)
 		}
 	}
@@ -133,37 +136,43 @@ func TestWindowEvents(t *testing.T) {
 	// The geometry to set the window.
 	gx, gy, gw, gh := 200, 400, 1000, 300
 
-	wid, err := NewWindowId(X)
+	wid, err := xproto.NewWindowID(X)
 	if err != nil {
 		t.Fatalf("NewId: %s", err)
 	}
 
 	screen := Setup(X).DefaultScreen(X) // alias
-	err = CreateWindowChecked(X, screen.RootDepth, wid, screen.Root,
+	cwc, err := xproto.CreateWindowChecked(X, screen.RootDepth, wid, screen.Root,
 		0, 0, 500, 500, 0,
-		WindowClassInputOutput, screen.RootVisual,
-		CwBackPixel|CwOverrideRedirect, []uint32{0xffffffff, 1}).Check()
+		xproto.WindowClassInputOutput, screen.RootVisual,
+		xproto.CwBackPixel|xproto.CwOverrideRedirect, []uint32{0xffffffff, 1})
 	if err != nil {
+		t.Fatalf("CreateWindow: %s", err)
+	} else if err := cwc.Check(); err != nil {
 		t.Fatalf("CreateWindow: %s", err)
 	}
 
-	err = MapWindowChecked(X, wid).Check()
+	mwc, err := xproto.MapWindowChecked(X, wid)
 	if err != nil {
+		t.Fatalf("MapWindow: %s", err)
+	} else if err := mwc.Check(); err != nil {
 		t.Fatalf("MapWindow: %s", err)
 	}
 
 	// We don't listen in the CreateWindow request so that we don't get
 	// a MapNotify event.
-	err = ChangeWindowAttributesChecked(X, wid,
-		CwEventMask, []uint32{EventMaskStructureNotify}).Check()
+	cwac, err := xproto.ChangeWindowAttributesChecked(X, wid,
+		xproto.CwEventMask, xproto.EventMaskStructureNotify)
 	if err != nil {
+		t.Fatalf("ChangeWindowAttributes: %s", err)
+	} else if err := cwac.Check(); err != nil {
 		t.Fatalf("ChangeWindowAttributes: %s", err)
 	}
 
-	err = ConfigureWindowChecked(X, wid,
-		ConfigWindowX|ConfigWindowY|
-			ConfigWindowWidth|ConfigWindowHeight,
-		[]uint32{uint32(gx), uint32(gy), uint32(gw), uint32(gh)}).Check()
+	err = xproto.ConfigureWindow(X, wid,
+		xproto.ConfigWindowX|xproto.ConfigWindowY|
+			xproto.ConfigWindowWidth|xproto.ConfigWindowHeight,
+		[]uint32{uint32(gx), uint32(gy), uint32(gw), uint32(gh)})
 	if err != nil {
 		t.Fatalf("ConfigureWindow: %s", err)
 	}

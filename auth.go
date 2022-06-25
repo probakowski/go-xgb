@@ -13,11 +13,10 @@ import (
 	"os"
 )
 
-// readAuthority reads the X authority file for the DISPLAY.
-// If hostname == "" or hostname == "localhost",
-// then use the system's hostname (as returned by os.Hostname) instead.
-func readAuthority(hostname, display string) (
-	name string, data []byte, err error) {
+// ReadAuthority reads the X authority file for the DISPLAY. Uses os.Hostname() if hostname empty.
+// Returns the authority name and data, or error
+func ReadAuthority(hostname, display string) (string, []byte, error) {
+	var err error
 
 	// b is a scratch buffer to use and should be at least 256 bytes long
 	// (i.e. it should be able to hold a hostname).
@@ -27,6 +26,7 @@ func readAuthority(hostname, display string) (
 	const familyLocal = 256
 	const familyWild = 65535
 
+	// if hostname empty get
 	if len(hostname) == 0 || hostname == "localhost" {
 		hostname, err = os.Hostname()
 		if err != nil {
@@ -34,16 +34,19 @@ func readAuthority(hostname, display string) (
 		}
 	}
 
+	// Fetch xauthority from shell env
 	fname := os.Getenv("XAUTHORITY")
+
+	// if none, use default $HOME/.Xauthority
 	if len(fname) == 0 {
 		home := os.Getenv("HOME")
 		if len(home) == 0 {
-			err = errors.New("Xauthority not found: $XAUTHORITY, $HOME not set")
-			return "", nil, err
+			return "", nil, errors.New("xauthority not found: $XAUTHORITY, $HOME not set")
 		}
 		fname = home + "/.Xauthority"
 	}
 
+	// Open xauthority for reading
 	r, err := os.Open(fname)
 	if err != nil {
 		return "", nil, err
@@ -84,11 +87,11 @@ func readAuthority(hostname, display string) (
 			return name0, data0, nil
 		}
 	}
-	panic("unreachable")
 }
 
 func getBytes(r io.Reader, b []byte) ([]byte, error) {
 	var n uint16
+
 	if err := binary.Read(r, binary.BigEndian, &n); err != nil {
 		return nil, err
 	} else if n > uint16(len(b)) {
@@ -98,13 +101,11 @@ func getBytes(r io.Reader, b []byte) ([]byte, error) {
 	if _, err := io.ReadFull(r, b[0:n]); err != nil {
 		return nil, err
 	}
+
 	return b[0:n], nil
 }
 
 func getString(r io.Reader, b []byte) (string, error) {
 	b, err := getBytes(r, b)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
+	return string(b), err
 }

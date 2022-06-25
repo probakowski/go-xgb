@@ -12,20 +12,29 @@ import (
 	"unicode/utf16"
 
 	"codeberg.org/gruf/go-xgb"
+	"codeberg.org/gruf/go-xgb/shape"
 	"codeberg.org/gruf/go-xgb/xproto"
 )
 
 func main() {
-	X, err := xgb.NewConn()
-	if err != nil {
-		fmt.Println("error connecting to X:", err)
-		return
-	}
-	defer X.Close()
+	// Open X server connection
+	xconn, b, _ := xgb.DefaultDialer.Dial("")
 
-	setup := xproto.Setup(X)
-	screen := setup.DefaultScreen(X)
-	wid, err := xproto.NewWindowId(X)
+	// Perform initial X proto setup
+	setup, err := xproto.Setup(xconn, b)
+	if err != nil {
+		panic(err)
+	}
+
+	// Register randr extension with XConn
+	if err := shape.Register(xconn); err != nil {
+		panic(err)
+	}
+
+	// Get default screen
+	screen := setup.Roots[0]
+
+	wid, err := xproto.NewWindowID(xconn)
 	if err != nil {
 		fmt.Println("error creating window id:", err)
 		return
@@ -34,14 +43,14 @@ func main() {
 	draw := xproto.Drawable(wid) // for now, we simply draw into the window
 
 	// Create the window
-	xproto.CreateWindow(X, screen.RootDepth, wid, screen.Root,
+	xproto.CreateWindow(xconn, screen.RootDepth, wid, screen.Root,
 		0, 0, 180, 200, 8, // X, Y, width, height, *border width*
 		xproto.WindowClassInputOutput, screen.RootVisual,
 		xproto.CwBackPixel|xproto.CwEventMask,
 		[]uint32{screen.WhitePixel, xproto.EventMaskStructureNotify | xproto.EventMaskExposure})
 
 	// Map the window on the screen
-	xproto.MapWindow(X, wid)
+	xproto.MapWindow(xconn, wid)
 
 	// Up to here everything is the same as in the `create-window` example.
 	// We opened a connection, created and mapped the window.
@@ -59,7 +68,7 @@ func main() {
 	//
 	// Here we create a new graphics context
 	// which only has the foreground (color) value set to black:
-	foreground, err := xproto.NewGcontextId(X)
+	foreground, err := xproto.NewGcontextID(xconn)
 	if err != nil {
 		fmt.Println("error creating foreground context:", err)
 		return
@@ -67,14 +76,14 @@ func main() {
 
 	mask := uint32(xproto.GcForeground)
 	values := []uint32{screen.BlackPixel}
-	xproto.CreateGC(X, foreground, draw, mask, values)
+	xproto.CreateGC(xconn, foreground, draw, mask, values)
 
 	// It is possible to set the foreground value to something different.
 	// In production, this should use xorg color maps instead for compatibility
 	// but for demonstration setting the color directly also works.
 	// For more information on color maps, see the xcb documentation:
 	// https://x.org/releases/X11R7.5/doc/libxcb/tutorial/#usecolor
-	red, err := xproto.NewGcontextId(X)
+	red, err := xproto.NewGcontextID(xconn)
 	if err != nil {
 		fmt.Println("error creating red context:", err)
 		return
@@ -82,10 +91,10 @@ func main() {
 
 	mask = uint32(xproto.GcForeground)
 	values = []uint32{0xff0000}
-	xproto.CreateGC(X, red, draw, mask, values)
+	xproto.CreateGC(xconn, red, draw, mask, values)
 
 	// We'll create another graphics context that draws thick lines:
-	thick, err := xproto.NewGcontextId(X)
+	thick, err := xproto.NewGcontextID(xconn)
 	if err != nil {
 		fmt.Println("error creating thick context:", err)
 		return
@@ -93,14 +102,14 @@ func main() {
 
 	mask = uint32(xproto.GcLineWidth)
 	values = []uint32{10}
-	xproto.CreateGC(X, thick, draw, mask, values)
+	xproto.CreateGC(xconn, thick, draw, mask, values)
 
 	// It is even possible to set multiple properties at once.
 	// Only remember to put the values in the same order as they're
 	// defined in `xproto`:
 	// Foreground is defined first, so we also set it's value first.
 	// LineWidth comes second.
-	blue, err := xproto.NewGcontextId(X)
+	blue, err := xproto.NewGcontextID(xconn)
 	if err != nil {
 		fmt.Println("error creating blue context:", err)
 		return
@@ -108,7 +117,7 @@ func main() {
 
 	mask = uint32(xproto.GcForeground | xproto.GcLineWidth)
 	values = []uint32{0x0000ff, 4}
-	xproto.CreateGC(X, blue, draw, mask, values)
+	xproto.CreateGC(xconn, blue, draw, mask, values)
 
 	// Properties of an already created gc can also be changed
 	// if the original values aren't needed anymore.
@@ -117,11 +126,11 @@ func main() {
 	// to smooth out the polyline:
 	mask = uint32(xproto.GcLineWidth | xproto.GcCapStyle)
 	values = []uint32{3, xproto.CapStyleRound}
-	xproto.ChangeGC(X, foreground, mask, values)
+	xproto.ChangeGC(xconn, foreground, mask, values)
 
 	// Writing text needs a bit more setup -- we first have
 	// to open the required font.
-	font, err := xproto.NewFontId(X)
+	font, err := xproto.NewFontID(xconn)
 	if err != nil {
 		fmt.Println("error creating font id:", err)
 		return
@@ -147,14 +156,14 @@ func main() {
 	// For now, we'll simply stick with the fixed font which is available
 	// to every X session:
 	fontname := "-*-fixed-*-*-*-*-14-*-*-*-*-*-*-*"
-	err = xproto.OpenFontChecked(X, font, uint16(len(fontname)), fontname).Check()
+	err = xproto.OpenFont(xconn, font, uint16(len(fontname)), fontname)
 	if err != nil {
 		fmt.Println("failed opening the font:", err)
 		return
 	}
 
 	// And create a context from it. We simply pass the font's ID to the GcFont property.
-	textCtx, err := xproto.NewGcontextId(X)
+	textCtx, err := xproto.NewGcontextID(xconn)
 	if err != nil {
 		fmt.Println("error creating text context:", err)
 		return
@@ -162,11 +171,11 @@ func main() {
 
 	mask = uint32(xproto.GcForeground | xproto.GcBackground | xproto.GcFont)
 	values = []uint32{screen.BlackPixel, screen.WhitePixel, uint32(font)}
-	xproto.CreateGC(X, textCtx, draw, mask, values)
+	xproto.CreateGC(xconn, textCtx, draw, mask, values)
 	text := convertStringToChar2b("Hellö World!") // Unicode capable!
 
 	// Close the font handle:
-	xproto.CloseFont(X, font)
+	xproto.CloseFont(xconn, font)
 
 	// After all, writing text is way more comfortable using Xft - it supports TrueType,
 	// and overall better configuration.
@@ -215,7 +224,7 @@ func main() {
 	}
 
 	for {
-		evt, err := X.WaitForEvent()
+		evt, err := xconn.Recv()
 
 		if err != nil {
 			fmt.Println("error reading event:", err)
@@ -225,14 +234,14 @@ func main() {
 		}
 
 		switch evt.(type) {
-		case xproto.ExposeEvent:
+		case *xproto.ExposeEvent:
 			// Draw the four points we specified earlier.
 			// Notice how we use the `foreground` context to draw them in black.
 			// Also notice how even though we changed the line width to 3,
 			// these still only appear as a single pixel.
 			// To draw points that are bigger than a single pixel,
 			// one has to either fill rectangles, circles or polygons.
-			xproto.PolyPoint(X, xproto.CoordModeOrigin, draw, foreground, points)
+			xproto.PolyPoint(xconn, xproto.CoordModeOrigin, draw, foreground, points)
 
 			// Draw the polyline. This time we specified `xproto.CoordModePrevious`,
 			// which means that every point is placed relatively to the previous.
@@ -241,22 +250,22 @@ func main() {
 			// It is also possible to use `xproto.CoordModePrevious` for drawing *points*
 			// which means that each point would be specified relative to the previous one,
 			// just as we did with the polyline.
-			xproto.PolyLine(X, xproto.CoordModePrevious, draw, foreground, polyline)
+			xproto.PolyLine(xconn, xproto.CoordModePrevious, draw, foreground, polyline)
 
 			// Draw two lines in red.
-			xproto.PolySegment(X, draw, red, segments)
+			xproto.PolySegment(xconn, draw, red, segments)
 
 			// Draw two thick rectangles.
 			// The line width only specifies the width of the outline.
 			// Notice how the second rectangle gets completely filled
 			// due to the line width.
-			xproto.PolyRectangle(X, draw, thick, rectangles)
+			xproto.PolyRectangle(xconn, draw, thick, rectangles)
 
 			// Draw the circular arcs in blue.
-			xproto.PolyArc(X, draw, blue, arcs)
+			xproto.PolyArc(xconn, draw, blue, arcs)
 
 			// There's also a fill variant for all drawing commands:
-			xproto.PolyFillRectangle(X, draw, red, rectangles2)
+			xproto.PolyFillRectangle(xconn, draw, red, rectangles2)
 
 			// Draw the text. Xorg currently knows two ways of specifying text:
 			//  a) the (extended) ASCII encoding using ImageText8(..., []byte)
@@ -264,9 +273,9 @@ func main() {
 			//     a structure consisting of two bytes.
 			// At the bottom of this example, there are two utility functions that help
 			// convert a go string into an array of Char2b's.
-			xproto.ImageText16(X, byte(len(text)), draw, textCtx, 10, 160, text)
+			xproto.ImageText16(xconn, byte(len(text)), draw, textCtx, 10, 160, text)
 
-		case xproto.DestroyNotifyEvent:
+		case *xproto.DestroyNotifyEvent:
 			return
 		}
 	}

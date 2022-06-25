@@ -12,7 +12,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"codeberg.org/gruf/go-xgb"
 	"codeberg.org/gruf/go-xgb/randr"
@@ -20,29 +19,35 @@ import (
 )
 
 func main() {
-	X, _ := xgb.NewConn()
+	// Open X server connection
+	xconn, b, _ := xgb.DefaultDialer.Dial("")
 
-	// Every extension must be initialized before it can be used.
-	err := randr.Init(X)
+	// Perform initial X proto setup
+	setup, err := xproto.Setup(xconn, b)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	// Get the root window on the default screen.
-	root := xproto.Setup(X).DefaultScreen(X).Root
+	// Register randr extension with XConn
+	if err := randr.Register(xconn); err != nil {
+		panic(err)
+	}
+
+	// Get default (root) window
+	root := setup.Roots[0].Root
 
 	// Gets the current screen resources. Screen resources contains a list
 	// of names, crtcs, outputs and modes, among other things.
-	resources, err := randr.GetScreenResources(X, root).Reply()
+	resources, err := randr.GetScreenResources(xconn, root)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Iterate through all of the outputs and show some of their info.
 	for _, output := range resources.Outputs {
-		info, err := randr.GetOutputInfo(X, output, 0).Reply()
+		info, err := randr.GetOutputInfo(xconn, output, 0)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
 		if info.Connection == randr.ConnectionConnected {
@@ -56,36 +61,39 @@ func main() {
 		}
 	}
 
-	fmt.Println("\n")
+	fmt.Println()
 
 	// Iterate through all of the crtcs and show some of their info.
 	for _, crtc := range resources.Crtcs {
-		info, err := randr.GetCrtcInfo(X, crtc, 0).Reply()
+		info, err := randr.GetCrtcInfo(xconn, crtc, 0)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
+
 		fmt.Printf("X: %d, Y: %d, Width: %d, Height: %d\n",
 			info.X, info.Y, info.Width, info.Height)
 	}
 
 	// Tell RandR to send us events. (I think these are all of them, as of 1.3.)
-	err = randr.SelectInputChecked(X, root,
+	err = randr.SelectInputUnchecked(xconn, root,
 		randr.NotifyMaskScreenChange|
 			randr.NotifyMaskCrtcChange|
 			randr.NotifyMaskOutputChange|
-			randr.NotifyMaskOutputProperty).Check()
+			randr.NotifyMaskOutputProperty)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
+
+	fmt.Println()
 
 	// Listen to events and just dump them to standard out.
 	// A more involved approach will have to read the 'U' field of
 	// RandrNotifyEvent, which is a union (really a struct) of type
 	// RanrNotifyDataUnion.
 	for {
-		ev, err := X.WaitForEvent()
+		ev, err := xconn.Recv()
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 		fmt.Println(ev)
 	}

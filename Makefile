@@ -14,19 +14,19 @@ ifndef XPROTO
 XPROTO=/usr/share/xcb
 endif
 
-# All of the XML files in my /usr/share/xcb directory EXCEPT XKB. -_-
+# All of the XML files in my /usr/share/xcb directory
 # This is intended to build xgbgen and generate Go code for each supported
-# extension.
+# extension. IGNORE: xkb.xml, glx.xml
 all: build-xgbgen \
 		 bigreq.xml composite.xml damage.xml dpms.xml dri2.xml \
-		 ge.xml glx.xml randr.xml record.xml render.xml res.xml \
-		 screensaver.xml shape.xml shm.xml xc_misc.xml \
+		 ge.xml randr.xml record.xml res.xml \
+		 render.xml screensaver.xml shape.xml shm.xml xc_misc.xml \
 		 xevie.xml xf86dri.xml xf86vidmode.xml xfixes.xml xinerama.xml \
 		 xprint.xml xproto.xml xselinux.xml xtest.xml \
 		 xvmc.xml xv.xml
 
 build-xgbgen:
-	(cd xgbgen && go build)
+	go build -o xgbgen ./cmd/xgbgen/
 
 # Builds each individual sub-package to make sure its valid Go code.
 build-all: bigreq.b composite.b damage.b dpms.b dri2.b ge.b glx.b randr.b \
@@ -51,11 +51,11 @@ install: bigreq.i composite.i damage.i dpms.i dri2.i ge.i glx.i randr.i \
 # There's probably a way to do this better, but Makefiles aren't my strong suit.
 xc_misc.xml: build-xgbgen
 	mkdir -p xcmisc
-	xgbgen/xgbgen --proto-path $(XPROTO) $(XPROTO)/xc_misc.xml > xcmisc/xcmisc.go
+	./xgbgen --gofmt=true --proto-path $(XPROTO) $(XPROTO)/xc_misc.xml > xcmisc/xcmisc.go
 
 %.xml: build-xgbgen
 	mkdir -p $*
-	xgbgen/xgbgen --proto-path $(XPROTO) $(XPROTO)/$*.xml > $*/$*.go
+	./xgbgen --gofmt=true --proto-path $(XPROTO) $(XPROTO)/$*.xml > $*/$*.go
 
 # Just test the xproto core protocol for now.
 test:
