@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -27,9 +26,7 @@ func (e *Error) Define(c *Context) {
 	e.ImplementsError(c)
 
 	// Let's the XGB event loop read this error.
-	c.Putln("func init() {")
-	c.Putln("	registerError(%d, Unmarshal%s)", e.Number, e.ErrType())
-	c.Putln("}")
+	c.Putln("func init() { registerError(%d, Unmarshal%s) }", e.Number, e.ErrType())
 	c.Putln("")
 }
 
@@ -66,8 +63,7 @@ func (e *Error) ImplementsError(c *Context) {
 	c.Putln("	return err.Sequence")
 	c.Putln("}")
 	c.Putln("")
-	c.Putln("// BadID returns the 'BadValue' number if one exists for the "+
-		"%s error. If no bad value exists, 0 is returned.", e.ErrConst())
+	c.Putln("// BadID returns the 'BadValue' number if one exists for the %s error. If no bad value exists, 0 is returned.", e.ErrConst())
 	c.Putln("func (err %s) BadID() uint32 {", e.ErrType())
 	if !c.protocol.isExt() {
 		c.Putln("return err.BadValue")
@@ -76,7 +72,6 @@ func (e *Error) ImplementsError(c *Context) {
 	}
 	c.Putln("}")
 	c.Putln("// Error returns a rudimentary string representation of the %s error.", e.ErrConst())
-	c.Putln("")
 	c.Putln("func (err %s) Error() string {", e.ErrType())
 	ErrorFieldString(c, e.Fields, e.ErrConst())
 	c.Putln("}")
@@ -152,22 +147,35 @@ func (e *ErrorCopy) ImplementsError(c *Context) {
 // ErrorFieldString works for both Error and ErrorCopy. It assembles all of the
 // fields in an error and formats them into a single string.
 func ErrorFieldString(c *Context, fields []Field, errName string) {
-	c.Putln("	fieldVals := make([]string, 0, %d)", len(fields))
-	c.Putln("	fieldVals = append(fieldVals, \"NiceName: \" + err.NiceName)")
-	c.Putln("	fieldVals = append(fieldVals, fmt.Sprintf(\"Sequence: %s\", err.Sequence))", "%d")
-	for _, field := range fields {
+	c.Putln("	var buf strings.Builder")
+	c.Putln("	")
+	c.Putln("	buf.WriteString(\"%s{\")", errName)
+	c.Putln("	buf.WriteString(\"NiceName: \"+err.NiceName)")
+	c.Putln("	buf.WriteByte(' ')")
+	c.Putln("	buf.WriteString(\"Sequence: \"+strconv.FormatUint(uint64(err.Sequence), 10))")
+	if len(fields) > 0 {
+		// Only add a space separator if not final field
+		c.Putln("	buf.WriteByte(' ')")
+	}
+	c.Putln("	")
+	for i, field := range fields {
 		switch field.(type) {
 		case *PadField:
 			continue
 		default:
 			if field.SrcType() == "string" {
-				c.Putln("	fieldVals = append(fieldVals, \"%s: \" + err.%s)",
-					field.SrcName(), field.SrcName())
+				c.Putln("	buf.WriteString(\"%s: \" + err.%s)", field.SrcName(), field.SrcName())
 			} else {
-				format := fmt.Sprintf("fmt.Sprintf(\"%s: %s\", err.%s)", field.SrcName(), "%d", field.SrcName())
-				c.Putln("	fieldVals = append(fieldVals, %s)", format)
+				c.Putln("	fmt.Fprintf(&buf, \"%s: %%d\", err.%s)", field.SrcName(), field.SrcName())
 			}
 		}
+
+		if i != len(fields)-1 {
+			// All but last entry need spacing
+			c.Putln("	buf.WriteString(\", \")")
+		}
 	}
-	c.Putln("	return \"%s {\" + strings.Join(fieldVals, \", \") + \"}\"", errName)
+	c.Putln("	buf.WriteByte('}')")
+	c.Putln("	")
+	c.Putln("	return buf.String()")
 }

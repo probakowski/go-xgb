@@ -37,16 +37,6 @@ build-all: bigreq.b composite.b damage.b dpms.b dri2.b ge.b glx.b randr.b \
 %.b:
 	(cd $* ; go build)
 
-# Installs each individual sub-package.
-install: bigreq.i composite.i damage.i dpms.i dri2.i ge.i glx.i randr.i \
-					 record.i render.i res.i screensaver.i shape.i shm.i xcmisc.i \
-					 xevie.i xf86dri.i xf86vidmode.i xfixes.i xinerama.i \
-					 xprint.i xproto.i xselinux.i xtest.i xv.i xvmc.i
-	go install
-
-%.i:
-	(cd $* ; go install)
-
 # xc_misc is special because it has an underscore.
 # There's probably a way to do this better, but Makefiles aren't my strong suit.
 xc_misc.xml: build-xgbgen
@@ -64,17 +54,4 @@ test:
 # Force all xproto benchmarks to run and no tests.
 bench:
 	(cd xproto ; go test -run 'nomatch' -bench '.*' -cpu 1,2,3,6)
-
-# gofmt all non-auto-generated code.
-# (auto-generated code is already gofmt'd.)
-# Also do a column check (80 cols) after a gofmt.
-# But don't check columns on auto-generated code, since I don't care if they
-# break 80 cols.
-gofmt:
-	gofmt -w *.go xgbgen/*.go examples/*.go examples/*/*.go xproto/xproto_test.go
-	colcheck *.go xgbgen/*.go examples/*.go examples/*/*.go xproto/xproto_test.go
-
-push:
-	git push origin master
-	git push github master
 

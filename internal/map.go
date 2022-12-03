@@ -4,27 +4,20 @@ import (
 	"sync"
 )
 
-type Map[Key comparable, Value any] struct {
-	kvs map[Key]Value
-	mu  sync.Mutex
-}
+// Map provides a wrapper around a sync.Map with type casting.
+type Map[Key comparable, Value any] struct{ m sync.Map }
 
-func NewMap[Key comparable, Value any]() *Map[Key, Value] {
-	return &Map[Key, Value]{kvs: map[Key]Value{}}
-}
-
+// Get ...
 func (m *Map[Key, Value]) Get(key Key) (v Value, ok bool) {
-	m.mu.Lock()
-	v, ok = m.kvs[key]
-	m.mu.Unlock()
-	return
+	i, ok := m.m.Load(key)
+	if !ok {
+		return v, false
+	}
+	return i.(Value), true
 }
 
+// Set ...
 func (m *Map[Key, Value]) Set(key Key, value Value) (ok bool) {
-	m.mu.Lock()
-	if _, ok = m.kvs[key]; !ok {
-		m.kvs[key] = value
-	}
-	m.mu.Unlock()
+	_, ok = m.m.LoadOrStore(key, value)
 	return !ok
 }

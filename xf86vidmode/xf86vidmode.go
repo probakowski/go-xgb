@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -22,8 +23,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -51,13 +52,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -109,17 +110,20 @@ func (err BadClockError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadClock error.
-
 func (err BadClockError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadClock {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadClock{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalBadClockError)
-}
+func init() { registerError(0, UnmarshalBadClockError) }
 
 // BadBadHTimings is the error number for a BadBadHTimings.
 const BadBadHTimings = 1
@@ -159,17 +163,20 @@ func (err BadHTimingsError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadHTimings error.
-
 func (err BadHTimingsError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadHTimings {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadHTimings{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(1, UnmarshalBadHTimingsError)
-}
+func init() { registerError(1, UnmarshalBadHTimingsError) }
 
 // BadBadVTimings is the error number for a BadBadVTimings.
 const BadBadVTimings = 2
@@ -209,17 +216,20 @@ func (err BadVTimingsError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadVTimings error.
-
 func (err BadVTimingsError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadVTimings {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadVTimings{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(2, UnmarshalBadVTimingsError)
-}
+func init() { registerError(2, UnmarshalBadVTimingsError) }
 
 // BadClientNotLocal is the error number for a BadClientNotLocal.
 const BadClientNotLocal = 5
@@ -259,17 +269,20 @@ func (err ClientNotLocalError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadClientNotLocal error.
-
 func (err ClientNotLocalError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadClientNotLocal {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadClientNotLocal{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(5, UnmarshalClientNotLocalError)
-}
+func init() { registerError(5, UnmarshalClientNotLocalError) }
 
 const (
 	ClockFlagProgramable = 1
@@ -315,17 +328,20 @@ func (err ExtensionDisabledError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadExtensionDisabled error.
-
 func (err ExtensionDisabledError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadExtensionDisabled {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadExtensionDisabled{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(4, UnmarshalExtensionDisabledError)
-}
+func init() { registerError(4, UnmarshalExtensionDisabledError) }
 
 const (
 	ModeFlagPositiveHsync = 1
@@ -515,17 +531,20 @@ func (err ModeUnsuitableError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadModeUnsuitable error.
-
 func (err ModeUnsuitableError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadModeUnsuitable {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadModeUnsuitable{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(3, UnmarshalModeUnsuitableError)
-}
+func init() { registerError(3, UnmarshalModeUnsuitableError) }
 
 const (
 	PermissionRead  = 1
@@ -572,17 +591,20 @@ func (err ZoomLockedError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadZoomLocked error.
-
 func (err ZoomLockedError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadZoomLocked {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadZoomLocked{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(6, UnmarshalZoomLockedError)
-}
+func init() { registerError(6, UnmarshalZoomLockedError) }
 
 // Skipping definition for base type 'Bool'
 

@@ -5,8 +5,7 @@ import (
 	"strings"
 )
 
-// AllCaps is a regex to test if a string identifier is made of
-// all upper case letters.
+// AllCaps is a regex to test if a string identifier is made of all upper case letters.
 var allCaps = regexp.MustCompile("^[A-Z0-9]+$")
 
 // popCount counts number of bits 'set' in mask.

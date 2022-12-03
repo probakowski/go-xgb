@@ -39,9 +39,7 @@ func (e *Event) Define(c *Context) {
 	c.Putln("")
 
 	// Let's the XGB event loop read this event.
-	c.Putln("func init() {")
-	c.Putln("	registerEvent(%d, Unmarshal%s)", e.Number, e.EvType())
-	c.Putln("}")
+	c.Putln("func init() { registerEvent(%d, Unmarshal%s) }", e.Number, e.EvType())
 	c.Putln("")
 }
 
@@ -133,15 +131,16 @@ func (e *EventCopy) Read(c *Context) {
 
 	var pkg string
 
-	evType := e.Old.(*Event).EvType()
+	oevType := e.Old.(*Event).EvType()
 
-	if strings.Contains(evType, ".") {
-		split := strings.Split(evType, ".")
+	if strings.Contains(oevType, ".") {
+		split := strings.Split(oevType, ".")
 		pkg = split[0] + "."
-		evType = split[1]
+		oevType = split[1]
 	}
 
-	c.Putln("	return %sUnmarshal%s(buf)", pkg, evType)
+	c.Putln("	ev, err := %sUnmarshal%s(buf)", pkg, oevType)
+	c.Putln("	return %s(ev.(%s)), err", e.EvType(), oevType)
 	c.Putln("}")
 	c.Putln("")
 }

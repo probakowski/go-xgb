@@ -9,10 +9,6 @@ type Queue[Elem any] struct {
 	mu sync.Mutex
 }
 
-func NewQueue[Elem any]() *Queue[Elem] {
-	return &Queue[Elem]{}
-}
-
 func (q *Queue[Elem]) Pop() (e Elem, ok bool) {
 	q.mu.Lock()
 	if ok = len(q.ll) > 0; ok {
@@ -27,4 +23,11 @@ func (q *Queue[Elem]) Push(elem Elem) {
 	q.mu.Lock()
 	q.ll = append(q.ll, elem)
 	q.mu.Unlock()
+}
+
+func (q *Queue[Elem]) Len() int {
+	q.mu.Lock()
+	l := len(q.ll)
+	q.mu.Unlock()
+	return l
 }

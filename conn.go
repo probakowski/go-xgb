@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	// ErrConnClosed ...
+	// ErrConnClosed is returned on attempts to use a closed connection.
 	ErrConnClosed = errors.New("x connection closed")
 
 	// verbose tracks whether verbose logging is enabled via $GODEBUG.
@@ -25,40 +25,32 @@ var (
 
 // XConn ...
 type XConn struct {
-	conn net.Conn                               // underlying net.Conn
-	xidg xidGenerator                           // generates new XIDs
-	inCh chan any                               // inbound event / error channel
-	popd *cookie                                // popped cookie from queue
-	ckQu *internal.Queue[*cookie]               // queue of waiting cookies
-	evfn *internal.Map[uint8, EventUnmarshaler] // map of registered event no. to event unmarshaler funcs
-	erfn *internal.Map[uint8, ErrorUnmarshaler] // map of registered error no. to error unmarshaler funcs
-	exts *internal.Map[string, XExtension]      // map of opcodes to extensions
-	logf func(string, ...any)                   // user provided log output function
-	done chan struct{}                          // closed on conn closed, used to select against cookie channels
-	seq  uint32                                 // current sequence no. (updates atomically)
-	cls  uint32                                 // tracks if conn closed
+	conn net.Conn                              // underlying net.Conn
+	xidg xidGenerator                          // generates new XIDs
+	inCh chan any                              // inbound event / error channel
+	popd *cookie                               // popped cookie from queue
+	ckQu internal.Queue[*cookie]               // queue of waiting cookies
+	evfn internal.Map[uint8, EventUnmarshaler] // map of registered event no. to event unmarshaler funcs
+	erfn internal.Map[uint8, ErrorUnmarshaler] // map of registered error no. to error unmarshaler funcs
+	exts internal.Map[string, uint8]           // map of opcodes to extensions
+	logf func(string, ...any)                  // user provided log output function
+	done chan struct{}                         // closed on conn closed, used to select against cookie channels
+	seq  uint32                                // current sequence no. (updates atomically)
+	cls  uint32                                // tracks if conn closed
 }
 
 // Register ...
 func (conn *XConn) Register(ext XExtension) error {
-	// Take our own refs to func maps
-	eventFuncs := ext.EventFuncs
-	errorFuncs := ext.ErrorFuncs
-
-	// Separate refs not needed
-	ext.EventFuncs = nil
-	ext.ErrorFuncs = nil
-
 	// Add this extension to our map
-	if !conn.exts.Set(ext.XName, ext) {
+	if !conn.exts.Set(ext.XName, ext.MajorOpcode) {
 		return fmt.Errorf("already registered ext %q", ext.XName)
 	}
 
 	// Iniitialize X type unmarshalers
-	return conn.init(eventFuncs, errorFuncs)
+	return conn.init(ext.EventFuncs, ext.ErrorFuncs)
 }
 
-// xproto_init is an package-private function used by xproto (with go linkname hackery) to initialize the xproto extension.
+// xproto_init is a package-private function used by xproto (with go linkname hackery) to initialize the xproto extension.
 func xproto_init(conn *XConn, eventFuncs map[uint8]EventUnmarshaler, errorFuncs map[uint8]ErrorUnmarshaler) error {
 	return conn.init(eventFuncs, errorFuncs)
 }
@@ -87,10 +79,9 @@ func (conn *XConn) init(eventFuncs map[uint8]EventUnmarshaler, errorFuncs map[ui
 	return nil
 }
 
-// Ext ...
+// Ext returns the major opcode for extension with given name.
 func (conn *XConn) Ext(name string) (op uint8, ok bool) {
-	ext, ok := conn.exts.Get(name)
-	return ext.MajorOpcode, ok
+	return conn.exts.Get(name)
 }
 
 // NextID ...
@@ -98,7 +89,7 @@ func (conn *XConn) NewXID() (uint32, error) {
 	return conn.xidg.Next()
 }
 
-// Send ...
+// Send will send given data to the X server.
 func (conn *XConn) Send(data []byte) error {
 	_ = atomic.AddUint32(&conn.seq, 1) // iter sequence
 	return conn.write(data)            // write data
@@ -123,8 +114,8 @@ func (conn *XConn) SendRecv(data []byte, dst XReply) error {
 	}
 
 	if dst == nil {
-		// Force sync with X
-		_ = conn.Sync()
+		// force sync with X
+		_ = conn.Send(inputfocus())
 	}
 
 	// Wait on rsp
@@ -154,68 +145,37 @@ func (conn *XConn) Recv() (XEvent, error) {
 	}
 }
 
-// Sync ...
+// Sync will force a roundtrip to the X server, by sending a GetInputFocus request and blocking on response.
 func (conn *XConn) Sync() error {
-	return conn.Send([]byte{
-		// GetInputFocus opcode
-		43,
-
-		// padding
-		0,
-
-		// LE encoded size in 4byte units
-		1,
-		1 >> 8,
-	})
+	return conn.SendRecv(inputfocus(), IgnoreXReply{})
 }
 
-// Close ...
+// Close will close the X connection.
 func (conn *XConn) Close() error {
 	if atomic.CompareAndSwapUint32(&conn.cls, 0, 1) {
-		// Close inbound ch
-		close(conn.inCh)
-
-		// Close X connection
-		return conn.conn.Close()
+		close(conn.inCh)         // close inbound ch
+		return conn.conn.Close() // close X
 	}
 	return nil
 }
 
-// unmarshalEvent ...
-func (conn *XConn) unmarshalEvent(b []byte) (XEvent, error) {
-	// We know it's AT LEAST 32 bytes long
-	_ = b[31]
-
-	// Check for unmarshaler with number
-	um, ok := conn.evfn.Get(b[0] & 127)
-
-	if !ok {
-		// No unmarshaler found for this event type
-		return nil, fmt.Errorf("unknown event type: %q", byteutil.B2S(b))
+// unmarshalEvent will attempt to unmarshal event data 'b' as event type with number 'n'.
+func (conn *XConn) unmarshalEvent(n uint8, b []byte) (XEvent, error) {
+	if um, ok := conn.evfn.Get(n); ok {
+		return um(b)
 	}
-
-	// Pass to unmarshaler
-	return um(b)
+	return nil, fmt.Errorf("unknown event type %d", n)
 }
 
-// unmarshalError ...
-func (conn *XConn) unmarshalError(b []byte) (XError, error) {
-	// We know it's AT LEAST 32 bytes long
-	_ = b[31]
-
-	// Check for unmarshaler with number
-	um, ok := conn.erfn.Get(b[1])
-
-	if !ok {
-		// No unmarshaler found for this error type
-		return nil, fmt.Errorf("unknown error type: %q", byteutil.B2S(b))
+// unmarshalError will attempt to unmarshal error data 'b' as error type with number 'n'.
+func (conn *XConn) unmarshalError(n uint8, b []byte) (XError, error) {
+	if um, ok := conn.erfn.Get(n); ok {
+		return um(b)
 	}
-
-	// Pass to unmarshaler
-	return um(b)
+	return nil, fmt.Errorf("unknown error type %d", n)
 }
 
-// cookie ...
+// cookie will attempt to pop the queued cookie with given sequence number.
 func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
 	if ck := conn.popd; ck != nil {
 		// Previously popped cookie
@@ -223,8 +183,8 @@ func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
 		switch {
 		// Out of date cookie
 		case ck.id < seq:
-			ck.err <- nil // trigger
 			conn.popd = nil
+			releaseCookie(ck)
 
 		// Cookie ahead of this
 		case ck.id > seq:
@@ -247,7 +207,7 @@ func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
 		switch {
 		// Out of date cookie
 		case ck.id < seq:
-			ck.err <- nil // trigger
+			releaseCookie(ck)
 
 		// Cookie ahead of this
 		case ck.id > seq:
@@ -271,19 +231,11 @@ func (conn *XConn) readloop() {
 		// is received of size > 32 bytes.
 		lbuf byteutil.Buffer
 
-		// resetBufs will reset both 32 byte array and the
-		// larger byteutil.Buffer for next read loop
-		resetBufs = func() {
-			for i := range buf {
-				buf[i] = 0
-			}
-			lbuf.Reset()
-		}
-
 		// prepLargeBuf will prepare the larger buffer for
 		// a received x reply of given size, also copying
 		// over the initial 32byte contents of small buf.
 		prepLargeBuf = func(sz uint32) {
+			lbuf.Reset() // ensure empty
 			lbuf.Grow(32 + int(sz)*4)
 			_ = copy(lbuf.B[:32], buf[:])
 		}
@@ -305,15 +257,12 @@ func (conn *XConn) readloop() {
 				break
 			}
 
-			// Close cookie
-			close(ck.err)
+			// Finished with cookie
+			releaseCookie(ck)
 		}
 	}()
 
 	for {
-		// Reset before read
-		resetBufs()
-
 		// Read next set of data from X into buf
 		_, err := io.ReadFull(conn.conn, buf[:])
 		if err != nil {
@@ -325,7 +274,7 @@ func (conn *XConn) readloop() {
 		// Error
 		case 0:
 			// Attempt to unmarshal X error type
-			xerr, err := conn.unmarshalError(buf[:])
+			xerr, err := conn.unmarshalError(buf[1], buf[:])
 			if err != nil {
 				conn.logf("unable to unmarshal x error: %v\n", err)
 				continue
@@ -351,10 +300,11 @@ func (conn *XConn) readloop() {
 
 		// Reply
 		case 1:
+			var reply []byte
+
 			// Get sequence ID + reply size
 			seq := binary.LittleEndian.Uint16(buf[2:])
 			size := binary.LittleEndian.Uint32(buf[4:])
-			reply := buf[:]
 
 			if size > 0 {
 				// More bytes to read
@@ -370,6 +320,9 @@ func (conn *XConn) readloop() {
 
 				// Set new reply data
 				reply = lbuf.B
+			} else {
+				// Use existing data
+				reply = buf[:]
 			}
 
 			// Debug log raw reply bytes
@@ -392,7 +345,7 @@ func (conn *XConn) readloop() {
 
 		default:
 			// Attempt to unmarshal X event type
-			xev, err := conn.unmarshalEvent(buf[:])
+			xev, err := conn.unmarshalEvent(buf[0]&127, buf[:])
 			if err != nil {
 				conn.logf("unable to unmarshal x event: %v\n", err)
 				continue
@@ -422,18 +375,15 @@ func (conn *XConn) write(data []byte) error {
 
 	// Write data to the underlying conn
 	_, err := conn.conn.Write(data)
-	if err == nil {
-		conn.debugf("send data=%v\n", data)
-		return nil
+	if err != nil {
+		// Write error occurred, wrap with context
+		err = fmt.Errorf("fatal xconn write error: %w", err)
+		_ = conn.Close()
+		return err
 	}
 
-	// Write error occurred, wrap with context
-	err = fmt.Errorf("fatal xconn write error: %w", err)
-
-	// Close our connection
-	_ = conn.Close()
-
-	return err
+	conn.debugf("send data=%v\n", data)
+	return nil
 }
 
 // debugf will log given format string and args only if debugging is enabled.
@@ -443,7 +393,7 @@ func (conn *XConn) debugf(format string, args ...any) {
 	}
 }
 
-// cookiePool ...
+// cookiePool is a memory pool of X cookies for use in SendRecv() requests.
 var cookiePool = sync.Pool{
 	New: func() any {
 		return &cookie{err: make(chan error)}
@@ -457,23 +407,39 @@ type cookie struct {
 	dst XReply
 }
 
-// acquireCookie ...
+// acquireCookie will acquire a fresh cookie from the pool.
 func acquireCookie() *cookie {
 	return cookiePool.Get().(*cookie)
 }
 
-// releaseCookie ...
+// releaseCookie will reset the cookie, drain it and release to pool.
 func releaseCookie(ck *cookie) {
 	// Reset fields
 	ck.id = 0
 	ck.dst = nil
 
 	select {
-	// Drain err chan
+	case ck.err <- nil:
 	case <-ck.err:
 	default:
 	}
 
 	// Place in pool
 	cookiePool.Put(ck)
+}
+
+// inputfocus returns a newly prepared input focus request.
+func inputfocus() []byte {
+	size := 4
+	b := 0
+	buf := make([]byte, size)
+
+	buf[b] = 43 // request opcode
+	b += 1
+
+	b += 1                                                 // padding
+	binary.LittleEndian.PutUint16(buf[b:], uint16(size/4)) // write request size in 4-byte units
+	b += 2
+
+	return buf
 }

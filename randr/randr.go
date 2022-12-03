@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -23,8 +24,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -52,13 +53,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -110,17 +111,20 @@ func (err BadCrtcError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadCrtc error.
-
 func (err BadCrtcError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadCrtc {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadCrtc{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(1, UnmarshalBadCrtcError)
-}
+func init() { registerError(1, UnmarshalBadCrtcError) }
 
 // BadBadMode is the error number for a BadBadMode.
 const BadBadMode = 2
@@ -160,17 +164,20 @@ func (err BadModeError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadMode error.
-
 func (err BadModeError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadMode {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadMode{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(2, UnmarshalBadModeError)
-}
+func init() { registerError(2, UnmarshalBadModeError) }
 
 // BadBadOutput is the error number for a BadBadOutput.
 const BadBadOutput = 0
@@ -210,17 +217,20 @@ func (err BadOutputError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadOutput error.
-
 func (err BadOutputError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadOutput {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadOutput{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalBadOutputError)
-}
+func init() { registerError(0, UnmarshalBadOutputError) }
 
 // BadBadProvider is the error number for a BadBadProvider.
 const BadBadProvider = 3
@@ -260,17 +270,20 @@ func (err BadProviderError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadProvider error.
-
 func (err BadProviderError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadProvider {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadProvider{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(3, UnmarshalBadProviderError)
-}
+func init() { registerError(3, UnmarshalBadProviderError) }
 
 const (
 	ConnectionConnected    = 0
@@ -837,21 +850,20 @@ func (v NotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(1, UnmarshalNotifyEvent)
-}
+func init() { registerEvent(1, UnmarshalNotifyEvent) }
 
 // NotifyDataUnion is a representation of the NotifyDataUnion union type.
 // Note that to *create* a Union, you should *never* create
 // this struct directly (unless you know what you're doing).
 // Instead use one of the following constructors for 'NotifyDataUnion':
-//     NotifyDataUnionCcNew(Cc CrtcChange) NotifyDataUnion
-//     NotifyDataUnionOcNew(Oc OutputChange) NotifyDataUnion
-//     NotifyDataUnionOpNew(Op OutputProperty) NotifyDataUnion
-//     NotifyDataUnionPcNew(Pc ProviderChange) NotifyDataUnion
-//     NotifyDataUnionPpNew(Pp ProviderProperty) NotifyDataUnion
-//     NotifyDataUnionRcNew(Rc ResourceChange) NotifyDataUnion
-//     NotifyDataUnionLcNew(Lc LeaseNotify) NotifyDataUnion
+//
+//	NotifyDataUnionCcNew(Cc CrtcChange) NotifyDataUnion
+//	NotifyDataUnionOcNew(Oc OutputChange) NotifyDataUnion
+//	NotifyDataUnionOpNew(Op OutputProperty) NotifyDataUnion
+//	NotifyDataUnionPcNew(Pc ProviderChange) NotifyDataUnion
+//	NotifyDataUnionPpNew(Pp ProviderProperty) NotifyDataUnion
+//	NotifyDataUnionRcNew(Rc ResourceChange) NotifyDataUnion
+//	NotifyDataUnionLcNew(Lc LeaseNotify) NotifyDataUnion
 type NotifyDataUnion struct {
 	Cc CrtcChange
 	Oc OutputChange
@@ -1880,9 +1892,7 @@ func (v ScreenChangeNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(0, UnmarshalScreenChangeNotifyEvent)
-}
+func init() { registerEvent(0, UnmarshalScreenChangeNotifyEvent) }
 
 type ScreenSize struct {
 	Width   uint16

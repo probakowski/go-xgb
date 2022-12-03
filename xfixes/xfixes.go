@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -24,8 +25,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -53,13 +54,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -111,17 +112,20 @@ func (err BadRegionError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadRegion error.
-
 func (err BadRegionError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadRegion {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadRegion{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalBadRegionError)
-}
+func init() { registerError(0, UnmarshalBadRegionError) }
 
 type Barrier uint32
 
@@ -220,9 +224,7 @@ func (v CursorNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(1, UnmarshalCursorNotifyEvent)
-}
+func init() { registerEvent(1, UnmarshalCursorNotifyEvent) }
 
 const (
 	CursorNotifyDisplayCursor = 0
@@ -360,9 +362,7 @@ func (v SelectionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(0, UnmarshalSelectionNotifyEvent)
-}
+func init() { registerEvent(0, UnmarshalSelectionNotifyEvent) }
 
 // Skipping definition for base type 'Bool'
 

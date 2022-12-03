@@ -6,16 +6,12 @@ import (
 	"codeberg.org/gruf/go-xgb/xproto"
 )
 
+// XPropConn ...
 type XPropConn struct {
-	atoms *internal.Map[string, xproto.Atom]
-	names *internal.Map[xproto.Atom, string]
-	xconn *xgb.XConn
-}
+	// XConn ...
+	XConn *xgb.XConn
 
-func NewConn(xconn *xgb.XConn) *XPropConn {
-	return &XPropConn{
-		atoms: internal.NewMap[string, xproto.Atom](),
-		names: internal.NewMap[xproto.Atom, string](),
-		xconn: xconn,
-	}
+	// internal caching
+	atoms internal.Map[string, xproto.Atom]
+	names internal.Map[xproto.Atom, string]
 }

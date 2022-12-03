@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -23,8 +24,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -52,13 +53,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -319,17 +320,20 @@ func (err BadControlError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadControl error.
-
 func (err BadControlError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadControl {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadControl{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(2, UnmarshalBadControlError)
-}
+func init() { registerError(2, UnmarshalBadControlError) }
 
 // BadBadEncoding is the error number for a BadBadEncoding.
 const BadBadEncoding = 1
@@ -369,17 +373,20 @@ func (err BadEncodingError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadEncoding error.
-
 func (err BadEncodingError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadEncoding {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadEncoding{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(1, UnmarshalBadEncodingError)
-}
+func init() { registerError(1, UnmarshalBadEncodingError) }
 
 // BadBadPort is the error number for a BadBadPort.
 const BadBadPort = 0
@@ -419,17 +426,20 @@ func (err BadPortError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadPort error.
-
 func (err BadPortError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadBadPort {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadPort{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalBadPortError)
-}
+func init() { registerError(0, UnmarshalBadPortError) }
 
 type Encoding uint32
 
@@ -1058,9 +1068,7 @@ func (v PortNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(1, UnmarshalPortNotifyEvent)
-}
+func init() { registerEvent(1, UnmarshalPortNotifyEvent) }
 
 type Rational struct {
 	Numerator   int32
@@ -1200,9 +1208,7 @@ func (v VideoNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(0, UnmarshalVideoNotifyEvent)
-}
+func init() { registerEvent(0, UnmarshalVideoNotifyEvent) }
 
 const (
 	VideoNotifyReasonStarted   = 0

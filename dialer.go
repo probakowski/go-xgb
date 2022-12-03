@@ -49,11 +49,11 @@ func (d *XDialer) Dial(display string) (*XConn, []byte, error) {
 
 // DialContext ...
 func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []byte, error) {
-	if len(display) == 0 {
+	if display == "" {
 		display = os.Getenv("DISPLAY")
 	}
 
-	//
+	// Keep original display string for errors
 	display0 := display
 
 	colonIdx := strings.LastIndex(display, ":")
@@ -65,27 +65,28 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 	var protocol, socket string
 
 	if display[0] == '/' {
-		socket = display[0:colonIdx]
+		// Filesystem location
+		socket = display[:colonIdx]
 	} else {
 		slashIdx := strings.LastIndex(display, "/")
 		if slashIdx >= 0 {
-			protocol = display[0:slashIdx]
+			// Address with protocol
+			protocol = display[:slashIdx]
 			host = display[slashIdx+1 : colonIdx]
 		} else {
-			host = display[0:colonIdx]
+			// Simply an address
+			host = display[:colonIdx]
 		}
 	}
 
 	display = display[colonIdx+1:]
-	if len(display) == 0 {
+	if display == "" {
 		return nil, nil, fmt.Errorf("bad display string %q", display0)
 	}
 
 	dotIdx := strings.LastIndex(display, ".")
-	if dotIdx < 0 {
-		display = display[0:]
-	} else {
-		display = display[0:dotIdx]
+	if dotIdx >= 0 {
+		display = display[:dotIdx]
 	}
 
 	dispNum, err := strconv.Atoi(display)
@@ -95,10 +96,10 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 
 	var conn net.Conn
 
-	if len(socket) != 0 {
+	if socket != "" {
 		// Dial unix socket address at display number
 		conn, err = net.Dial("unix", socket+":"+display)
-	} else if len(host) != 0 && host != "unix" {
+	} else if host != "" && host != "unix" {
 		// default proto is tcp
 		if protocol == "" {
 			protocol = "tcp"
@@ -151,7 +152,7 @@ func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XC
 
 	head := make([]byte, 8)
 
-	// Read response from server
+	// Read response header from server
 	if _, err := io.ReadFull(conn, head[0:8]); err != nil {
 		return nil, nil, err
 	}
@@ -163,7 +164,7 @@ func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XC
 		return nil, nil, fmt.Errorf("x protocol version mismatch: %d.%d", major, minor)
 	}
 
-	// Prepare buffer for next group of data
+	// Prepare buffer for remainder of data
 	dataLen := binary.LittleEndian.Uint16(head[6:])
 	data := make([]byte, int(dataLen)*4+8, int(dataLen)*4+8)
 	copy(data, head)
@@ -201,10 +202,6 @@ func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XC
 			max:  resourceIDMask,
 		},
 		inCh: make(chan any, d.InboundBuffer),
-		ckQu: internal.NewQueue[*cookie](),
-		evfn: internal.NewMap[uint8, EventUnmarshaler](),
-		erfn: internal.NewMap[uint8, ErrorUnmarshaler](),
-		exts: internal.NewMap[string, XExtension](),
 		logf: logf,
 		done: make(chan struct{}),
 	}

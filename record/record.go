@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -22,8 +23,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -51,13 +52,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -113,18 +114,22 @@ func (err BadContextError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadBadContext error.
-
 func (err BadContextError) Error() string {
-	fieldVals := make([]string, 0, 1)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("InvalidRecord: %d", err.InvalidRecord))
-	return "BadBadContext {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadContext{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "InvalidRecord: %d", err.InvalidRecord)
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalBadContextError)
-}
+func init() { registerError(0, UnmarshalBadContextError) }
 
 type ClientInfo struct {
 	ClientResource ClientSpec

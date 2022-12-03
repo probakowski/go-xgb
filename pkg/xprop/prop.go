@@ -12,7 +12,7 @@ func (conn *XPropConn) GetProp(win xproto.Window, atom xproto.Atom) (xproto.GetP
 	if err != nil {
 		return xproto.GetPropertyReply{}, err
 	}
-	reply, err := xproto.GetProperty(conn.xconn, false, win, atom, xproto.GetPropertyTypeAny, 0, (1<<32)-1)
+	reply, err := xproto.GetProperty(conn.XConn, false, win, atom, xproto.GetPropertyTypeAny, 0, (1<<32)-1)
 	if err != nil {
 		return xproto.GetPropertyReply{}, fmt.Errorf("error retrieving property %q on window '%d': %w", atomName, win, err)
 	} else if reply.Format == 0 {
@@ -26,7 +26,7 @@ func (conn *XPropConn) GetPropName(win xproto.Window, atomName string) (xproto.G
 	if err != nil {
 		return xproto.GetPropertyReply{}, err
 	}
-	reply, err := xproto.GetProperty(conn.xconn, false, win, atom, xproto.GetPropertyTypeAny, 0, (1<<32)-1)
+	reply, err := xproto.GetProperty(conn.XConn, false, win, atom, xproto.GetPropertyTypeAny, 0, (1<<32)-1)
 	if err != nil {
 		return xproto.GetPropertyReply{}, fmt.Errorf("error retrieving property %q on window '%d': %w", atomName, win, err)
 	} else if reply.Format == 0 {
@@ -44,7 +44,7 @@ func (conn *XPropConn) ChangeProp(win xproto.Window, format uint8, prop, typ xpr
 	if err != nil {
 		return err
 	}
-	if err := xproto.ChangeProperty(conn.xconn, xproto.PropModeReplace, win, prop, typ, format, uint32(len(data)/(int(format)/8)), data); err != nil {
+	if err := xproto.ChangeProperty(conn.XConn, xproto.PropModeReplace, win, prop, typ, format, uint32(len(data)/(int(format)/8)), data); err != nil {
 		return fmt.Errorf("error changing property %q of type %q on window '%d': %w", propName, typName, win, err)
 	}
 	return nil
@@ -59,7 +59,7 @@ func (conn *XPropConn) ChangePropName(win xproto.Window, format uint8, propName,
 	if err != nil {
 		return err
 	}
-	if err := xproto.ChangeProperty(conn.xconn, xproto.PropModeReplace, win, prop, typ, format, uint32(len(data)/(int(format)/8)), data); err != nil {
+	if err := xproto.ChangeProperty(conn.XConn, xproto.PropModeReplace, win, prop, typ, format, uint32(len(data)/(int(format)/8)), data); err != nil {
 		return fmt.Errorf("error changing property %q of type %q on window '%d': %w", propName, typName, win, err)
 	}
 	return nil

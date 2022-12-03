@@ -25,7 +25,7 @@ func (conn *XPropConn) Atom(name string, onlyIfExists bool) (xproto.Atom, error)
 		return id, nil
 	}
 
-	reply, err := xproto.InternAtom(conn.xconn, onlyIfExists, uint16(len(name)), name)
+	reply, err := xproto.InternAtom(conn.XConn, onlyIfExists, uint16(len(name)), name)
 	if err != nil {
 		return 0, fmt.Errorf("error interning atom with name %q: %w", name, err)
 	} else if reply.Atom == 0 {
@@ -43,7 +43,7 @@ func (conn *XPropConn) AtomName(id xproto.Atom) (string, error) {
 		return name, nil
 	}
 
-	reply, err := xproto.GetAtomName(conn.xconn, id)
+	reply, err := xproto.GetAtomName(conn.XConn, id)
 	if err != nil {
 		return "", fmt.Errorf("error fetching atom name for id '%d': %w", id, err)
 	} else if reply.Name == "" {

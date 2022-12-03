@@ -4,6 +4,7 @@ package xproto
 import (
 	"encoding/binary"
 	"fmt"
+	"strconv"
 	"strings"
 	_ "unsafe"
 
@@ -13,8 +14,8 @@ import (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 // registerEvent will register an event unmarshaler in global map, panics on overlap
@@ -76,13 +77,23 @@ func (err AccessError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadAccess error.
 func (err AccessError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadAccess {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadAccess{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -117,13 +128,23 @@ func (err AllocError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadAlloc error.
 func (err AllocError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadAlloc {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadAlloc{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -331,13 +352,23 @@ func (err AtomError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadAtom error.
 func (err AtomError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadAtom {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadAtom{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -518,9 +549,7 @@ func (v ButtonPressEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(4, UnmarshalButtonPressEvent)
-}
+func init() { registerEvent(4, UnmarshalButtonPressEvent) }
 
 // ButtonRelease is the event number for a ButtonReleaseEvent.
 const ButtonRelease = 5
@@ -529,7 +558,8 @@ type ButtonReleaseEvent ButtonPressEvent
 
 // ButtonReleaseEventNew constructs a ButtonReleaseEvent value that implements xgb.Event from a byte slice.
 func UnmarshalButtonReleaseEvent(buf []byte) (xgb.XEvent, error) {
-	return UnmarshalButtonPressEvent(buf)
+	ev, err := UnmarshalButtonPressEvent(buf)
+	return ButtonReleaseEvent(ev.(ButtonPressEvent)), err
 }
 
 // Bytes writes a ButtonReleaseEvent value to a byte slice.
@@ -777,9 +807,7 @@ func (v CirculateNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(26, UnmarshalCirculateNotifyEvent)
-}
+func init() { registerEvent(26, UnmarshalCirculateNotifyEvent) }
 
 // CirculateRequest is the event number for a CirculateRequestEvent.
 const CirculateRequest = 27
@@ -788,7 +816,8 @@ type CirculateRequestEvent CirculateNotifyEvent
 
 // CirculateRequestEventNew constructs a CirculateRequestEvent value that implements xgb.Event from a byte slice.
 func UnmarshalCirculateRequestEvent(buf []byte) (xgb.XEvent, error) {
-	return UnmarshalCirculateNotifyEvent(buf)
+	ev, err := UnmarshalCirculateNotifyEvent(buf)
+	return CirculateRequestEvent(ev.(CirculateNotifyEvent)), err
 }
 
 // Bytes writes a CirculateRequestEvent value to a byte slice.
@@ -883,9 +912,7 @@ func (v ClientMessageEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(33, UnmarshalClientMessageEvent)
-}
+func init() { registerEvent(33, UnmarshalClientMessageEvent) }
 
 // ClientMessageDataUnion is a representation of the ClientMessageDataUnion union type.
 // Note that to *create* a Union, you should *never* create
@@ -1202,13 +1229,23 @@ func (err ColormapError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadColormap error.
 func (err ColormapError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadColormap {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadColormap{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -1305,9 +1342,7 @@ func (v ColormapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(32, UnmarshalColormapNotifyEvent)
-}
+func init() { registerEvent(32, UnmarshalColormapNotifyEvent) }
 
 const (
 	ColormapStateUninstalled = 0
@@ -1444,9 +1479,7 @@ func (v ConfigureNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(22, UnmarshalConfigureNotifyEvent)
-}
+func init() { registerEvent(22, UnmarshalConfigureNotifyEvent) }
 
 // ConfigureRequest is the event number for a ConfigureRequestEvent.
 const ConfigureRequest = 23
@@ -1561,9 +1594,7 @@ func (v ConfigureRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(23, UnmarshalConfigureRequestEvent)
-}
+func init() { registerEvent(23, UnmarshalConfigureRequestEvent) }
 
 const (
 	CoordModeOrigin   = 0
@@ -1683,9 +1714,7 @@ func (v CreateNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(16, UnmarshalCreateNotifyEvent)
-}
+func init() { registerEvent(16, UnmarshalCreateNotifyEvent) }
 
 type Cursor uint32
 
@@ -1693,6 +1722,10 @@ func NewCursorID(c *xgb.XConn) (Cursor, error) {
 	id, err := c.NewXID()
 	return Cursor(id), err
 }
+
+const (
+	CursorNone = 0
+)
 
 // BadCursor is the error number for a BadCursor.
 const BadCursor = 6
@@ -1717,22 +1750,28 @@ func (err CursorError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadCursor error.
 func (err CursorError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadCursor {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadCursor{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
 	registerError(6, UnmarshalCursorError)
 }
-
-const (
-	CursorNone = 0
-)
 
 const (
 	CwBackPixmap       = 1
@@ -1893,9 +1932,7 @@ func (v DestroyNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(17, UnmarshalDestroyNotifyEvent)
-}
+func init() { registerEvent(17, UnmarshalDestroyNotifyEvent) }
 
 type Drawable uint32
 
@@ -1927,13 +1964,23 @@ func (err DrawableError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadDrawable error.
 func (err DrawableError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadDrawable {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadDrawable{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -2067,9 +2114,7 @@ func (v EnterNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(7, UnmarshalEnterNotifyEvent)
-}
+func init() { registerEvent(7, UnmarshalEnterNotifyEvent) }
 
 const (
 	EventMaskNoEvent              = 0
@@ -2195,9 +2240,7 @@ func (v ExposeEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(12, UnmarshalExposeEvent)
-}
+func init() { registerEvent(12, UnmarshalExposeEvent) }
 
 const (
 	ExposuresNotAllowed = 0
@@ -2294,9 +2337,7 @@ func (v FocusInEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(9, UnmarshalFocusInEvent)
-}
+func init() { registerEvent(9, UnmarshalFocusInEvent) }
 
 // FocusOut is the event number for a FocusOutEvent.
 const FocusOut = 10
@@ -2305,7 +2346,8 @@ type FocusOutEvent FocusInEvent
 
 // FocusOutEventNew constructs a FocusOutEvent value that implements xgb.Event from a byte slice.
 func UnmarshalFocusOutEvent(buf []byte) (xgb.XEvent, error) {
-	return UnmarshalFocusInEvent(buf)
+	ev, err := UnmarshalFocusInEvent(buf)
+	return FocusOutEvent(ev.(FocusInEvent)), err
 }
 
 // Bytes writes a FocusOutEvent value to a byte slice.
@@ -2333,10 +2375,6 @@ func NewFontID(c *xgb.XConn) (Font, error) {
 	return Font(id), err
 }
 
-const (
-	FontNone = 0
-)
-
 // BadFont is the error number for a BadFont.
 const BadFont = 7
 
@@ -2360,18 +2398,32 @@ func (err FontError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadFont error.
 func (err FontError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadFont {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadFont{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
 	registerError(7, UnmarshalFontError)
 }
+
+const (
+	FontNone = 0
+)
 
 const (
 	FontDrawLeftToRight = 0
@@ -2528,13 +2580,23 @@ func (err GContextError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadGContext error.
 func (err GContextError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadGContext {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadGContext{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -2617,9 +2679,7 @@ func (v GeGenericEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(35, UnmarshalGeGenericEvent)
-}
+func init() { registerEvent(35, UnmarshalGeGenericEvent) }
 
 const (
 	GetPropertyTypeAny = 0
@@ -2751,9 +2811,7 @@ func (v GraphicsExposureEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(13, UnmarshalGraphicsExposureEvent)
-}
+func init() { registerEvent(13, UnmarshalGraphicsExposureEvent) }
 
 const (
 	GravityBitForget = 0
@@ -2846,9 +2904,7 @@ func (v GravityNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(24, UnmarshalGravityNotifyEvent)
-}
+func init() { registerEvent(24, UnmarshalGravityNotifyEvent) }
 
 const (
 	GxClear        = 0
@@ -2978,13 +3034,23 @@ func (err IDChoiceError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadIDChoice error.
 func (err IDChoiceError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadIDChoice {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadIDChoice{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -3025,13 +3091,23 @@ func (err ImplementationError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadImplementation error.
 func (err ImplementationError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadImplementation {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadImplementation{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -3207,9 +3283,7 @@ func (v KeyPressEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(2, UnmarshalKeyPressEvent)
-}
+func init() { registerEvent(2, UnmarshalKeyPressEvent) }
 
 // KeyRelease is the event number for a KeyReleaseEvent.
 const KeyRelease = 3
@@ -3218,7 +3292,8 @@ type KeyReleaseEvent KeyPressEvent
 
 // KeyReleaseEventNew constructs a KeyReleaseEvent value that implements xgb.Event from a byte slice.
 func UnmarshalKeyReleaseEvent(buf []byte) (xgb.XEvent, error) {
-	return UnmarshalKeyPressEvent(buf)
+	ev, err := UnmarshalKeyPressEvent(buf)
+	return KeyReleaseEvent(ev.(KeyPressEvent)), err
 }
 
 // Bytes writes a KeyReleaseEvent value to a byte slice.
@@ -3288,9 +3363,7 @@ func (v KeymapNotifyEvent) SeqID() uint16 {
 	return 0
 }
 
-func init() {
-	registerEvent(11, UnmarshalKeymapNotifyEvent)
-}
+func init() { registerEvent(11, UnmarshalKeymapNotifyEvent) }
 
 type Keysym uint32
 
@@ -3305,7 +3378,8 @@ type LeaveNotifyEvent EnterNotifyEvent
 
 // LeaveNotifyEventNew constructs a LeaveNotifyEvent value that implements xgb.Event from a byte slice.
 func UnmarshalLeaveNotifyEvent(buf []byte) (xgb.XEvent, error) {
-	return UnmarshalEnterNotifyEvent(buf)
+	ev, err := UnmarshalEnterNotifyEvent(buf)
+	return LeaveNotifyEvent(ev.(EnterNotifyEvent)), err
 }
 
 // Bytes writes a LeaveNotifyEvent value to a byte slice.
@@ -3354,13 +3428,23 @@ func (err LengthError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadLength error.
 func (err LengthError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadLength {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadLength{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -3462,9 +3546,7 @@ func (v MapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(19, UnmarshalMapNotifyEvent)
-}
+func init() { registerEvent(19, UnmarshalMapNotifyEvent) }
 
 // MapRequest is the event number for a MapRequestEvent.
 const MapRequest = 20
@@ -3528,9 +3610,7 @@ func (v MapRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(20, UnmarshalMapRequestEvent)
-}
+func init() { registerEvent(20, UnmarshalMapRequestEvent) }
 
 const (
 	MapStateUnmapped   = 0
@@ -3618,9 +3698,7 @@ func (v MappingNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(34, UnmarshalMappingNotifyEvent)
-}
+func init() { registerEvent(34, UnmarshalMappingNotifyEvent) }
 
 const (
 	MappingStatusSuccess = 0
@@ -3651,13 +3729,23 @@ func (err MatchError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadMatch error.
 func (err MatchError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadMatch {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadMatch{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -3810,9 +3898,7 @@ func (v MotionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(6, UnmarshalMotionNotifyEvent)
-}
+func init() { registerEvent(6, UnmarshalMotionNotifyEvent) }
 
 // BadName is the error number for a BadName.
 const BadName = 15
@@ -3837,13 +3923,23 @@ func (err NameError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadName error.
 func (err NameError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadName {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadName{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -3924,9 +4020,7 @@ func (v NoExposureEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(14, UnmarshalNoExposureEvent)
-}
+func init() { registerEvent(14, UnmarshalNoExposureEvent) }
 
 const (
 	NotifyDetailAncestor         = 0
@@ -3953,10 +4047,6 @@ func NewPixmapID(c *xgb.XConn) (Pixmap, error) {
 	return Pixmap(id), err
 }
 
-const (
-	PixmapNone = 0
-)
-
 // BadPixmap is the error number for a BadPixmap.
 const BadPixmap = 4
 
@@ -3980,18 +4070,32 @@ func (err PixmapError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadPixmap error.
 func (err PixmapError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadPixmap {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadPixmap{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
 	registerError(4, UnmarshalPixmapError)
 }
+
+const (
+	PixmapNone = 0
+)
 
 const (
 	PlaceOnTop    = 0
@@ -4150,9 +4254,7 @@ func (v PropertyNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(28, UnmarshalPropertyNotifyEvent)
-}
+func init() { registerEvent(28, UnmarshalPropertyNotifyEvent) }
 
 const (
 	QueryShapeOfLargestCursor  = 0
@@ -4327,9 +4429,7 @@ func (v ReparentNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(21, UnmarshalReparentNotifyEvent)
-}
+func init() { registerEvent(21, UnmarshalReparentNotifyEvent) }
 
 // BadRequest is the error number for a BadRequest.
 const BadRequest = 1
@@ -4384,20 +4484,27 @@ func (err RequestError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadRequest error.
-
 func (err RequestError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadRequest {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadRequest{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(1, UnmarshalRequestError)
-}
+func init() { registerError(1, UnmarshalRequestError) }
 
 // ResizeRequest is the event number for a ResizeRequestEvent.
 const ResizeRequest = 25
@@ -4468,9 +4575,7 @@ func (v ResizeRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(25, UnmarshalResizeRequestEvent)
-}
+func init() { registerEvent(25, UnmarshalResizeRequestEvent) }
 
 type Rgb struct {
 	Red   uint16
@@ -4851,9 +4956,7 @@ func (v SelectionClearEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(29, UnmarshalSelectionClearEvent)
-}
+func init() { registerEvent(29, UnmarshalSelectionClearEvent) }
 
 // SelectionNotify is the event number for a SelectionNotifyEvent.
 const SelectionNotify = 31
@@ -4938,9 +5041,7 @@ func (v SelectionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(31, UnmarshalSelectionNotifyEvent)
-}
+func init() { registerEvent(31, UnmarshalSelectionNotifyEvent) }
 
 // SelectionRequest is the event number for a SelectionRequestEvent.
 const SelectionRequest = 30
@@ -5032,9 +5133,7 @@ func (v SelectionRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(30, UnmarshalSelectionRequestEvent)
-}
+func init() { registerEvent(30, UnmarshalSelectionRequestEvent) }
 
 const (
 	SendEventDestPointerWindow = 0
@@ -5784,9 +5883,7 @@ func (v UnmapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(18, UnmarshalUnmapNotifyEvent)
-}
+func init() { registerEvent(18, UnmarshalUnmapNotifyEvent) }
 
 // BadValue is the error number for a BadValue.
 const BadValue = 2
@@ -5841,20 +5938,27 @@ func (err ValueError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadValue error.
-
 func (err ValueError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadValue {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadValue{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(2, UnmarshalValueError)
-}
+func init() { registerError(2, UnmarshalValueError) }
 
 const (
 	VisibilityUnobscured        = 0
@@ -5929,9 +6033,7 @@ func (v VisibilityNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(15, UnmarshalVisibilityNotifyEvent)
-}
+func init() { registerEvent(15, UnmarshalVisibilityNotifyEvent) }
 
 const (
 	VisualClassStaticGray  = 0
@@ -6045,6 +6147,10 @@ func NewWindowID(c *xgb.XConn) (Window, error) {
 	return Window(id), err
 }
 
+const (
+	WindowNone = 0
+)
+
 // BadWindow is the error number for a BadWindow.
 const BadWindow = 3
 
@@ -6068,22 +6174,28 @@ func (err WindowError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadWindow error.
 func (err WindowError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadWindow {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadWindow{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
 	registerError(3, UnmarshalWindowError)
 }
-
-const (
-	WindowNone = 0
-)
 
 const (
 	WindowClassCopyFromParent = 0

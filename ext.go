@@ -30,3 +30,16 @@ type XExtension struct {
 	EventFuncs  map[uint8]EventUnmarshaler
 	ErrorFuncs  map[uint8]ErrorUnmarshaler
 }
+
+// RawXReply ...
+type RawXReply []byte
+
+func (rpl *RawXReply) Unmarshal(data []byte) error {
+	(*rpl) = append((*rpl)[:0], data...)
+	return nil
+}
+
+// ignoreXReply
+type IgnoreXReply struct{}
+
+func (IgnoreXReply) Unmarshal([]byte) error { return nil }

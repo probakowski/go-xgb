@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -22,8 +23,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -51,13 +52,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -347,17 +348,20 @@ func (err GlyphError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadGlyph error.
-
 func (err GlyphError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadGlyph {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadGlyph{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(4, UnmarshalGlyphError)
-}
+func init() { registerError(4, UnmarshalGlyphError) }
 
 // BadGlyphSet is the error number for a BadGlyphSet.
 const BadGlyphSet = 3
@@ -397,17 +401,20 @@ func (err GlyphSetError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadGlyphSet error.
-
 func (err GlyphSetError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadGlyphSet {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadGlyphSet{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(3, UnmarshalGlyphSetError)
-}
+func init() { registerError(3, UnmarshalGlyphSetError) }
 
 type Glyphinfo struct {
 	Width  uint16
@@ -671,67 +678,20 @@ func (err PictFormatError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadPictFormat error.
-
 func (err PictFormatError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadPictFormat {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadPictFormat{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(0, UnmarshalPictFormatError)
-}
-
-// BadPictOp is the error number for a BadPictOp.
-const BadPictOp = 2
-
-type PictOpError struct {
-	Sequence uint16
-	NiceName string
-}
-
-// UnmarshalPictOpError constructs a PictOpError value that implements xgb.Error from a byte slice.
-func UnmarshalPictOpError(buf []byte) (xgb.XError, error) {
-	if len(buf) != 32 {
-		return nil, fmt.Errorf("invalid data size %d for \"PictOpError\"", len(buf))
-	}
-
-	v := PictOpError{}
-	v.NiceName = "PictOp"
-
-	b := 1 // skip error determinant
-	b += 1 // don't read error number
-
-	v.Sequence = binary.LittleEndian.Uint16(buf[b:])
-	b += 2
-
-	return v, nil
-}
-
-// SeqID returns the sequence id attached to the BadPictOp error.
-// This is mostly used internally.
-func (err PictOpError) SeqID() uint16 {
-	return err.Sequence
-}
-
-// BadID returns the 'BadValue' number if one exists for the BadPictOp error. If no bad value exists, 0 is returned.
-func (err PictOpError) BadID() uint32 {
-	return 0
-}
-
-// Error returns a rudimentary string representation of the BadPictOp error.
-
-func (err PictOpError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadPictOp {" + strings.Join(fieldVals, ", ") + "}"
-}
-
-func init() {
-	registerError(2, UnmarshalPictOpError)
-}
+func init() { registerError(0, UnmarshalPictFormatError) }
 
 const (
 	PictOpClear               = 0
@@ -788,6 +748,59 @@ const (
 	PictOpHSLColor            = 61
 	PictOpHSLLuminosity       = 62
 )
+
+// BadPictOp is the error number for a BadPictOp.
+const BadPictOp = 2
+
+type PictOpError struct {
+	Sequence uint16
+	NiceName string
+}
+
+// UnmarshalPictOpError constructs a PictOpError value that implements xgb.Error from a byte slice.
+func UnmarshalPictOpError(buf []byte) (xgb.XError, error) {
+	if len(buf) != 32 {
+		return nil, fmt.Errorf("invalid data size %d for \"PictOpError\"", len(buf))
+	}
+
+	v := PictOpError{}
+	v.NiceName = "PictOp"
+
+	b := 1 // skip error determinant
+	b += 1 // don't read error number
+
+	v.Sequence = binary.LittleEndian.Uint16(buf[b:])
+	b += 2
+
+	return v, nil
+}
+
+// SeqID returns the sequence id attached to the BadPictOp error.
+// This is mostly used internally.
+func (err PictOpError) SeqID() uint16 {
+	return err.Sequence
+}
+
+// BadID returns the 'BadValue' number if one exists for the BadPictOp error. If no bad value exists, 0 is returned.
+func (err PictOpError) BadID() uint32 {
+	return 0
+}
+
+// Error returns a rudimentary string representation of the BadPictOp error.
+func (err PictOpError) Error() string {
+	var buf strings.Builder
+
+	buf.WriteString("BadPictOp{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
+}
+
+func init() { registerError(2, UnmarshalPictOpError) }
 
 const (
 	PictTypeIndexed = 0
@@ -1077,17 +1090,20 @@ func (err PictureError) BadID() uint32 {
 }
 
 // Error returns a rudimentary string representation of the BadPicture error.
-
 func (err PictureError) Error() string {
-	fieldVals := make([]string, 0, 0)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	return "BadPicture {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadPicture{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
-func init() {
-	registerError(1, UnmarshalPictureError)
-}
+func init() { registerError(1, UnmarshalPictureError) }
 
 const (
 	PictureNone = 0

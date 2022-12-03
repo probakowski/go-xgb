@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"codeberg.org/gruf/go-xgb"
@@ -21,8 +22,8 @@ const (
 
 var (
 	// generated index maps of defined event and error numbers -> unmarshalers.
-	eventFuncs = map[uint8]xgb.EventUnmarshaler{}
-	errorFuncs = map[uint8]xgb.ErrorUnmarshaler{}
+	eventFuncs = make(map[uint8]xgb.EventUnmarshaler)
+	errorFuncs = make(map[uint8]xgb.ErrorUnmarshaler)
 )
 
 func registerEvent(n uint8, fn xgb.EventUnmarshaler) {
@@ -50,13 +51,13 @@ func Register(xconn *xgb.XConn) error {
 	}
 
 	// Clone event funcs map but set our event no. start index
-	extEventFuncs := map[uint8]xgb.EventUnmarshaler{}
+	extEventFuncs := make(map[uint8]xgb.EventUnmarshaler, len(eventFuncs))
 	for n, fn := range eventFuncs {
 		extEventFuncs[n+reply.FirstEvent] = fn
 	}
 
 	// Clone error funcs map but set our error no. start index
-	extErrorFuncs := map[uint8]xgb.ErrorUnmarshaler{}
+	extErrorFuncs := make(map[uint8]xgb.ErrorUnmarshaler, len(errorFuncs))
 	for n, fn := range errorFuncs {
 		extErrorFuncs[n+reply.FirstError] = fn
 	}
@@ -93,13 +94,23 @@ func (err BadSegError) BadID() uint32 {
 
 // Error returns a rudimentary string representation of the BadBadSeg error.
 func (err BadSegError) Error() string {
-	fieldVals := make([]string, 0, 4)
-	fieldVals = append(fieldVals, "NiceName: "+err.NiceName)
-	fieldVals = append(fieldVals, fmt.Sprintf("Sequence: %d", err.Sequence))
-	fieldVals = append(fieldVals, fmt.Sprintf("BadValue: %d", err.BadValue))
-	fieldVals = append(fieldVals, fmt.Sprintf("MinorOpcode: %d", err.MinorOpcode))
-	fieldVals = append(fieldVals, fmt.Sprintf("MajorOpcode: %d", err.MajorOpcode))
-	return "BadBadSeg {" + strings.Join(fieldVals, ", ") + "}"
+	var buf strings.Builder
+
+	buf.WriteString("BadBadSeg{")
+	buf.WriteString("NiceName: " + err.NiceName)
+	buf.WriteByte(' ')
+	buf.WriteString("Sequence: " + strconv.FormatUint(uint64(err.Sequence), 10))
+	buf.WriteByte(' ')
+
+	fmt.Fprintf(&buf, "BadValue: %d", err.BadValue)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MinorOpcode: %d", err.MinorOpcode)
+	buf.WriteString(", ")
+	fmt.Fprintf(&buf, "MajorOpcode: %d", err.MajorOpcode)
+	buf.WriteString(", ")
+	buf.WriteByte('}')
+
+	return buf.String()
 }
 
 func init() {
@@ -194,9 +205,7 @@ func (v CompletionEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
-func init() {
-	registerEvent(0, UnmarshalCompletionEvent)
-}
+func init() { registerEvent(0, UnmarshalCompletionEvent) }
 
 type Seg uint32
 
