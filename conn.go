@@ -1,7 +1,9 @@
 package xgb
 
 import (
+	"container/list"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -27,7 +29,7 @@ type XConn struct {
 
 	seq  uint16     // cookie (event) sequence number
 	popd *cookie    // popped cookie from queue
-	ckQu []*cookie  // queue of waiting cookies
+	ckQu list.List  // queue of waiting cookies
 	mu   sync.Mutex // conn mutex: protects seq,ckQu and writes
 
 	evfn internal.Map[uint8, EventUnmarshaler] // map of registered event no. to event unmarshaler funcs
@@ -88,7 +90,7 @@ func (conn *XConn) NewXID() (uint32, error) {
 }
 
 // Send will send given data to the X server.
-func (conn *XConn) Send(data []byte) (err error) {
+func (conn *XConn) Send(data []byte) error {
 	// Acquire cookie from pool,
 	// conn.cookie() will release.
 	ck := acquireCookie()
@@ -96,24 +98,25 @@ func (conn *XConn) Send(data []byte) (err error) {
 	// Acquire conn lock
 	conn.mu.Lock()
 
-	// Write data to X conn, set sequence
-	ck.seq, err = conn.write(data)
+	// Write data to X connection
+	seq, err := conn.write(data)
 	if err != nil {
 		conn.mu.Unlock()
-		return
+		return err
 	}
 
-	// Register cookie in conn queue
-	conn.ckQu = append(conn.ckQu, ck)
+	// Register cookie with seq
+	conn.ckQu.PushFront(ck)
+	ck.seq = seq
 
 	// Unlock conn
 	conn.mu.Unlock()
 
-	return
+	return nil
 }
 
 // SendRecv ...
-func (conn *XConn) SendRecv(data []byte, dst XReply) (err error) {
+func (conn *XConn) SendRecv(data []byte, dst XReply) error {
 	// Acquire cookie from pool
 	ck := acquireCookie()
 	defer releaseCookie(ck)
@@ -127,25 +130,40 @@ func (conn *XConn) SendRecv(data []byte, dst XReply) (err error) {
 	// Acquire conn lock
 	conn.mu.Lock()
 
-	// Write data to X conn, set sequence
-	ck.seq, err = conn.write(data)
+	// Write data to X connection
+	seq, err := conn.write(data)
 	if err != nil {
 		conn.mu.Unlock()
-		return
+		return err
 	}
 
-	// Register cookie in conn queue
-	conn.ckQu = append(conn.ckQu, ck)
+	// Register cookie with seq
+	conn.ckQu.PushBack(ck)
+	ck.seq = seq
+
+	if dst == nil {
+		// Force X sync.
+
+		// Acquire cookie from pool,
+		// conn.cookie() will release.
+		sck := acquireCookie()
+
+		// Write input focus request to X
+		seq, err := conn.write([]byte{
+			0x2b, 0x0, 0x1, 0x0,
+		})
+		if err != nil {
+			conn.mu.Unlock()
+			return err
+		}
+
+		// Register cookie with seq
+		conn.ckQu.PushBack(sck)
+		sck.seq = seq
+	}
 
 	// Unlock conn
 	conn.mu.Unlock()
-
-	if dst == nil {
-		// force sync with X
-		_ = conn.Send([]byte{
-			0x2b, 0x0, 0x1, 0x0,
-		})
-	}
 
 	// Wait on event/err
 	return <-ck.err
@@ -207,57 +225,66 @@ func (conn *XConn) unmarshalError(n uint8, b []byte) (XError, error) {
 
 // getCookie will attempt to pop the queued cookie with given sequence number.
 func (conn *XConn) getCookie(seq uint16) (*cookie, bool) {
-	if ck := conn.popd; ck != nil {
-		// Previously popped cookie
+	// Acquire conn lock
+	conn.mu.Lock()
 
-		switch {
-		// Out of date cookie
-		case ck.seq < seq:
-			conn.popd = nil
-			ck.send(nil) // ping
-			releaseCookie(ck)
-
-		// Cookie ahead of this
-		case ck.seq > seq:
+	for {
+		// Pop cookie at front of queue
+		ck, ok := conn.popCookie()
+		if !ok {
+			conn.mu.Unlock()
 			return nil, false
-
-		// We found it!
-		default:
-			conn.popd = nil
-			return ck, true
 		}
-	}
-
-	for len(conn.ckQu) > 0 {
-		// Get front of queue
-		ck := conn.ckQu[0]
-
-		// Drop front of queue
-		nl := len(conn.ckQu) - 1
-		copy(conn.ckQu, conn.ckQu[:nl])
-		conn.ckQu = conn.ckQu[:nl]
 
 		switch {
 		// Out of date cookie
 		case ck.seq < seq:
-			ck.send(nil) // ping
+			var err error
+
+			if ck.dst != nil {
+				err = errors.New("received no reply")
+			}
+
+			// Send error
+			ck.send(err)
+
+			// Release to pool
 			releaseCookie(ck)
 
 		// Cookie ahead of this
 		case ck.seq > seq:
 			conn.popd = ck // store
+			conn.mu.Unlock()
 			return nil, false
 
 		// We found it!
 		default:
+			conn.mu.Unlock()
 			return ck, true
 		}
 	}
-
-	return nil, false
 }
 
-// readloop ...
+func (conn *XConn) popCookie() (*cookie, bool) {
+	if ck := conn.popd; ck != nil {
+		conn.popd = nil
+		return ck, true
+	}
+
+	// Grab first cookie in queue
+	elem := conn.ckQu.Front()
+
+	if elem == nil {
+		// no queued cookies
+		return nil, false
+	}
+
+	// Drop front queue element
+	conn.ckQu.Remove(elem)
+
+	return elem.Value.(*cookie), true
+}
+
 func (conn *XConn) readloop() {
 	var (
 		// buf is the main read buffer.
@@ -306,14 +333,14 @@ func (conn *XConn) readloop() {
 			// Debug log raw error bytes
 			conn.debugf("recv xerror=%v\n", buf[:])
 
-			// Look for cookie waiting for response
+			// Look for a cookie waiting for a response
 			if ck, ok := conn.getCookie(xerr.SeqID()); ok {
-				ck.err <- xerr
+				ck.send(xerr)
 				continue
 			}
 
 			select {
-			// Conn closed
+			// Connection closed
 			case <-conn.done:
 				return
 
@@ -351,7 +378,7 @@ func (conn *XConn) readloop() {
 			// Debug log raw reply bytes
 			conn.debugf("recv xreply=%v\n", reply)
 
-			// Look for cookie waiting for response
+			// Look for cookie waiting for a response
 			if ck, ok := conn.getCookie(seq); ok {
 				var err error
 
@@ -362,8 +389,8 @@ func (conn *XConn) readloop() {
 					}
 				}
 
-				// Trigger return
-				ck.err <- err
+				// Send error
+				ck.send(err)
 			}
 
 		default:
@@ -372,6 +399,15 @@ func (conn *XConn) readloop() {
 			if err != nil {
 				conn.logf("unable to unmarshal x event: %v\n", err)
 				continue
+			}
+
+			// Drop any stale cookies waiting on
+			// replies / errors up-to this event.
+			ck, ok := conn.getCookie(xev.SeqID())
+			if ok {
+				// ping and release
+				ck.send(nil)
+				releaseCookie(ck)
 			}
 
 			// Debug log raw event bytes
@@ -393,6 +429,7 @@ func (conn *XConn) readloop() {
 func (conn *XConn) write(data []byte) (seq uint16, err error) {
 	// Write data to underlying connection
 	if _, err = conn.conn.Write(data); err != nil {
+		conn.logf("fatal xconn write error: %v\n")
 		_ = conn.Close()
 		return
 	}
