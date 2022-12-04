@@ -2,41 +2,37 @@ package xgb
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"net"
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 
 	"codeberg.org/gruf/go-byteutil"
 	"codeberg.org/gruf/go-xgb/internal"
 )
 
-var (
-	// ErrConnClosed is returned on attempts to use a closed connection.
-	ErrConnClosed = errors.New("x connection closed")
-
-	// verbose tracks whether verbose logging is enabled via $GODEBUG.
-	verbose = strings.Contains(os.Getenv("GODEBUG"), "xgbdebug")
-)
+// verbose tracks whether verbose logging is enabled via $GODEBUG.
+var verbose = strings.Contains(os.Getenv("GODEBUG"), "xgbdebug")
 
 // XConn ...
 type XConn struct {
-	conn net.Conn                              // underlying net.Conn
-	xidg xidGenerator                          // generates new XIDs
-	inCh chan any                              // inbound event / error channel
-	popd *cookie                               // popped cookie from queue
-	ckQu internal.Queue[*cookie]               // queue of waiting cookies
+	conn net.Conn             // underlying network connection
+	logf func(string, ...any) // user provided log output function
+	inCh chan any             // inbound event / error channel
+	done chan struct{}        // closed on conn closed, used to select against cookie channels
+
+	xidg xidGenerator // generates new XIDs
+
+	seq  uint16     // cookie (event) sequence number
+	popd *cookie    // popped cookie from queue
+	ckQu []*cookie  // queue of waiting cookies
+	mu   sync.Mutex // conn mutex: protects seq,ckQu and writes
+
 	evfn internal.Map[uint8, EventUnmarshaler] // map of registered event no. to event unmarshaler funcs
 	erfn internal.Map[uint8, ErrorUnmarshaler] // map of registered error no. to error unmarshaler funcs
 	exts internal.Map[string, uint8]           // map of opcodes to extensions
-	logf func(string, ...any)                  // user provided log output function
-	done chan struct{}                         // closed on conn closed, used to select against cookie channels
-	seq  uint32                                // current sequence no. (updates atomically)
-	cls  uint32                                // tracks if conn closed
 }
 
 // Register ...
@@ -57,9 +53,11 @@ func xproto_init(conn *XConn, eventFuncs map[uint8]EventUnmarshaler, errorFuncs 
 
 // init ...
 func (conn *XConn) init(eventFuncs map[uint8]EventUnmarshaler, errorFuncs map[uint8]ErrorUnmarshaler) error {
-	// Check if connection already closed
-	if atomic.LoadUint32(&conn.cls) != 0 {
-		return ErrConnClosed
+	select {
+	// Check if closed
+	case <-conn.done:
+		return net.ErrClosed
+	default:
 	}
 
 	// Copy over the extension event unmarshalers
@@ -90,49 +88,75 @@ func (conn *XConn) NewXID() (uint32, error) {
 }
 
 // Send will send given data to the X server.
-func (conn *XConn) Send(data []byte) error {
-	_ = atomic.AddUint32(&conn.seq, 1) // iter sequence
-	return conn.write(data)            // write data
+func (conn *XConn) Send(data []byte) (err error) {
+	// Acquire cookie from pool,
+	// conn.cookie() will release.
+	ck := acquireCookie()
+
+	// Acquire conn lock
+	conn.mu.Lock()
+
+	// Write data to X conn, set sequence
+	ck.seq, err = conn.write(data)
+	if err != nil {
+		conn.mu.Unlock()
+		return
+	}
+
+	// Register cookie in conn queue
+	conn.ckQu = append(conn.ckQu, ck)
+
+	// Unlock conn
+	conn.mu.Unlock()
+
+	return
 }
 
 // SendRecv ...
-func (conn *XConn) SendRecv(data []byte, dst XReply) error {
+func (conn *XConn) SendRecv(data []byte, dst XReply) (err error) {
 	// Acquire cookie from pool
 	ck := acquireCookie()
 	defer releaseCookie(ck)
 
+	// SendRecv is synchronous
+	ck.syn = true
+
 	// Set unmarshal dst
 	ck.dst = dst
 
-	// Get next sequence ID and register cookie
-	ck.id = uint16(atomic.AddUint32(&conn.seq, 1))
-	conn.ckQu.Push(ck)
+	// Acquire conn lock
+	conn.mu.Lock()
 
-	// Write request data to X server
-	if err := conn.write(data); err != nil {
-		return err
+	// Write data to X conn, set sequence
+	ck.seq, err = conn.write(data)
+	if err != nil {
+		conn.mu.Unlock()
+		return
 	}
+
+	// Register cookie in conn queue
+	conn.ckQu = append(conn.ckQu, ck)
+
+	// Unlock conn
+	conn.mu.Unlock()
 
 	if dst == nil {
 		// force sync with X
-		_ = conn.Send(inputfocus())
+		_ = conn.Send([]byte{
+			0x2b, 0x0, 0x1, 0x0,
+		})
 	}
 
-	// Wait on rsp
+	// Wait on event/err
 	return <-ck.err
 }
 
 // Recv ...
 func (conn *XConn) Recv() (XEvent, error) {
-	// Check if connection already closed
-	if atomic.LoadUint32(&conn.cls) != 0 {
-		return nil, ErrConnClosed
-	}
-
 	// Wait on next event
 	v, ok := <-conn.inCh
 	if !ok {
-		return nil, ErrConnClosed
+		return nil, net.ErrClosed
 	}
 
 	switch v := v.(type) {
@@ -147,16 +171,22 @@ func (conn *XConn) Recv() (XEvent, error) {
 
 // Sync will force a roundtrip to the X server, by sending a GetInputFocus request and blocking on response.
 func (conn *XConn) Sync() error {
-	return conn.SendRecv(inputfocus(), IgnoreXReply{})
+	return conn.SendRecv([]byte{0x2b, 0x0, 0x1, 0x0}, IgnoreXReply{})
 }
 
 // Close will close the X connection.
 func (conn *XConn) Close() error {
-	if atomic.CompareAndSwapUint32(&conn.cls, 0, 1) {
-		close(conn.inCh)         // close inbound ch
-		return conn.conn.Close() // close X
+	select {
+	case <-conn.done:
+		// already closed
+		return nil
+
+	default:
+		// close connection
+		close(conn.inCh)
+		close(conn.done)
+		return conn.conn.Close()
 	}
-	return nil
 }
 
 // unmarshalEvent will attempt to unmarshal event data 'b' as event type with number 'n'.
@@ -175,19 +205,20 @@ func (conn *XConn) unmarshalError(n uint8, b []byte) (XError, error) {
 	return nil, fmt.Errorf("unknown error type %d", n)
 }
 
-// cookie will attempt to pop the queued cookie with given sequence number.
-func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
+// getCookie will attempt to pop the queued cookie with given sequence number.
+func (conn *XConn) getCookie(seq uint16) (*cookie, bool) {
 	if ck := conn.popd; ck != nil {
 		// Previously popped cookie
 
 		switch {
 		// Out of date cookie
-		case ck.id < seq:
+		case ck.seq < seq:
 			conn.popd = nil
+			ck.send(nil) // ping
 			releaseCookie(ck)
 
 		// Cookie ahead of this
-		case ck.id > seq:
+		case ck.seq > seq:
 			return nil, false
 
 		// We found it!
@@ -197,20 +228,23 @@ func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
 		}
 	}
 
-	for {
-		// Pop next cookie from queue
-		ck, ok := conn.ckQu.Pop()
-		if !ok {
-			return nil, false
-		}
+	for len(conn.ckQu) > 0 {
+		// Get front of queue
+		ck := conn.ckQu[0]
+
+		// Drop front of queue
+		nl := len(conn.ckQu) - 1
+		copy(conn.ckQu, conn.ckQu[:nl])
+		conn.ckQu = conn.ckQu[:nl]
 
 		switch {
 		// Out of date cookie
-		case ck.id < seq:
+		case ck.seq < seq:
+			ck.send(nil) // ping
 			releaseCookie(ck)
 
 		// Cookie ahead of this
-		case ck.id > seq:
+		case ck.seq > seq:
 			conn.popd = ck // store
 			return nil, false
 
@@ -219,6 +253,8 @@ func (conn *XConn) cookie(seq uint16) (*cookie, bool) {
 			return ck, true
 		}
 	}
+
+	return nil, false
 }
 
 // readloop ...
@@ -245,21 +281,8 @@ func (conn *XConn) readloop() {
 		// Close connection
 		_ = conn.Close()
 
-		if ck := conn.popd; ck != nil {
-			// Close cookie
-			close(ck.err)
-		}
-
-		for {
-			// Pop all cookies from queue
-			ck, ok := conn.ckQu.Pop()
-			if !ok {
-				break
-			}
-
-			// Finished with cookie
-			releaseCookie(ck)
-		}
+		// Forcibly outdate to drop all cookies
+		_, _ = conn.getCookie(^uint16(0))
 	}()
 
 	for {
@@ -284,7 +307,7 @@ func (conn *XConn) readloop() {
 			conn.debugf("recv xerror=%v\n", buf[:])
 
 			// Look for cookie waiting for response
-			if ck, ok := conn.cookie(xerr.SeqID()); ok {
+			if ck, ok := conn.getCookie(xerr.SeqID()); ok {
 				ck.err <- xerr
 				continue
 			}
@@ -329,7 +352,7 @@ func (conn *XConn) readloop() {
 			conn.debugf("recv xreply=%v\n", reply)
 
 			// Look for cookie waiting for response
-			if ck, ok := conn.cookie(seq); ok {
+			if ck, ok := conn.getCookie(seq); ok {
 				var err error
 
 				if ck.dst != nil {
@@ -367,23 +390,21 @@ func (conn *XConn) readloop() {
 }
 
 // write ...
-func (conn *XConn) write(data []byte) error {
-	// Check if connection already closed
-	if atomic.LoadUint32(&conn.cls) != 0 {
-		return ErrConnClosed
-	}
-
-	// Write data to the underlying conn
-	_, err := conn.conn.Write(data)
-	if err != nil {
-		// Write error occurred, wrap with context
-		err = fmt.Errorf("fatal xconn write error: %w", err)
+func (conn *XConn) write(data []byte) (seq uint16, err error) {
+	// Write data to underlying connection
+	if _, err = conn.conn.Write(data); err != nil {
 		_ = conn.Close()
-		return err
+		return
 	}
 
+	// Debug log sent data
 	conn.debugf("send data=%v\n", data)
-	return nil
+
+	// Iter sequence
+	conn.seq++
+	seq = conn.seq
+
+	return
 }
 
 // debugf will log given format string and args only if debugging is enabled.
@@ -402,9 +423,17 @@ var cookiePool = sync.Pool{
 
 // cookie ...
 type cookie struct {
-	id  uint16
+	seq uint16
 	err chan error
 	dst XReply
+	syn bool
+}
+
+func (ck *cookie) send(err error) {
+	if !ck.syn {
+		return
+	}
+	ck.err <- err
 }
 
 // acquireCookie will acquire a fresh cookie from the pool.
@@ -415,31 +444,10 @@ func acquireCookie() *cookie {
 // releaseCookie will reset the cookie, drain it and release to pool.
 func releaseCookie(ck *cookie) {
 	// Reset fields
-	ck.id = 0
+	ck.seq = 0
 	ck.dst = nil
-
-	select {
-	case ck.err <- nil:
-	case <-ck.err:
-	default:
-	}
+	ck.syn = false
 
 	// Place in pool
 	cookiePool.Put(ck)
-}
-
-// inputfocus returns a newly prepared input focus request.
-func inputfocus() []byte {
-	size := 4
-	b := 0
-	buf := make([]byte, size)
-
-	buf[b] = 43 // request opcode
-	b += 1
-
-	b += 1                                                 // padding
-	binary.LittleEndian.PutUint16(buf[b:], uint16(size/4)) // write request size in 4-byte units
-	b += 2
-
-	return buf
 }
