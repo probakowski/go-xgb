@@ -1,5 +1,12 @@
 # go-xgb
 
+XGB is the X protocol Go language Binding.
+
+It is the Go equivalent of XCB, the X protocol C-language Binding
+(http://xcb.freedesktop.org/).
+
+### gruf's Fork
+
 This is a fork of jezek's `go-xgb` repository. It is not yet complete, tests
 are not yet updated and neither is the `ewmh` utility package.
 
@@ -12,17 +19,14 @@ code itself. The code generator `xgbgen` was still used as the basis for parsing
 - rely on memory pooling where possible
 - reduced reliance on concurrency
 
+### jezek's Fork
 
-=============================================================================
-
-jezek's Fork
-============
 I've forked the XGB repository from BurntSushi's github to apply some
 patches which caused panics and memory leaks upon close and tests were added,
 to test multiple server close scenarios.
 
-BurntSushi's Fork
-=================
+### BurntSushi's Fork
+
 I've forked the XGB repository from Google Code due to inactivty upstream.
 
 Godoc documentation can be found here:
@@ -42,15 +46,6 @@ in tact.
 
 I suppose I can legitimately release xgbgen under the WTFPL. To be fair, it is
 at least as complex as XGB itself. *sigh*
-
-What follows is the original README:
-
-XGB README
-==========
-XGB is the X protocol Go language Binding.
-
-It is the Go equivalent of XCB, the X protocol C-language Binding
-(http://xcb.freedesktop.org/).
 
 Unless otherwise noted, the XGB source files are distributed
 under the BSD-style license found in the LICENSE file.
