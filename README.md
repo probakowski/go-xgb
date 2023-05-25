@@ -1,11 +1,16 @@
 # go-xgb
 
 This is a fork of jezek's `go-xgb` repository. It is not yet complete, tests
-are not yet updated and neither are the utility packages.
+are not yet updated and neither is the `ewmh` utility package.
 
 It is a complete rewrite of the dialer, underlying x connection and the generated
 code itself. The code generator `xgbgen` was still used as the basis for parsing
-`xcb` definition files for generation.
+`xcb` definition files for generation. The primary differences intended were:
+- more idiomatic Go code
+- more idiomatic logging
+- support debug output via `debug` build tag
+- rely on memory pooling where possible
+- reduced reliance on concurrency
 
 
 =============================================================================
