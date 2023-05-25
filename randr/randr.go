@@ -293,9 +293,9 @@ const (
 
 type Crtc uint32
 
-func NewCrtcID(c *xgb.XConn) (Crtc, error) {
-	id, err := c.NewXID()
-	return Crtc(id), err
+func NewCrtcID(c *xgb.XConn) Crtc {
+	id := c.NewXID()
+	return Crtc(id)
 }
 
 type CrtcChange struct {
@@ -408,9 +408,9 @@ func CrtcChangeListBytes(buf []byte, list []CrtcChange) int {
 
 type Lease uint32
 
-func NewLeaseID(c *xgb.XConn) (Lease, error) {
-	id, err := c.NewXID()
-	return Lease(id), err
+func NewLeaseID(c *xgb.XConn) Lease {
+	id := c.NewXID()
+	return Lease(id)
 }
 
 type LeaseNotify struct {
@@ -488,9 +488,9 @@ func LeaseNotifyListBytes(buf []byte, list []LeaseNotify) int {
 
 type Mode uint32
 
-func NewModeID(c *xgb.XConn) (Mode, error) {
-	id, err := c.NewXID()
-	return Mode(id), err
+func NewModeID(c *xgb.XConn) Mode {
+	id := c.NewXID()
+	return Mode(id)
 }
 
 const (
@@ -1288,9 +1288,9 @@ const (
 
 type Output uint32
 
-func NewOutputID(c *xgb.XConn) (Output, error) {
-	id, err := c.NewXID()
-	return Output(id), err
+func NewOutputID(c *xgb.XConn) Output {
+	id := c.NewXID()
+	return Output(id)
 }
 
 type OutputChange struct {
@@ -1478,9 +1478,9 @@ func OutputPropertyListBytes(buf []byte, list []OutputProperty) int {
 
 type Provider uint32
 
-func NewProviderID(c *xgb.XConn) (Provider, error) {
-	id, err := c.NewXID()
-	return Provider(id), err
+func NewProviderID(c *xgb.XConn) Provider {
+	id := c.NewXID()
+	return Provider(id)
 }
 
 const (

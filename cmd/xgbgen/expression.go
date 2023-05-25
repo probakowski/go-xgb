@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 )
 
 // Expression represents all the different forms of expressions possible in
@@ -46,8 +45,7 @@ func (e *Function) Concrete() bool {
 }
 
 func (e *Function) Eval() int {
-	log.Fatalf("Cannot evaluate a 'Function'. It is not concrete.")
-	panic("unreachable")
+	panic("Cannot evaluate a 'Function'. It is not concrete.")
 }
 
 func (e *Function) Reduce(prefix string) string {
@@ -110,9 +108,7 @@ func (e *BinaryOp) Eval() int {
 	case "&lt;&lt;":
 		return int(uint(e.Expr1.Eval()) << uint(e.Expr2.Eval()))
 	}
-
-	log.Fatalf("Invalid binary operator '%s' for expression.", e.Op)
-	panic("unreachable")
+	panic(fmt.Sprintf("Invalid binary operator '%s' for expression.", e.Op))
 }
 
 func (e *BinaryOp) Reduce(prefix string) string {
@@ -166,9 +162,7 @@ func (e *UnaryOp) Eval() int {
 	case "~":
 		return ^e.Expr.Eval()
 	}
-
-	log.Fatalf("Invalid unary operator '%s' for expression.", e.Op)
-	panic("unreachable")
+	panic(fmt.Sprintf("Invalid unary operator '%s' for expression.", e.Op))
 }
 
 func (e *UnaryOp) Reduce(prefix string) string {
@@ -301,8 +295,7 @@ func (e *FieldRef) Concrete() bool {
 }
 
 func (e *FieldRef) Eval() int {
-	log.Fatalf("Cannot evaluate a 'FieldRef'. It is not concrete.")
-	panic("unreachable")
+	panic("Cannot evaluate a 'FieldRef'. It is not concrete.")
 }
 
 func (e *FieldRef) Reduce(prefix string) string {

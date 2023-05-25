@@ -3,6 +3,7 @@ package main
 // Size corresponds to an expression that represents the number of bytes
 // in some *thing*. Generally, sizes are used to allocate buffers and to
 // inform X how big requests are.
+//
 // Size is basically a thin layer over an Expression that yields easy methods
 // for adding and multiplying sizes.
 type Size struct {

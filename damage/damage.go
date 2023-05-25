@@ -127,9 +127,9 @@ func init() { registerError(0, UnmarshalBadDamageError) }
 
 type Damage uint32
 
-func NewDamageID(c *xgb.XConn) (Damage, error) {
-	id, err := c.NewXID()
-	return Damage(id), err
+func NewDamageID(c *xgb.XConn) Damage {
+	id := c.NewXID()
+	return Damage(id)
 }
 
 // Notify is the event number for a NotifyEvent.

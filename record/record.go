@@ -204,9 +204,9 @@ type ClientSpec uint32
 
 type Context uint32
 
-func NewContextID(c *xgb.XConn) (Context, error) {
-	id, err := c.NewXID()
-	return Context(id), err
+func NewContextID(c *xgb.XConn) Context {
+	id := c.NewXID()
+	return Context(id)
 }
 
 const (

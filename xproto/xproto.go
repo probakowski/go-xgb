@@ -251,9 +251,9 @@ const (
 
 type Atom uint32
 
-func NewAtomID(c *xgb.XConn) (Atom, error) {
-	id, err := c.NewXID()
-	return Atom(id), err
+func NewAtomID(c *xgb.XConn) Atom {
+	id := c.NewXID()
+	return Atom(id)
 }
 
 const (
@@ -1197,9 +1197,9 @@ func ColoritemListBytes(buf []byte, list []Coloritem) int {
 
 type Colormap uint32
 
-func NewColormapID(c *xgb.XConn) (Colormap, error) {
-	id, err := c.NewXID()
-	return Colormap(id), err
+func NewColormapID(c *xgb.XConn) Colormap {
+	id := c.NewXID()
+	return Colormap(id)
 }
 
 const (
@@ -1718,9 +1718,9 @@ func init() { registerEvent(16, UnmarshalCreateNotifyEvent) }
 
 type Cursor uint32
 
-func NewCursorID(c *xgb.XConn) (Cursor, error) {
-	id, err := c.NewXID()
-	return Cursor(id), err
+func NewCursorID(c *xgb.XConn) Cursor {
+	id := c.NewXID()
+	return Cursor(id)
 }
 
 const (
@@ -1936,9 +1936,9 @@ func init() { registerEvent(17, UnmarshalDestroyNotifyEvent) }
 
 type Drawable uint32
 
-func NewDrawableID(c *xgb.XConn) (Drawable, error) {
-	id, err := c.NewXID()
-	return Drawable(id), err
+func NewDrawableID(c *xgb.XConn) Drawable {
+	id := c.NewXID()
+	return Drawable(id)
 }
 
 // BadDrawable is the error number for a BadDrawable.
@@ -2370,9 +2370,9 @@ func init() {
 
 type Font uint32
 
-func NewFontID(c *xgb.XConn) (Font, error) {
-	id, err := c.NewXID()
-	return Font(id), err
+func NewFontID(c *xgb.XConn) Font {
+	id := c.NewXID()
+	return Font(id)
 }
 
 // BadFont is the error number for a BadFont.
@@ -2432,9 +2432,9 @@ const (
 
 type Fontable uint32
 
-func NewFontableID(c *xgb.XConn) (Fontable, error) {
-	id, err := c.NewXID()
-	return Fontable(id), err
+func NewFontableID(c *xgb.XConn) Fontable {
+	id := c.NewXID()
+	return Fontable(id)
 }
 
 type Fontprop struct {
@@ -2631,9 +2631,9 @@ const (
 
 type Gcontext uint32
 
-func NewGcontextID(c *xgb.XConn) (Gcontext, error) {
-	id, err := c.NewXID()
-	return Gcontext(id), err
+func NewGcontextID(c *xgb.XConn) Gcontext {
+	id := c.NewXID()
+	return Gcontext(id)
 }
 
 // GeGeneric is the event number for a GeGenericEvent.
@@ -4042,9 +4042,9 @@ const (
 
 type Pixmap uint32
 
-func NewPixmapID(c *xgb.XConn) (Pixmap, error) {
-	id, err := c.NewXID()
-	return Pixmap(id), err
+func NewPixmapID(c *xgb.XConn) Pixmap {
+	id := c.NewXID()
+	return Pixmap(id)
 }
 
 // BadPixmap is the error number for a BadPixmap.
@@ -6142,9 +6142,9 @@ type Visualid uint32
 
 type Window uint32
 
-func NewWindowID(c *xgb.XConn) (Window, error) {
-	id, err := c.NewXID()
-	return Window(id), err
+func NewWindowID(c *xgb.XConn) Window {
+	id := c.NewXID()
+	return Window(id)
 }
 
 const (

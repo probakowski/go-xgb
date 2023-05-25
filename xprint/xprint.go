@@ -339,9 +339,9 @@ func init() { registerEvent(0, UnmarshalNotifyEvent) }
 
 type Pcontext uint32
 
-func NewPcontextID(c *xgb.XConn) (Pcontext, error) {
-	id, err := c.NewXID()
-	return Pcontext(id), err
+func NewPcontextID(c *xgb.XConn) Pcontext {
+	id := c.NewXID()
+	return Pcontext(id)
 }
 
 type Printer struct {
@@ -488,7 +488,7 @@ func CreateContextUnchecked(c *xgb.XConn, ContextId uint32, PrinterNameLen uint3
 // Write request to wire for CreateContext
 // createContextRequest writes a CreateContext request to a byte slice.
 func createContextRequest(opcode uint8, ContextId uint32, PrinterNameLen uint32, LocaleLen uint32, PrinterName []String8, Locale []String8) []byte {
-	size := internal.Pad4(((16 + internal.Pad4((int(PrinterNameLen) * 1))) + internal.Pad4((int(LocaleLen) * 1))))
+	size := internal.Pad4((((16 + internal.Pad4((int(PrinterNameLen) * 1))) + 0) + internal.Pad4((int(LocaleLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
 
@@ -514,6 +514,8 @@ func createContextRequest(opcode uint8, ContextId uint32, PrinterNameLen uint32,
 		buf[b] = uint8(PrinterName[i])
 		b += 1
 	}
+
+	b += 0 // padding
 
 	for i := 0; i < int(LocaleLen); i++ {
 		buf[b] = uint8(Locale[i])
@@ -1263,7 +1265,7 @@ func (v *PrintGetPrinterListReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetPrinterList
 // printGetPrinterListRequest writes a PrintGetPrinterList request to a byte slice.
 func printGetPrinterListRequest(opcode uint8, PrinterNameLen uint32, LocaleLen uint32, PrinterName []String8, Locale []String8) []byte {
-	size := internal.Pad4(((12 + internal.Pad4((int(PrinterNameLen) * 1))) + internal.Pad4((int(LocaleLen) * 1))))
+	size := internal.Pad4((((12 + internal.Pad4((int(PrinterNameLen) * 1))) + 0) + internal.Pad4((int(LocaleLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
 
@@ -1286,6 +1288,8 @@ func printGetPrinterListRequest(opcode uint8, PrinterNameLen uint32, LocaleLen u
 		buf[b] = uint8(PrinterName[i])
 		b += 1
 	}
+
+	b += 0 // padding
 
 	for i := 0; i < int(LocaleLen); i++ {
 		buf[b] = uint8(Locale[i])
@@ -1461,7 +1465,7 @@ func PrintPutDocumentDataUnchecked(c *xgb.XConn, Drawable xproto.Drawable, LenDa
 // Write request to wire for PrintPutDocumentData
 // printPutDocumentDataRequest writes a PrintPutDocumentData request to a byte slice.
 func printPutDocumentDataRequest(opcode uint8, Drawable xproto.Drawable, LenData uint32, LenFmt uint16, LenOptions uint16, Data []byte, DocFormat []String8, Options []String8) []byte {
-	size := internal.Pad4((((16 + internal.Pad4((int(LenData) * 1))) + internal.Pad4((int(LenFmt) * 1))) + internal.Pad4((int(LenOptions) * 1))))
+	size := internal.Pad4((((((16 + internal.Pad4((int(LenData) * 1))) + 0) + internal.Pad4((int(LenFmt) * 1))) + 0) + internal.Pad4((int(LenOptions) * 1))))
 	b := 0
 	buf := make([]byte, size)
 
@@ -1489,10 +1493,14 @@ func printPutDocumentDataRequest(opcode uint8, Drawable xproto.Drawable, LenData
 	copy(buf[b:], Data[:LenData])
 	b += int(LenData)
 
+	b += 0 // padding
+
 	for i := 0; i < int(LenFmt); i++ {
 		buf[b] = uint8(DocFormat[i])
 		b += 1
 	}
+
+	b += 0 // padding
 
 	for i := 0; i < int(LenOptions); i++ {
 		buf[b] = uint8(Options[i])

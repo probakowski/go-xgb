@@ -73,23 +73,23 @@ func Register(xconn *xgb.XConn) error {
 
 type Context uint32
 
-func NewContextID(c *xgb.XConn) (Context, error) {
-	id, err := c.NewXID()
-	return Context(id), err
+func NewContextID(c *xgb.XConn) Context {
+	id := c.NewXID()
+	return Context(id)
 }
 
 type Subpicture uint32
 
-func NewSubpictureID(c *xgb.XConn) (Subpicture, error) {
-	id, err := c.NewXID()
-	return Subpicture(id), err
+func NewSubpictureID(c *xgb.XConn) Subpicture {
+	id := c.NewXID()
+	return Subpicture(id)
 }
 
 type Surface uint32
 
-func NewSurfaceID(c *xgb.XConn) (Surface, error) {
-	id, err := c.NewXID()
-	return Surface(id), err
+func NewSurfaceID(c *xgb.XConn) Surface {
+	id := c.NewXID()
+	return Surface(id)
 }
 
 type SurfaceInfo struct {

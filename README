@@ -1,27 +1,14 @@
-XGB is the X Go Binding, which is a low-level API to communicate with the
-core X protocol and many of the X extensions. It is closely modeled after
-XCB and xpyb.
+# go-xgb
 
-It is thread safe and gets immediate improvement from parallelism when
-GOMAXPROCS > 1. (See the benchmarks in xproto/xproto_test.go for evidence.)
+This is a fork of jezek's `go-xgb` repository. It is not yet complete, tests
+are not yet updated and neither are the utility packages.
 
-Please see doc.go for more info.
+It is a complete rewrite of the dialer, underlying x connection and the generated
+code itself. The code generator `xgbgen` was still used as the basis for parsing
+`xcb` definition files for generation.
 
-Note that unless you know you need XGB, you can probably make your life
-easier by using a slightly higher level library: xgbutil.
 
-This is a fork of github.com/BurntSushi/xgb
-
-Quick Usage
-===========
-go get github.com/jezek/xgb
-go run go/path/src/github.com/jezek/xgb/examples/create-window/main.go
-
-gruf's Fork
-===========
-
-I've forked the XGB repository from jezek's github to add Go module support
-and more flexible logging. Possibly some other future changes too
+=============================================================================
 
 jezek's Fork
 ============

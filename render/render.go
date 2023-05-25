@@ -500,9 +500,9 @@ func GlyphinfoListBytes(buf []byte, list []Glyphinfo) int {
 
 type Glyphset uint32
 
-func NewGlyphsetID(c *xgb.XConn) (Glyphset, error) {
-	id, err := c.NewXID()
-	return Glyphset(id), err
+func NewGlyphsetID(c *xgb.XConn) Glyphset {
+	id := c.NewXID()
+	return Glyphset(id)
 }
 
 type Indexvalue struct {
@@ -888,9 +888,9 @@ func PictdepthListSize(list []Pictdepth) int {
 
 type Pictformat uint32
 
-func NewPictformatID(c *xgb.XConn) (Pictformat, error) {
-	id, err := c.NewXID()
-	return Pictformat(id), err
+func NewPictformatID(c *xgb.XConn) Pictformat {
+	id := c.NewXID()
+	return Pictformat(id)
 }
 
 type Pictforminfo struct {
@@ -1047,9 +1047,9 @@ func PictscreenListSize(list []Pictscreen) int {
 
 type Picture uint32
 
-func NewPictureID(c *xgb.XConn) (Picture, error) {
-	id, err := c.NewXID()
-	return Picture(id), err
+func NewPictureID(c *xgb.XConn) Picture {
+	id := c.NewXID()
+	return Picture(id)
 }
 
 // BadPicture is the error number for a BadPicture.

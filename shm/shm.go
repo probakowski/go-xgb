@@ -209,9 +209,9 @@ func init() { registerEvent(0, UnmarshalCompletionEvent) }
 
 type Seg uint32
 
-func NewSegID(c *xgb.XConn) (Seg, error) {
-	id, err := c.NewXID()
-	return Seg(id), err
+func NewSegID(c *xgb.XConn) Seg {
+	id := c.NewXID()
+	return Seg(id)
 }
 
 // Skipping definition for base type 'Bool'

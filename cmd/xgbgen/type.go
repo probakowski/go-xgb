@@ -44,7 +44,6 @@ func (t *Translation) RealType(p *Protocol) Type {
 	if ni := strings.Index(t.XmlName(), ":"); ni > -1 {
 		namespace, typeName = strings.ToLower(typeName[:ni]), typeName[ni+1:]
 	}
-
 	if len(namespace) == 0 || namespace == strings.ToLower(p.Name) {
 		for _, typ := range p.Types {
 			if typeName == typ.XmlName() {

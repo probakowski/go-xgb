@@ -2,16 +2,15 @@ package ewmh
 
 import (
 	"codeberg.org/gruf/go-xgb"
+	"codeberg.org/gruf/go-xgb/pkg/xevent"
+	"codeberg.org/gruf/go-xgb/pkg/xprop"
 	"codeberg.org/gruf/go-xgb/xproto"
-
-	"codeberg.org/gruf/go-xgbutil/xevent"
-	"codeberg.org/gruf/go-xgbutil/xprop"
 )
 
 // ClientEvent is a convenience function that sends ClientMessage events
 // to the root window as specified by the EWMH spec.
-func ClientEvent(xconn *xgb.XConn, window xproto.Window, messageType string, data ...interface{}) error {
-	mstype, err := xprop.Atm(xu, messageType)
+func ClientEvent(conn *xprop.XPropConn, window xproto.Window, messageType string, data ...interface{}) error {
+	mstype, err := conn.Atom(messageType, false)
 	if err != nil {
 		return err
 	}
@@ -24,7 +23,7 @@ func ClientEvent(xconn *xgb.XConn, window xproto.Window, messageType string, dat
 		return err
 	}
 
-	return xevent.SendRootEvent(xu, cm, uint32(evMask))
+	return xevent.SendRootEvent(conn, cm, uint32(evMask))
 }
 
 // _NET_ACTIVE_WINDOW get

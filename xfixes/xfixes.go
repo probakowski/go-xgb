@@ -129,9 +129,9 @@ func init() { registerError(0, UnmarshalBadRegionError) }
 
 type Barrier uint32
 
-func NewBarrierID(c *xgb.XConn) (Barrier, error) {
-	id, err := c.NewXID()
-	return Barrier(id), err
+func NewBarrierID(c *xgb.XConn) Barrier {
+	id := c.NewXID()
+	return Barrier(id)
 }
 
 const (
@@ -139,6 +139,11 @@ const (
 	BarrierDirectionsPositiveY = 2
 	BarrierDirectionsNegativeX = 4
 	BarrierDirectionsNegativeY = 8
+)
+
+const (
+	ClientDisconnectFlagsDefault   = 0
+	ClientDisconnectFlagsTerminate = 1
 )
 
 // CursorNotify is the event number for a CursorNotifyEvent.
@@ -236,9 +241,9 @@ const (
 
 type Region uint32
 
-func NewRegionID(c *xgb.XConn) (Region, error) {
-	id, err := c.NewXID()
-	return Region(id), err
+func NewRegionID(c *xgb.XConn) Region {
+	id := c.NewXID()
+	return Region(id)
 }
 
 const (
@@ -1074,6 +1079,78 @@ func fetchRegionRequest(opcode uint8, Region Region) []byte {
 	return buf
 }
 
+// GetClientDisconnectMode sends a checked request.
+func GetClientDisconnectMode(c *xgb.XConn) (GetClientDisconnectModeReply, error) {
+	var reply GetClientDisconnectModeReply
+	op, ok := c.Ext("XFIXES")
+	if !ok {
+		return reply, errors.New("cannot issue request \"GetClientDisconnectMode\" using the uninitialized extension \"XFIXES\". xfixes.Register(xconn) must be called first.")
+	}
+	err := c.SendRecv(getClientDisconnectModeRequest(op), &reply)
+	return reply, err
+}
+
+// GetClientDisconnectModeUnchecked sends an unchecked request.
+func GetClientDisconnectModeUnchecked(c *xgb.XConn) error {
+	op, ok := c.Ext("XFIXES")
+	if !ok {
+		return errors.New("cannot issue request \"GetClientDisconnectMode\" using the uninitialized extension \"XFIXES\". xfixes.Register(xconn) must be called first.")
+	}
+	return c.Send(getClientDisconnectModeRequest(op))
+}
+
+// GetClientDisconnectModeReply represents the data returned from a GetClientDisconnectMode request.
+type GetClientDisconnectModeReply struct {
+	Sequence uint16 // sequence number of the request for this reply
+	Length   uint32 // number of bytes in this reply
+	// padding: 1 bytes
+	DisconnectMode uint32
+	// padding: 20 bytes
+}
+
+// Unmarshal reads a byte slice into a GetClientDisconnectModeReply value.
+func (v *GetClientDisconnectModeReply) Unmarshal(buf []byte) error {
+	if size := 32; len(buf) < size {
+		return fmt.Errorf("not enough data to unmarshal \"GetClientDisconnectModeReply\": have=%d need=%d", len(buf), size)
+	}
+
+	b := 1 // skip reply determinant
+
+	b += 1 // padding
+
+	v.Sequence = binary.LittleEndian.Uint16(buf[b:])
+	b += 2
+
+	v.Length = binary.LittleEndian.Uint32(buf[b:]) // 4-byte units
+	b += 4
+
+	v.DisconnectMode = binary.LittleEndian.Uint32(buf[b:])
+	b += 4
+
+	b += 20 // padding
+
+	return nil
+}
+
+// Write request to wire for GetClientDisconnectMode
+// getClientDisconnectModeRequest writes a GetClientDisconnectMode request to a byte slice.
+func getClientDisconnectModeRequest(opcode uint8) []byte {
+	size := 4
+	b := 0
+	buf := make([]byte, size)
+
+	buf[b] = opcode
+	b += 1
+
+	buf[b] = 34 // request opcode
+	b += 1
+
+	binary.LittleEndian.PutUint16(buf[b:], uint16(size/4)) // write request size in 4-byte units
+	b += 2
+
+	return buf
+}
+
 // GetCursorImage sends a checked request.
 func GetCursorImage(c *xgb.XConn) (GetCursorImageReply, error) {
 	var reply GetCursorImageReply
@@ -1727,6 +1804,46 @@ func selectSelectionInputRequest(opcode uint8, Window xproto.Window, Selection x
 	b += 4
 
 	binary.LittleEndian.PutUint32(buf[b:], EventMask)
+	b += 4
+
+	return buf
+}
+
+// SetClientDisconnectMode sends a checked request.
+func SetClientDisconnectMode(c *xgb.XConn, DisconnectMode uint32) error {
+	op, ok := c.Ext("XFIXES")
+	if !ok {
+		return errors.New("cannot issue request \"SetClientDisconnectMode\" using the uninitialized extension \"XFIXES\". xfixes.Register(xconn) must be called first.")
+	}
+	return c.SendRecv(setClientDisconnectModeRequest(op, DisconnectMode), nil)
+}
+
+// SetClientDisconnectModeUnchecked sends an unchecked request.
+func SetClientDisconnectModeUnchecked(c *xgb.XConn, DisconnectMode uint32) error {
+	op, ok := c.Ext("XFIXES")
+	if !ok {
+		return errors.New("cannot issue request \"SetClientDisconnectMode\" using the uninitialized extension \"XFIXES\". xfixes.Register(xconn) must be called first.")
+	}
+	return c.Send(setClientDisconnectModeRequest(op, DisconnectMode))
+}
+
+// Write request to wire for SetClientDisconnectMode
+// setClientDisconnectModeRequest writes a SetClientDisconnectMode request to a byte slice.
+func setClientDisconnectModeRequest(opcode uint8, DisconnectMode uint32) []byte {
+	size := 8
+	b := 0
+	buf := make([]byte, size)
+
+	buf[b] = opcode
+	b += 1
+
+	buf[b] = 33 // request opcode
+	b += 1
+
+	binary.LittleEndian.PutUint16(buf[b:], uint16(size/4)) // write request size in 4-byte units
+	b += 2
+
+	binary.LittleEndian.PutUint32(buf[b:], DisconnectMode)
 	b += 4
 
 	return buf

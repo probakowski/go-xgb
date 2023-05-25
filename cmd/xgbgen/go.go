@@ -81,10 +81,10 @@ func (enum *Enum) Define(c *Context) {
 func (res *Resource) Define(c *Context) {
 	c.Putln("type %s uint32", res.SrcName())
 	c.Putln("")
-	c.Putln("func New%sID(c *xgb.XConn) (%s, error) {",
+	c.Putln("func New%sID(c *xgb.XConn) %s {",
 		res.SrcName(), res.SrcName())
-	c.Putln("	id, err := c.NewXID()")
-	c.Putln("	return %s(id), err", res.SrcName())
+	c.Putln("	id := c.NewXID()")
+	c.Putln("	return %s(id)", res.SrcName())
 	c.Putln("}")
 	c.Putln("")
 }

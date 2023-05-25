@@ -17,21 +17,12 @@ func CreateCursor(xconn *xgb.XConn, cursor uint16) (xproto.Cursor, error) {
 // (This implies each request is a checked request. The performance loss is
 // probably acceptable since cursors should be created once and reused.)
 func CreateCursorExtra(xconn *xgb.XConn, cursor, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue uint16) (xproto.Cursor, error) {
-	fontID, err := xproto.NewFontID(xconn)
+	fontID := xproto.NewFontID(xconn)
+	cursorID := xproto.NewCursorID(xconn)
+	err := xproto.OpenFont(xconn, fontID, uint16(len("cursor")), "cursor")
 	if err != nil {
 		return 0, err
 	}
-
-	cursorID, err := xproto.NewCursorID(xconn)
-	if err != nil {
-		return 0, err
-	}
-
-	err = xproto.OpenFont(xconn, fontID, uint16(len("cursor")), "cursor")
-	if err != nil {
-		return 0, err
-	}
-
 	err = xproto.CreateGlyphCursor(xconn, cursorID, fontID, fontID,
 		cursor, cursor+1,
 		foreRed, foreGreen, foreBlue,
@@ -39,11 +30,9 @@ func CreateCursorExtra(xconn *xgb.XConn, cursor, foreRed, foreGreen, foreBlue, b
 	if err != nil {
 		return 0, err
 	}
-
 	err = xproto.CloseFont(xconn, fontID)
 	if err != nil {
 		return 0, err
 	}
-
 	return cursorID, nil
 }

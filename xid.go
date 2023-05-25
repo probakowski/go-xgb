@@ -1,10 +1,11 @@
 package xgb
 
 import (
-	"errors"
 	"sync"
 )
 
+// xidGenerator generates X resource identifiers
+// give X server provided base, max and inc.
 type xidGenerator struct {
 	base uint32
 	last uint32
@@ -13,20 +14,20 @@ type xidGenerator struct {
 	mu   sync.Mutex
 }
 
-func (gen *xidGenerator) Next() (uint32, error) {
+// Next returns the next available resource identifier.
+func (gen *xidGenerator) Next() uint32 {
+	// Acquire lock.
 	gen.mu.Lock()
+	defer gen.mu.Unlock()
 
 	// check if space left in uint32
 	if gen.last > (gen.max - gen.inc) {
-		gen.mu.Unlock()
-		return 0, errors.New("no more available resource identifiers")
+		panic("no more available resource identifiers")
 	}
 
 	// generate next value
 	gen.last += gen.inc
 	next := (gen.last | gen.base)
 
-	// unlock and return
-	gen.mu.Unlock()
-	return next, nil
+	return next
 }

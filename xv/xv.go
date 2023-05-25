@@ -443,9 +443,9 @@ func init() { registerError(0, UnmarshalBadPortError) }
 
 type Encoding uint32
 
-func NewEncodingID(c *xgb.XConn) (Encoding, error) {
-	id, err := c.NewXID()
-	return Encoding(id), err
+func NewEncodingID(c *xgb.XConn) Encoding {
+	id := c.NewXID()
+	return Encoding(id)
 }
 
 type EncodingInfo struct {
@@ -987,9 +987,9 @@ const (
 
 type Port uint32
 
-func NewPortID(c *xgb.XConn) (Port, error) {
-	id, err := c.NewXID()
-	return Port(id), err
+func NewPortID(c *xgb.XConn) Port {
+	id := c.NewXID()
+	return Port(id)
 }
 
 // PortNotify is the event number for a PortNotifyEvent.
