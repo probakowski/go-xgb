@@ -7,17 +7,20 @@ It is the Go equivalent of XCB, the X protocol C-language Binding
 
 ### gruf's Fork
 
-This is a fork of jezek's `go-xgb` repository. It is not yet complete, tests
-are not yet updated and neither is the `ewmh` utility package.
+This is a fork of jezek's `go-xgb` repository. It is not yet complete... 
+- tests are not yet updated
+- `ewmh` utility package is not yet functional
+- some code comments are marked "TODO" with `...`
 
-It is a complete rewrite of the dialer, underlying x connection and the generated
-code itself. The code generator `xgbgen` was still used as the basis for parsing
-`xcb` definition files for generation. The primary differences intended were:
+It is a complete rewrite of the dialer, underlying X connection and generated
+code itself. Though the existing `xgbgen` code generator was still used as the
+basis for parsing `xcb` definition files.
+
+The primary differences intended were:
 - more idiomatic Go code
 - more idiomatic logging
 - support debug output via `debug` build tag
 - rely on memory pooling where possible
-- reduced reliance on concurrency
 
 ### jezek's Fork
 
