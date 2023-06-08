@@ -18,7 +18,9 @@ import (
 // le is a shorthand for the littleendian binary enc/dec.
 var le = binary.LittleEndian
 
-// XConn ...
+// XConn represents a connection to an X server, handling
+// asychronous background receipt and unmarshaling of incoming
+// data for use as the more accessible XError and XEvent types.
 type XConn struct {
 	conn net.Conn      // underlying network connection
 	inCh chan any      // inbound event / error channel
@@ -37,7 +39,7 @@ type XConn struct {
 	exts internal.Map[string, uint8]           // map of opcodes to extensions
 }
 
-// Register ...
+// Register querying the X server for support of this extension, and register relevant event / error unmarshalers internally within XConn.
 func (conn *XConn) Register(ext XExtension) error {
 	// Add this extension to our map, erroring on clash.
 	if !conn.exts.Set(ext.XName, ext.MajorOpcode) {
@@ -53,7 +55,6 @@ func xproto_init(conn *XConn, eventFuncs map[uint8]EventUnmarshaler, errorFuncs 
 	return conn.init(eventFuncs, errorFuncs)
 }
 
-// init ...
 func (conn *XConn) init(eventFuncs map[uint8]EventUnmarshaler, errorFuncs map[uint8]ErrorUnmarshaler) error {
 	select {
 	// Check if closed
