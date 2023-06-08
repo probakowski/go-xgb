@@ -38,7 +38,7 @@ func registerError(n uint8, fn xgb.ErrorUnmarshaler) {
 	errorFuncs[n] = fn
 }
 
-// Register ...
+// Register will query the X server for GenericEvent extension support, and register relevant extension unmarshalers with the XConn.
 func Register(xconn *xgb.XConn) error {
 	// Query the X server for this extension
 	reply, err := xproto.QueryExtension(xconn, uint16(len(ExtXName)), ExtXName)

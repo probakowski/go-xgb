@@ -101,7 +101,7 @@ func (c *Context) Morph(xmlBytes []byte) {
 		c.Putln("	errorFuncs[n] = fn")
 		c.Putln("}")
 		c.Putln("")
-		c.Putln("// Register ...")
+		c.Putln("// Register will query the X server for %s extension support, and register relevant extension unmarshalers with the XConn.", c.protocol.ExtName)
 		c.Putln("func Register(xconn *xgb.XConn) error {")
 		c.Putln("	// Query the X server for this extension")
 		c.Putln("	reply, err := xproto.QueryExtension(xconn, uint16(len(ExtXName)), ExtXName)")

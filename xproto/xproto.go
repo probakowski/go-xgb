@@ -6180,10 +6180,6 @@ func NewWindowID(c *xgb.XConn) Window {
 	return Window(id)
 }
 
-const (
-	WindowNone = 0
-)
-
 // BadWindow is the error number for a BadWindow.
 const BadWindow = 3
 
@@ -6231,6 +6227,10 @@ func (err *WindowError) Error() string {
 func init() {
 	registerError(3, UnmarshalWindowError)
 }
+
+const (
+	WindowNone = 0
+)
 
 const (
 	WindowClassCopyFromParent = 0
