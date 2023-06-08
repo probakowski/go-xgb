@@ -86,7 +86,7 @@ func UnmarshalBadDamageError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadDamageError\"", len(buf))
 	}
 
-	v := BadDamageError{}
+	v := &BadDamageError{}
 	v.NiceName = "BadDamage"
 
 	b := 1 // skip error determinant
@@ -100,17 +100,17 @@ func UnmarshalBadDamageError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadDamage error.
 // This is mostly used internally.
-func (err BadDamageError) SeqID() uint16 {
+func (err *BadDamageError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadDamage error. If no bad value exists, 0 is returned.
-func (err BadDamageError) BadID() uint32 {
+func (err *BadDamageError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadDamage error.
-func (err BadDamageError) Error() string {
+func (err *BadDamageError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadDamage{")
@@ -151,7 +151,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"NotifyEvent\"", len(buf))
 	}
 
-	v := NotifyEvent{}
+	v := &NotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Level = buf[b]
@@ -179,7 +179,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a NotifyEvent value to a byte slice.
-func (v NotifyEvent) Bytes() []byte {
+func (v *NotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -219,7 +219,7 @@ func (v NotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the Notify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v NotifyEvent) SeqID() uint16 {
+func (v *NotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

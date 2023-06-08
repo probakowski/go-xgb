@@ -29,7 +29,7 @@ func (e *Event) Define(c *Context) {
 	c.Putln("// SeqID returns the sequence id attached to the %s event.", e.SrcName())
 	c.Putln("// Events without a sequence number (KeymapNotify) return 0.")
 	c.Putln("// This is mostly used internally.")
-	c.Putln("func (v %s) SeqID() uint16 {", e.EvType())
+	c.Putln("func (v *%s) SeqID() uint16 {", e.EvType())
 	if e.NoSequence {
 		c.Putln("	return 0")
 	} else {
@@ -50,7 +50,7 @@ func (e *Event) Read(c *Context) {
 	c.Putln("		return nil, fmt.Errorf(\"invalid data size %%d for \\\"%s\\\"\", len(buf))", e.EvType())
 	c.Putln("	}")
 	c.Putln("	")
-	c.Putln("	v := %s{}", e.EvType())
+	c.Putln("	v := &%s{}", e.EvType())
 	c.Putln("	b := 1 // don't read event number")
 	c.Putln("	")
 	for i, field := range e.Fields {
@@ -69,7 +69,7 @@ func (e *Event) Read(c *Context) {
 
 func (e *Event) Write(c *Context) {
 	c.Putln("// Bytes writes a %s value to a byte slice.", e.EvType())
-	c.Putln("func (v %s) Bytes() []byte {", e.EvType())
+	c.Putln("func (v *%s) Bytes() []byte {", e.EvType())
 	c.Putln("	buf := make([]byte, %s)", e.Size())
 	c.Putln("	b := 0")
 	c.Putln("	")
@@ -110,7 +110,7 @@ func (e *EventCopy) Define(c *Context) {
 	c.Putln("// SeqID returns the sequence id attached to the %s event.", e.SrcName())
 	c.Putln("// Events without a sequence number (KeymapNotify) return 0.")
 	c.Putln("// This is mostly used internally.")
-	c.Putln("func (v %s) SeqID() uint16 {", e.EvType())
+	c.Putln("func (v *%s) SeqID() uint16 {", e.EvType())
 	if e.Old.(*Event).NoSequence {
 		c.Putln("	return uint16(0)")
 	} else {
@@ -139,16 +139,27 @@ func (e *EventCopy) Read(c *Context) {
 		oevType = split[1]
 	}
 
-	c.Putln("	ev, err := %sUnmarshal%s(buf)", pkg, oevType)
-	c.Putln("	return %s(ev.(%s)), err", e.EvType(), oevType)
+	c.Putln("	x, err := %sUnmarshal%s(buf)", pkg, oevType)
+	c.Putln("	xev, _ := x.(*%s%s)", pkg, oevType)
+	c.Putln("	return (*%s)(xev), err", e.EvType())
 	c.Putln("}")
 	c.Putln("")
 }
 
 func (e *EventCopy) Write(c *Context) {
+	var pkg string
+
+	oevType := e.Old.(*Event).EvType()
+
+	if strings.Contains(oevType, ".") {
+		split := strings.Split(oevType, ".")
+		pkg = split[0] + "."
+		oevType = split[1]
+	}
+
 	c.Putln("// Bytes writes a %s value to a byte slice.", e.EvType())
-	c.Putln("func (v %s) Bytes() []byte {", e.EvType())
-	c.Putln("	buf := %s(v).Bytes()", e.Old.(*Event).EvType())
+	c.Putln("func (v *%s) Bytes() []byte {", e.EvType())
+	c.Putln("	buf := (*%s%s)(v).Bytes()", pkg, oevType)
 	c.Putln("	buf[0] = %d", e.Number)
 	c.Putln("	return buf")
 	c.Putln("}")

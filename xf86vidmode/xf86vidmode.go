@@ -86,7 +86,7 @@ func UnmarshalBadClockError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadClockError\"", len(buf))
 	}
 
-	v := BadClockError{}
+	v := &BadClockError{}
 	v.NiceName = "BadClock"
 
 	b := 1 // skip error determinant
@@ -100,17 +100,17 @@ func UnmarshalBadClockError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadClock error.
 // This is mostly used internally.
-func (err BadClockError) SeqID() uint16 {
+func (err *BadClockError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadClock error. If no bad value exists, 0 is returned.
-func (err BadClockError) BadID() uint32 {
+func (err *BadClockError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadClock error.
-func (err BadClockError) Error() string {
+func (err *BadClockError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadClock{")
@@ -139,7 +139,7 @@ func UnmarshalBadHTimingsError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadHTimingsError\"", len(buf))
 	}
 
-	v := BadHTimingsError{}
+	v := &BadHTimingsError{}
 	v.NiceName = "BadHTimings"
 
 	b := 1 // skip error determinant
@@ -153,17 +153,17 @@ func UnmarshalBadHTimingsError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadHTimings error.
 // This is mostly used internally.
-func (err BadHTimingsError) SeqID() uint16 {
+func (err *BadHTimingsError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadHTimings error. If no bad value exists, 0 is returned.
-func (err BadHTimingsError) BadID() uint32 {
+func (err *BadHTimingsError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadHTimings error.
-func (err BadHTimingsError) Error() string {
+func (err *BadHTimingsError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadHTimings{")
@@ -192,7 +192,7 @@ func UnmarshalBadVTimingsError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadVTimingsError\"", len(buf))
 	}
 
-	v := BadVTimingsError{}
+	v := &BadVTimingsError{}
 	v.NiceName = "BadVTimings"
 
 	b := 1 // skip error determinant
@@ -206,17 +206,17 @@ func UnmarshalBadVTimingsError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadVTimings error.
 // This is mostly used internally.
-func (err BadVTimingsError) SeqID() uint16 {
+func (err *BadVTimingsError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadVTimings error. If no bad value exists, 0 is returned.
-func (err BadVTimingsError) BadID() uint32 {
+func (err *BadVTimingsError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadVTimings error.
-func (err BadVTimingsError) Error() string {
+func (err *BadVTimingsError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadVTimings{")
@@ -245,7 +245,7 @@ func UnmarshalClientNotLocalError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ClientNotLocalError\"", len(buf))
 	}
 
-	v := ClientNotLocalError{}
+	v := &ClientNotLocalError{}
 	v.NiceName = "ClientNotLocal"
 
 	b := 1 // skip error determinant
@@ -259,17 +259,17 @@ func UnmarshalClientNotLocalError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadClientNotLocal error.
 // This is mostly used internally.
-func (err ClientNotLocalError) SeqID() uint16 {
+func (err *ClientNotLocalError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadClientNotLocal error. If no bad value exists, 0 is returned.
-func (err ClientNotLocalError) BadID() uint32 {
+func (err *ClientNotLocalError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadClientNotLocal error.
-func (err ClientNotLocalError) Error() string {
+func (err *ClientNotLocalError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadClientNotLocal{")
@@ -304,7 +304,7 @@ func UnmarshalExtensionDisabledError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ExtensionDisabledError\"", len(buf))
 	}
 
-	v := ExtensionDisabledError{}
+	v := &ExtensionDisabledError{}
 	v.NiceName = "ExtensionDisabled"
 
 	b := 1 // skip error determinant
@@ -318,17 +318,17 @@ func UnmarshalExtensionDisabledError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadExtensionDisabled error.
 // This is mostly used internally.
-func (err ExtensionDisabledError) SeqID() uint16 {
+func (err *ExtensionDisabledError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadExtensionDisabled error. If no bad value exists, 0 is returned.
-func (err ExtensionDisabledError) BadID() uint32 {
+func (err *ExtensionDisabledError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadExtensionDisabled error.
-func (err ExtensionDisabledError) Error() string {
+func (err *ExtensionDisabledError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadExtensionDisabled{")
@@ -507,7 +507,7 @@ func UnmarshalModeUnsuitableError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ModeUnsuitableError\"", len(buf))
 	}
 
-	v := ModeUnsuitableError{}
+	v := &ModeUnsuitableError{}
 	v.NiceName = "ModeUnsuitable"
 
 	b := 1 // skip error determinant
@@ -521,17 +521,17 @@ func UnmarshalModeUnsuitableError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadModeUnsuitable error.
 // This is mostly used internally.
-func (err ModeUnsuitableError) SeqID() uint16 {
+func (err *ModeUnsuitableError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadModeUnsuitable error. If no bad value exists, 0 is returned.
-func (err ModeUnsuitableError) BadID() uint32 {
+func (err *ModeUnsuitableError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadModeUnsuitable error.
-func (err ModeUnsuitableError) Error() string {
+func (err *ModeUnsuitableError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadModeUnsuitable{")
@@ -567,7 +567,7 @@ func UnmarshalZoomLockedError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ZoomLockedError\"", len(buf))
 	}
 
-	v := ZoomLockedError{}
+	v := &ZoomLockedError{}
 	v.NiceName = "ZoomLocked"
 
 	b := 1 // skip error determinant
@@ -581,17 +581,17 @@ func UnmarshalZoomLockedError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadZoomLocked error.
 // This is mostly used internally.
-func (err ZoomLockedError) SeqID() uint16 {
+func (err *ZoomLockedError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadZoomLocked error. If no bad value exists, 0 is returned.
-func (err ZoomLockedError) BadID() uint32 {
+func (err *ZoomLockedError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadZoomLocked error.
-func (err ZoomLockedError) Error() string {
+func (err *ZoomLockedError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadZoomLocked{")

@@ -37,7 +37,7 @@ func (e *Error) Read(c *Context) {
 	c.Putln("		return nil, fmt.Errorf(\"invalid data size %%d for \\\"%s\\\"\", len(buf))", e.ErrType())
 	c.Putln("	}")
 	c.Putln("	")
-	c.Putln("	v := %s{}", e.ErrType())
+	c.Putln("	v := &%s{}", e.ErrType())
 	c.Putln("	v.NiceName = \"%s\"", e.SrcName())
 	c.Putln("	")
 	c.Putln("	b := 1 // skip error determinant")
@@ -59,12 +59,12 @@ func (e *Error) Read(c *Context) {
 func (e *Error) ImplementsError(c *Context) {
 	c.Putln("// SeqID returns the sequence id attached to the %s error.", e.ErrConst())
 	c.Putln("// This is mostly used internally.")
-	c.Putln("func (err %s) SeqID() uint16 {", e.ErrType())
+	c.Putln("func (err *%s) SeqID() uint16 {", e.ErrType())
 	c.Putln("	return err.Sequence")
 	c.Putln("}")
 	c.Putln("")
 	c.Putln("// BadID returns the 'BadValue' number if one exists for the %s error. If no bad value exists, 0 is returned.", e.ErrConst())
-	c.Putln("func (err %s) BadID() uint32 {", e.ErrType())
+	c.Putln("func (err *%s) BadID() uint32 {", e.ErrType())
 	if !c.protocol.isExt() {
 		c.Putln("return err.BadValue")
 	} else {
@@ -72,7 +72,7 @@ func (e *Error) ImplementsError(c *Context) {
 	}
 	c.Putln("}")
 	c.Putln("// Error returns a rudimentary string representation of the %s error.", e.ErrConst())
-	c.Putln("func (err %s) Error() string {", e.ErrType())
+	c.Putln("func (err *%s) Error() string {", e.ErrType())
 	ErrorFieldString(c, e.Fields, e.ErrConst())
 	c.Putln("}")
 	c.Putln("")
@@ -114,7 +114,9 @@ func (e *ErrorCopy) Read(c *Context) {
 		errType = split[1]
 	}
 
-	c.Putln("	return %sUnmarshal%s(buf)", pkg, errType)
+	c.Putln("	x, err := %sUnmarshal%s(buf)", pkg, errType)
+	c.Putln("	xerr, _ := x.(*%s%s)", pkg, errType)
+	c.Putln("	return (*%s)(xerr), err", e.ErrType())
 	c.Putln("}")
 	c.Putln("")
 }
@@ -124,12 +126,12 @@ func (e *ErrorCopy) ImplementsError(c *Context) {
 	c.Putln("// SequenceId returns the sequence id attached to the %s error.",
 		e.ErrConst())
 	c.Putln("// This is mostly used internally.")
-	c.Putln("func (err %s) SeqID() uint16 {", e.ErrType())
+	c.Putln("func (err *%s) SeqID() uint16 {", e.ErrType())
 	c.Putln("	return err.Sequence")
 	c.Putln("}")
 	c.Putln("")
 	c.Putln("// BadId returns the 'BadValue' number if one exists for the %s error. If no bad value exists, 0 is returned.", e.ErrConst())
-	c.Putln("func (err %s) BadID() uint32 {", e.ErrType())
+	c.Putln("func (err *%s) BadID() uint32 {", e.ErrType())
 	if !c.protocol.isExt() {
 		c.Putln("	return err.BadValue")
 	} else {
@@ -138,7 +140,7 @@ func (e *ErrorCopy) ImplementsError(c *Context) {
 	c.Putln("}")
 	c.Putln("")
 	c.Putln("// Error returns a rudimentary string representation of the %s error.", e.ErrConst())
-	c.Putln("func (err %s) Error() string {", e.ErrType())
+	c.Putln("func (err *%s) Error() string {", e.ErrType())
 	ErrorFieldString(c, e.Old.(*Error).Fields, e.ErrConst())
 	c.Putln("}")
 	c.Putln("")

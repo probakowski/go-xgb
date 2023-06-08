@@ -88,7 +88,7 @@ func UnmarshalBadRegionError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadRegionError\"", len(buf))
 	}
 
-	v := BadRegionError{}
+	v := &BadRegionError{}
 	v.NiceName = "BadRegion"
 
 	b := 1 // skip error determinant
@@ -102,17 +102,17 @@ func UnmarshalBadRegionError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadRegion error.
 // This is mostly used internally.
-func (err BadRegionError) SeqID() uint16 {
+func (err *BadRegionError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadRegion error. If no bad value exists, 0 is returned.
-func (err BadRegionError) BadID() uint32 {
+func (err *BadRegionError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadRegion error.
-func (err BadRegionError) Error() string {
+func (err *BadRegionError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadRegion{")
@@ -165,7 +165,7 @@ func UnmarshalCursorNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"CursorNotifyEvent\"", len(buf))
 	}
 
-	v := CursorNotifyEvent{}
+	v := &CursorNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Subtype = buf[b]
@@ -192,7 +192,7 @@ func UnmarshalCursorNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a CursorNotifyEvent value to a byte slice.
-func (v CursorNotifyEvent) Bytes() []byte {
+func (v *CursorNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -225,7 +225,7 @@ func (v CursorNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the CursorNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v CursorNotifyEvent) SeqID() uint16 {
+func (v *CursorNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -297,7 +297,7 @@ func UnmarshalSelectionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"SelectionNotifyEvent\"", len(buf))
 	}
 
-	v := SelectionNotifyEvent{}
+	v := &SelectionNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Subtype = buf[b]
@@ -327,7 +327,7 @@ func UnmarshalSelectionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a SelectionNotifyEvent value to a byte slice.
-func (v SelectionNotifyEvent) Bytes() []byte {
+func (v *SelectionNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -363,7 +363,7 @@ func (v SelectionNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the SelectionNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v SelectionNotifyEvent) SeqID() uint16 {
+func (v *SelectionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

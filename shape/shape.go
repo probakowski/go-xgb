@@ -94,7 +94,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"NotifyEvent\"", len(buf))
 	}
 
-	v := NotifyEvent{}
+	v := &NotifyEvent{}
 	b := 1 // don't read event number
 
 	v.ShapeKind = Kind(buf[b])
@@ -130,7 +130,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a NotifyEvent value to a byte slice.
-func (v NotifyEvent) Bytes() []byte {
+func (v *NotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -176,7 +176,7 @@ func (v NotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the Notify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v NotifyEvent) SeqID() uint16 {
+func (v *NotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

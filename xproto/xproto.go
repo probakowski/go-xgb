@@ -61,22 +61,24 @@ type AccessError RequestError
 
 // AccessErrorNew constructs a AccessError value that implements xgb.Error from a byte slice.
 func UnmarshalAccessError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*AccessError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadAccess error.
 // This is mostly used internally.
-func (err AccessError) SeqID() uint16 {
+func (err *AccessError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadAccess error. If no bad value exists, 0 is returned.
-func (err AccessError) BadID() uint32 {
+func (err *AccessError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadAccess error.
-func (err AccessError) Error() string {
+func (err *AccessError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadAccess{")
@@ -112,22 +114,24 @@ type AllocError RequestError
 
 // AllocErrorNew constructs a AllocError value that implements xgb.Error from a byte slice.
 func UnmarshalAllocError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*AllocError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadAlloc error.
 // This is mostly used internally.
-func (err AllocError) SeqID() uint16 {
+func (err *AllocError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadAlloc error. If no bad value exists, 0 is returned.
-func (err AllocError) BadID() uint32 {
+func (err *AllocError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadAlloc error.
-func (err AllocError) Error() string {
+func (err *AllocError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadAlloc{")
@@ -336,22 +340,24 @@ type AtomError ValueError
 
 // AtomErrorNew constructs a AtomError value that implements xgb.Error from a byte slice.
 func UnmarshalAtomError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*AtomError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadAtom error.
 // This is mostly used internally.
-func (err AtomError) SeqID() uint16 {
+func (err *AtomError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadAtom error. If no bad value exists, 0 is returned.
-func (err AtomError) BadID() uint32 {
+func (err *AtomError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadAtom error.
-func (err AtomError) Error() string {
+func (err *AtomError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadAtom{")
@@ -445,7 +451,7 @@ func UnmarshalButtonPressEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ButtonPressEvent\"", len(buf))
 	}
 
-	v := ButtonPressEvent{}
+	v := &ButtonPressEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = Button(buf[b])
@@ -490,7 +496,7 @@ func UnmarshalButtonPressEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ButtonPressEvent value to a byte slice.
-func (v ButtonPressEvent) Bytes() []byte {
+func (v *ButtonPressEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -545,7 +551,7 @@ func (v ButtonPressEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ButtonPress event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ButtonPressEvent) SeqID() uint16 {
+func (v *ButtonPressEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -558,13 +564,14 @@ type ButtonReleaseEvent ButtonPressEvent
 
 // ButtonReleaseEventNew constructs a ButtonReleaseEvent value that implements xgb.Event from a byte slice.
 func UnmarshalButtonReleaseEvent(buf []byte) (xgb.XEvent, error) {
-	ev, err := UnmarshalButtonPressEvent(buf)
-	return ButtonReleaseEvent(ev.(ButtonPressEvent)), err
+	x, err := UnmarshalButtonPressEvent(buf)
+	xev, _ := x.(*ButtonPressEvent)
+	return (*ButtonReleaseEvent)(xev), err
 }
 
 // Bytes writes a ButtonReleaseEvent value to a byte slice.
-func (v ButtonReleaseEvent) Bytes() []byte {
-	buf := ButtonPressEvent(v).Bytes()
+func (v *ButtonReleaseEvent) Bytes() []byte {
+	buf := (*ButtonPressEvent)(v).Bytes()
 	buf[0] = 5
 	return buf
 }
@@ -572,7 +579,7 @@ func (v ButtonReleaseEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ButtonRelease event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ButtonReleaseEvent) SeqID() uint16 {
+func (v *ButtonReleaseEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -747,7 +754,7 @@ func UnmarshalCirculateNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"CirculateNotifyEvent\"", len(buf))
 	}
 
-	v := CirculateNotifyEvent{}
+	v := &CirculateNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -772,7 +779,7 @@ func UnmarshalCirculateNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a CirculateNotifyEvent value to a byte slice.
-func (v CirculateNotifyEvent) Bytes() []byte {
+func (v *CirculateNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -803,7 +810,7 @@ func (v CirculateNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the CirculateNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v CirculateNotifyEvent) SeqID() uint16 {
+func (v *CirculateNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -816,13 +823,14 @@ type CirculateRequestEvent CirculateNotifyEvent
 
 // CirculateRequestEventNew constructs a CirculateRequestEvent value that implements xgb.Event from a byte slice.
 func UnmarshalCirculateRequestEvent(buf []byte) (xgb.XEvent, error) {
-	ev, err := UnmarshalCirculateNotifyEvent(buf)
-	return CirculateRequestEvent(ev.(CirculateNotifyEvent)), err
+	x, err := UnmarshalCirculateNotifyEvent(buf)
+	xev, _ := x.(*CirculateNotifyEvent)
+	return (*CirculateRequestEvent)(xev), err
 }
 
 // Bytes writes a CirculateRequestEvent value to a byte slice.
-func (v CirculateRequestEvent) Bytes() []byte {
-	buf := CirculateNotifyEvent(v).Bytes()
+func (v *CirculateRequestEvent) Bytes() []byte {
+	buf := (*CirculateNotifyEvent)(v).Bytes()
 	buf[0] = 27
 	return buf
 }
@@ -830,7 +838,7 @@ func (v CirculateRequestEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the CirculateRequest event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v CirculateRequestEvent) SeqID() uint16 {
+func (v *CirculateRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -855,7 +863,7 @@ func UnmarshalClientMessageEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ClientMessageEvent\"", len(buf))
 	}
 
-	v := ClientMessageEvent{}
+	v := &ClientMessageEvent{}
 	b := 1 // don't read event number
 
 	v.Format = buf[b]
@@ -877,7 +885,7 @@ func UnmarshalClientMessageEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ClientMessageEvent value to a byte slice.
-func (v ClientMessageEvent) Bytes() []byte {
+func (v *ClientMessageEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -908,7 +916,7 @@ func (v ClientMessageEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ClientMessage event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ClientMessageEvent) SeqID() uint16 {
+func (v *ClientMessageEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1213,22 +1221,24 @@ type ColormapError ValueError
 
 // ColormapErrorNew constructs a ColormapError value that implements xgb.Error from a byte slice.
 func UnmarshalColormapError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*ColormapError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadColormap error.
 // This is mostly used internally.
-func (err ColormapError) SeqID() uint16 {
+func (err *ColormapError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadColormap error. If no bad value exists, 0 is returned.
-func (err ColormapError) BadID() uint32 {
+func (err *ColormapError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadColormap error.
-func (err ColormapError) Error() string {
+func (err *ColormapError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadColormap{")
@@ -1276,7 +1286,7 @@ func UnmarshalColormapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ColormapNotifyEvent\"", len(buf))
 	}
 
-	v := ColormapNotifyEvent{}
+	v := &ColormapNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -1302,7 +1312,7 @@ func UnmarshalColormapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ColormapNotifyEvent value to a byte slice.
-func (v ColormapNotifyEvent) Bytes() []byte {
+func (v *ColormapNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -1338,7 +1348,7 @@ func (v ColormapNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ColormapNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ColormapNotifyEvent) SeqID() uint16 {
+func (v *ColormapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1383,7 +1393,7 @@ func UnmarshalConfigureNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ConfigureNotifyEvent\"", len(buf))
 	}
 
-	v := ConfigureNotifyEvent{}
+	v := &ConfigureNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -1424,7 +1434,7 @@ func UnmarshalConfigureNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ConfigureNotifyEvent value to a byte slice.
-func (v ConfigureNotifyEvent) Bytes() []byte {
+func (v *ConfigureNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -1475,7 +1485,7 @@ func (v ConfigureNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ConfigureNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ConfigureNotifyEvent) SeqID() uint16 {
+func (v *ConfigureNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1504,7 +1514,7 @@ func UnmarshalConfigureRequestEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ConfigureRequestEvent\"", len(buf))
 	}
 
-	v := ConfigureRequestEvent{}
+	v := &ConfigureRequestEvent{}
 	b := 1 // don't read event number
 
 	v.StackMode = buf[b]
@@ -1544,7 +1554,7 @@ func UnmarshalConfigureRequestEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ConfigureRequestEvent value to a byte slice.
-func (v ConfigureRequestEvent) Bytes() []byte {
+func (v *ConfigureRequestEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -1590,7 +1600,7 @@ func (v ConfigureRequestEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ConfigureRequest event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ConfigureRequestEvent) SeqID() uint16 {
+func (v *ConfigureRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1624,7 +1634,7 @@ func UnmarshalCreateNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"CreateNotifyEvent\"", len(buf))
 	}
 
-	v := CreateNotifyEvent{}
+	v := &CreateNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -1662,7 +1672,7 @@ func UnmarshalCreateNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a CreateNotifyEvent value to a byte slice.
-func (v CreateNotifyEvent) Bytes() []byte {
+func (v *CreateNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -1710,7 +1720,7 @@ func (v CreateNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the CreateNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v CreateNotifyEvent) SeqID() uint16 {
+func (v *CreateNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1734,22 +1744,24 @@ type CursorError ValueError
 
 // CursorErrorNew constructs a CursorError value that implements xgb.Error from a byte slice.
 func UnmarshalCursorError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*CursorError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadCursor error.
 // This is mostly used internally.
-func (err CursorError) SeqID() uint16 {
+func (err *CursorError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadCursor error. If no bad value exists, 0 is returned.
-func (err CursorError) BadID() uint32 {
+func (err *CursorError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadCursor error.
-func (err CursorError) Error() string {
+func (err *CursorError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadCursor{")
@@ -1886,7 +1898,7 @@ func UnmarshalDestroyNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"DestroyNotifyEvent\"", len(buf))
 	}
 
-	v := DestroyNotifyEvent{}
+	v := &DestroyNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -1904,7 +1916,7 @@ func UnmarshalDestroyNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a DestroyNotifyEvent value to a byte slice.
-func (v DestroyNotifyEvent) Bytes() []byte {
+func (v *DestroyNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -1928,7 +1940,7 @@ func (v DestroyNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the DestroyNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v DestroyNotifyEvent) SeqID() uint16 {
+func (v *DestroyNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -1948,22 +1960,24 @@ type DrawableError ValueError
 
 // DrawableErrorNew constructs a DrawableError value that implements xgb.Error from a byte slice.
 func UnmarshalDrawableError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*DrawableError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadDrawable error.
 // This is mostly used internally.
-func (err DrawableError) SeqID() uint16 {
+func (err *DrawableError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadDrawable error. If no bad value exists, 0 is returned.
-func (err DrawableError) BadID() uint32 {
+func (err *DrawableError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadDrawable error.
-func (err DrawableError) Error() string {
+func (err *DrawableError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadDrawable{")
@@ -2012,7 +2026,7 @@ func UnmarshalEnterNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"EnterNotifyEvent\"", len(buf))
 	}
 
-	v := EnterNotifyEvent{}
+	v := &EnterNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = buf[b]
@@ -2058,7 +2072,7 @@ func UnmarshalEnterNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a EnterNotifyEvent value to a byte slice.
-func (v EnterNotifyEvent) Bytes() []byte {
+func (v *EnterNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2110,7 +2124,7 @@ func (v EnterNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the EnterNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v EnterNotifyEvent) SeqID() uint16 {
+func (v *EnterNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2166,7 +2180,7 @@ func UnmarshalExposeEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ExposeEvent\"", len(buf))
 	}
 
-	v := ExposeEvent{}
+	v := &ExposeEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -2198,7 +2212,7 @@ func UnmarshalExposeEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ExposeEvent value to a byte slice.
-func (v ExposeEvent) Bytes() []byte {
+func (v *ExposeEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2236,7 +2250,7 @@ func (v ExposeEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the Expose event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ExposeEvent) SeqID() uint16 {
+func (v *ExposeEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2285,7 +2299,7 @@ func UnmarshalFocusInEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"FocusInEvent\"", len(buf))
 	}
 
-	v := FocusInEvent{}
+	v := &FocusInEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = buf[b]
@@ -2306,7 +2320,7 @@ func UnmarshalFocusInEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a FocusInEvent value to a byte slice.
-func (v FocusInEvent) Bytes() []byte {
+func (v *FocusInEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2333,7 +2347,7 @@ func (v FocusInEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the FocusIn event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v FocusInEvent) SeqID() uint16 {
+func (v *FocusInEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2346,13 +2360,14 @@ type FocusOutEvent FocusInEvent
 
 // FocusOutEventNew constructs a FocusOutEvent value that implements xgb.Event from a byte slice.
 func UnmarshalFocusOutEvent(buf []byte) (xgb.XEvent, error) {
-	ev, err := UnmarshalFocusInEvent(buf)
-	return FocusOutEvent(ev.(FocusInEvent)), err
+	x, err := UnmarshalFocusInEvent(buf)
+	xev, _ := x.(*FocusInEvent)
+	return (*FocusOutEvent)(xev), err
 }
 
 // Bytes writes a FocusOutEvent value to a byte slice.
-func (v FocusOutEvent) Bytes() []byte {
-	buf := FocusInEvent(v).Bytes()
+func (v *FocusOutEvent) Bytes() []byte {
+	buf := (*FocusInEvent)(v).Bytes()
 	buf[0] = 10
 	return buf
 }
@@ -2360,7 +2375,7 @@ func (v FocusOutEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the FocusOut event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v FocusOutEvent) SeqID() uint16 {
+func (v *FocusOutEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2382,22 +2397,24 @@ type FontError ValueError
 
 // FontErrorNew constructs a FontError value that implements xgb.Error from a byte slice.
 func UnmarshalFontError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*FontError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadFont error.
 // This is mostly used internally.
-func (err FontError) SeqID() uint16 {
+func (err *FontError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadFont error. If no bad value exists, 0 is returned.
-func (err FontError) BadID() uint32 {
+func (err *FontError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadFont error.
-func (err FontError) Error() string {
+func (err *FontError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadFont{")
@@ -2564,22 +2581,24 @@ type GContextError ValueError
 
 // GContextErrorNew constructs a GContextError value that implements xgb.Error from a byte slice.
 func UnmarshalGContextError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*GContextError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadGContext error.
 // This is mostly used internally.
-func (err GContextError) SeqID() uint16 {
+func (err *GContextError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadGContext error. If no bad value exists, 0 is returned.
-func (err GContextError) BadID() uint32 {
+func (err *GContextError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadGContext error.
-func (err GContextError) Error() string {
+func (err *GContextError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadGContext{")
@@ -2650,7 +2669,7 @@ func UnmarshalGeGenericEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"GeGenericEvent\"", len(buf))
 	}
 
-	v := GeGenericEvent{}
+	v := &GeGenericEvent{}
 	b := 1 // don't read event number
 
 	b += 22 // padding
@@ -2659,7 +2678,7 @@ func UnmarshalGeGenericEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a GeGenericEvent value to a byte slice.
-func (v GeGenericEvent) Bytes() []byte {
+func (v *GeGenericEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2675,7 +2694,7 @@ func (v GeGenericEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the GeGeneric event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v GeGenericEvent) SeqID() uint16 {
+func (v *GeGenericEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2725,7 +2744,7 @@ func UnmarshalGraphicsExposureEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"GraphicsExposureEvent\"", len(buf))
 	}
 
-	v := GraphicsExposureEvent{}
+	v := &GraphicsExposureEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -2763,7 +2782,7 @@ func UnmarshalGraphicsExposureEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a GraphicsExposureEvent value to a byte slice.
-func (v GraphicsExposureEvent) Bytes() []byte {
+func (v *GraphicsExposureEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2807,7 +2826,7 @@ func (v GraphicsExposureEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the GraphicsExposure event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v GraphicsExposureEvent) SeqID() uint16 {
+func (v *GraphicsExposureEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -2846,7 +2865,7 @@ func UnmarshalGravityNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"GravityNotifyEvent\"", len(buf))
 	}
 
-	v := GravityNotifyEvent{}
+	v := &GravityNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -2870,7 +2889,7 @@ func UnmarshalGravityNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a GravityNotifyEvent value to a byte slice.
-func (v GravityNotifyEvent) Bytes() []byte {
+func (v *GravityNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -2900,7 +2919,7 @@ func (v GravityNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the GravityNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v GravityNotifyEvent) SeqID() uint16 {
+func (v *GravityNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3018,22 +3037,24 @@ type IDChoiceError ValueError
 
 // IDChoiceErrorNew constructs a IDChoiceError value that implements xgb.Error from a byte slice.
 func UnmarshalIDChoiceError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*IDChoiceError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadIDChoice error.
 // This is mostly used internally.
-func (err IDChoiceError) SeqID() uint16 {
+func (err *IDChoiceError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadIDChoice error. If no bad value exists, 0 is returned.
-func (err IDChoiceError) BadID() uint32 {
+func (err *IDChoiceError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadIDChoice error.
-func (err IDChoiceError) Error() string {
+func (err *IDChoiceError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadIDChoice{")
@@ -3075,22 +3096,24 @@ type ImplementationError RequestError
 
 // ImplementationErrorNew constructs a ImplementationError value that implements xgb.Error from a byte slice.
 func UnmarshalImplementationError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*ImplementationError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadImplementation error.
 // This is mostly used internally.
-func (err ImplementationError) SeqID() uint16 {
+func (err *ImplementationError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadImplementation error. If no bad value exists, 0 is returned.
-func (err ImplementationError) BadID() uint32 {
+func (err *ImplementationError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadImplementation error.
-func (err ImplementationError) Error() string {
+func (err *ImplementationError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadImplementation{")
@@ -3179,7 +3202,7 @@ func UnmarshalKeyPressEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"KeyPressEvent\"", len(buf))
 	}
 
-	v := KeyPressEvent{}
+	v := &KeyPressEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = Keycode(buf[b])
@@ -3224,7 +3247,7 @@ func UnmarshalKeyPressEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a KeyPressEvent value to a byte slice.
-func (v KeyPressEvent) Bytes() []byte {
+func (v *KeyPressEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3279,7 +3302,7 @@ func (v KeyPressEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the KeyPress event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v KeyPressEvent) SeqID() uint16 {
+func (v *KeyPressEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3292,13 +3315,14 @@ type KeyReleaseEvent KeyPressEvent
 
 // KeyReleaseEventNew constructs a KeyReleaseEvent value that implements xgb.Event from a byte slice.
 func UnmarshalKeyReleaseEvent(buf []byte) (xgb.XEvent, error) {
-	ev, err := UnmarshalKeyPressEvent(buf)
-	return KeyReleaseEvent(ev.(KeyPressEvent)), err
+	x, err := UnmarshalKeyPressEvent(buf)
+	xev, _ := x.(*KeyPressEvent)
+	return (*KeyReleaseEvent)(xev), err
 }
 
 // Bytes writes a KeyReleaseEvent value to a byte slice.
-func (v KeyReleaseEvent) Bytes() []byte {
-	buf := KeyPressEvent(v).Bytes()
+func (v *KeyReleaseEvent) Bytes() []byte {
+	buf := (*KeyPressEvent)(v).Bytes()
 	buf[0] = 3
 	return buf
 }
@@ -3306,7 +3330,7 @@ func (v KeyReleaseEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the KeyRelease event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v KeyReleaseEvent) SeqID() uint16 {
+func (v *KeyReleaseEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3331,7 +3355,7 @@ func UnmarshalKeymapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"KeymapNotifyEvent\"", len(buf))
 	}
 
-	v := KeymapNotifyEvent{}
+	v := &KeymapNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Keys = make([]byte, 31)
@@ -3342,7 +3366,7 @@ func UnmarshalKeymapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a KeymapNotifyEvent value to a byte slice.
-func (v KeymapNotifyEvent) Bytes() []byte {
+func (v *KeymapNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3359,7 +3383,7 @@ func (v KeymapNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the KeymapNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v KeymapNotifyEvent) SeqID() uint16 {
+func (v *KeymapNotifyEvent) SeqID() uint16 {
 	return 0
 }
 
@@ -3378,13 +3402,14 @@ type LeaveNotifyEvent EnterNotifyEvent
 
 // LeaveNotifyEventNew constructs a LeaveNotifyEvent value that implements xgb.Event from a byte slice.
 func UnmarshalLeaveNotifyEvent(buf []byte) (xgb.XEvent, error) {
-	ev, err := UnmarshalEnterNotifyEvent(buf)
-	return LeaveNotifyEvent(ev.(EnterNotifyEvent)), err
+	x, err := UnmarshalEnterNotifyEvent(buf)
+	xev, _ := x.(*EnterNotifyEvent)
+	return (*LeaveNotifyEvent)(xev), err
 }
 
 // Bytes writes a LeaveNotifyEvent value to a byte slice.
-func (v LeaveNotifyEvent) Bytes() []byte {
-	buf := EnterNotifyEvent(v).Bytes()
+func (v *LeaveNotifyEvent) Bytes() []byte {
+	buf := (*EnterNotifyEvent)(v).Bytes()
 	buf[0] = 8
 	return buf
 }
@@ -3392,7 +3417,7 @@ func (v LeaveNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the LeaveNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v LeaveNotifyEvent) SeqID() uint16 {
+func (v *LeaveNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3412,22 +3437,24 @@ type LengthError RequestError
 
 // LengthErrorNew constructs a LengthError value that implements xgb.Error from a byte slice.
 func UnmarshalLengthError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*LengthError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadLength error.
 // This is mostly used internally.
-func (err LengthError) SeqID() uint16 {
+func (err *LengthError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadLength error. If no bad value exists, 0 is returned.
-func (err LengthError) BadID() uint32 {
+func (err *LengthError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadLength error.
-func (err LengthError) Error() string {
+func (err *LengthError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadLength{")
@@ -3486,7 +3513,7 @@ func UnmarshalMapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"MapNotifyEvent\"", len(buf))
 	}
 
-	v := MapNotifyEvent{}
+	v := &MapNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -3509,7 +3536,7 @@ func UnmarshalMapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a MapNotifyEvent value to a byte slice.
-func (v MapNotifyEvent) Bytes() []byte {
+func (v *MapNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3542,7 +3569,7 @@ func (v MapNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the MapNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v MapNotifyEvent) SeqID() uint16 {
+func (v *MapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3564,7 +3591,7 @@ func UnmarshalMapRequestEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"MapRequestEvent\"", len(buf))
 	}
 
-	v := MapRequestEvent{}
+	v := &MapRequestEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -3582,7 +3609,7 @@ func UnmarshalMapRequestEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a MapRequestEvent value to a byte slice.
-func (v MapRequestEvent) Bytes() []byte {
+func (v *MapRequestEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3606,7 +3633,7 @@ func (v MapRequestEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the MapRequest event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v MapRequestEvent) SeqID() uint16 {
+func (v *MapRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3642,7 +3669,7 @@ func UnmarshalMappingNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"MappingNotifyEvent\"", len(buf))
 	}
 
-	v := MappingNotifyEvent{}
+	v := &MappingNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -3665,7 +3692,7 @@ func UnmarshalMappingNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a MappingNotifyEvent value to a byte slice.
-func (v MappingNotifyEvent) Bytes() []byte {
+func (v *MappingNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3694,7 +3721,7 @@ func (v MappingNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the MappingNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v MappingNotifyEvent) SeqID() uint16 {
+func (v *MappingNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3713,22 +3740,24 @@ type MatchError RequestError
 
 // MatchErrorNew constructs a MatchError value that implements xgb.Error from a byte slice.
 func UnmarshalMatchError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*MatchError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadMatch error.
 // This is mostly used internally.
-func (err MatchError) SeqID() uint16 {
+func (err *MatchError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadMatch error. If no bad value exists, 0 is returned.
-func (err MatchError) BadID() uint32 {
+func (err *MatchError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadMatch error.
-func (err MatchError) Error() string {
+func (err *MatchError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadMatch{")
@@ -3794,7 +3823,7 @@ func UnmarshalMotionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"MotionNotifyEvent\"", len(buf))
 	}
 
-	v := MotionNotifyEvent{}
+	v := &MotionNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = buf[b]
@@ -3839,7 +3868,7 @@ func UnmarshalMotionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a MotionNotifyEvent value to a byte slice.
-func (v MotionNotifyEvent) Bytes() []byte {
+func (v *MotionNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -3894,7 +3923,7 @@ func (v MotionNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the MotionNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v MotionNotifyEvent) SeqID() uint16 {
+func (v *MotionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -3907,22 +3936,24 @@ type NameError RequestError
 
 // NameErrorNew constructs a NameError value that implements xgb.Error from a byte slice.
 func UnmarshalNameError(buf []byte) (xgb.XError, error) {
-	return UnmarshalRequestError(buf)
+	x, err := UnmarshalRequestError(buf)
+	xerr, _ := x.(*RequestError)
+	return (*NameError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadName error.
 // This is mostly used internally.
-func (err NameError) SeqID() uint16 {
+func (err *NameError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadName error. If no bad value exists, 0 is returned.
-func (err NameError) BadID() uint32 {
+func (err *NameError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadName error.
-func (err NameError) Error() string {
+func (err *NameError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadName{")
@@ -3964,7 +3995,7 @@ func UnmarshalNoExposureEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"NoExposureEvent\"", len(buf))
 	}
 
-	v := NoExposureEvent{}
+	v := &NoExposureEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -3987,7 +4018,7 @@ func UnmarshalNoExposureEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a NoExposureEvent value to a byte slice.
-func (v NoExposureEvent) Bytes() []byte {
+func (v *NoExposureEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -4016,7 +4047,7 @@ func (v NoExposureEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the NoExposure event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v NoExposureEvent) SeqID() uint16 {
+func (v *NoExposureEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -4054,22 +4085,24 @@ type PixmapError ValueError
 
 // PixmapErrorNew constructs a PixmapError value that implements xgb.Error from a byte slice.
 func UnmarshalPixmapError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*PixmapError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadPixmap error.
 // This is mostly used internally.
-func (err PixmapError) SeqID() uint16 {
+func (err *PixmapError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadPixmap error. If no bad value exists, 0 is returned.
-func (err PixmapError) BadID() uint32 {
+func (err *PixmapError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadPixmap error.
-func (err PixmapError) Error() string {
+func (err *PixmapError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadPixmap{")
@@ -4192,7 +4225,7 @@ func UnmarshalPropertyNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"PropertyNotifyEvent\"", len(buf))
 	}
 
-	v := PropertyNotifyEvent{}
+	v := &PropertyNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -4218,7 +4251,7 @@ func UnmarshalPropertyNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a PropertyNotifyEvent value to a byte slice.
-func (v PropertyNotifyEvent) Bytes() []byte {
+func (v *PropertyNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -4250,7 +4283,7 @@ func (v PropertyNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the PropertyNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v PropertyNotifyEvent) SeqID() uint16 {
+func (v *PropertyNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -4351,7 +4384,7 @@ func UnmarshalReparentNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ReparentNotifyEvent\"", len(buf))
 	}
 
-	v := ReparentNotifyEvent{}
+	v := &ReparentNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -4383,7 +4416,7 @@ func UnmarshalReparentNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ReparentNotifyEvent value to a byte slice.
-func (v ReparentNotifyEvent) Bytes() []byte {
+func (v *ReparentNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -4425,7 +4458,7 @@ func (v ReparentNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ReparentNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ReparentNotifyEvent) SeqID() uint16 {
+func (v *ReparentNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -4449,7 +4482,7 @@ func UnmarshalRequestError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"RequestError\"", len(buf))
 	}
 
-	v := RequestError{}
+	v := &RequestError{}
 	v.NiceName = "Request"
 
 	b := 1 // skip error determinant
@@ -4474,17 +4507,17 @@ func UnmarshalRequestError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadRequest error.
 // This is mostly used internally.
-func (err RequestError) SeqID() uint16 {
+func (err *RequestError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadRequest error. If no bad value exists, 0 is returned.
-func (err RequestError) BadID() uint32 {
+func (err *RequestError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadRequest error.
-func (err RequestError) Error() string {
+func (err *RequestError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadRequest{")
@@ -4523,7 +4556,7 @@ func UnmarshalResizeRequestEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ResizeRequestEvent\"", len(buf))
 	}
 
-	v := ResizeRequestEvent{}
+	v := &ResizeRequestEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -4544,7 +4577,7 @@ func UnmarshalResizeRequestEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a ResizeRequestEvent value to a byte slice.
-func (v ResizeRequestEvent) Bytes() []byte {
+func (v *ResizeRequestEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -4571,7 +4604,7 @@ func (v ResizeRequestEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the ResizeRequest event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v ResizeRequestEvent) SeqID() uint16 {
+func (v *ResizeRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -4904,7 +4937,7 @@ func UnmarshalSelectionClearEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"SelectionClearEvent\"", len(buf))
 	}
 
-	v := SelectionClearEvent{}
+	v := &SelectionClearEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -4925,7 +4958,7 @@ func UnmarshalSelectionClearEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a SelectionClearEvent value to a byte slice.
-func (v SelectionClearEvent) Bytes() []byte {
+func (v *SelectionClearEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -4952,7 +4985,7 @@ func (v SelectionClearEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the SelectionClear event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v SelectionClearEvent) SeqID() uint16 {
+func (v *SelectionClearEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -4977,7 +5010,7 @@ func UnmarshalSelectionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"SelectionNotifyEvent\"", len(buf))
 	}
 
-	v := SelectionNotifyEvent{}
+	v := &SelectionNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -5004,7 +5037,7 @@ func UnmarshalSelectionNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a SelectionNotifyEvent value to a byte slice.
-func (v SelectionNotifyEvent) Bytes() []byte {
+func (v *SelectionNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -5037,7 +5070,7 @@ func (v SelectionNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the SelectionNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v SelectionNotifyEvent) SeqID() uint16 {
+func (v *SelectionNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -5063,7 +5096,7 @@ func UnmarshalSelectionRequestEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"SelectionRequestEvent\"", len(buf))
 	}
 
-	v := SelectionRequestEvent{}
+	v := &SelectionRequestEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -5093,7 +5126,7 @@ func UnmarshalSelectionRequestEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a SelectionRequestEvent value to a byte slice.
-func (v SelectionRequestEvent) Bytes() []byte {
+func (v *SelectionRequestEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -5129,7 +5162,7 @@ func (v SelectionRequestEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the SelectionRequest event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v SelectionRequestEvent) SeqID() uint16 {
+func (v *SelectionRequestEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -5823,7 +5856,7 @@ func UnmarshalUnmapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"UnmapNotifyEvent\"", len(buf))
 	}
 
-	v := UnmapNotifyEvent{}
+	v := &UnmapNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -5846,7 +5879,7 @@ func UnmarshalUnmapNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a UnmapNotifyEvent value to a byte slice.
-func (v UnmapNotifyEvent) Bytes() []byte {
+func (v *UnmapNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -5879,7 +5912,7 @@ func (v UnmapNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the UnmapNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v UnmapNotifyEvent) SeqID() uint16 {
+func (v *UnmapNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -5903,7 +5936,7 @@ func UnmarshalValueError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"ValueError\"", len(buf))
 	}
 
-	v := ValueError{}
+	v := &ValueError{}
 	v.NiceName = "Value"
 
 	b := 1 // skip error determinant
@@ -5928,17 +5961,17 @@ func UnmarshalValueError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadValue error.
 // This is mostly used internally.
-func (err ValueError) SeqID() uint16 {
+func (err *ValueError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadValue error. If no bad value exists, 0 is returned.
-func (err ValueError) BadID() uint32 {
+func (err *ValueError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadValue error.
-func (err ValueError) Error() string {
+func (err *ValueError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadValue{")
@@ -5983,7 +6016,7 @@ func UnmarshalVisibilityNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"VisibilityNotifyEvent\"", len(buf))
 	}
 
-	v := VisibilityNotifyEvent{}
+	v := &VisibilityNotifyEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -6003,7 +6036,7 @@ func UnmarshalVisibilityNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a VisibilityNotifyEvent value to a byte slice.
-func (v VisibilityNotifyEvent) Bytes() []byte {
+func (v *VisibilityNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -6029,7 +6062,7 @@ func (v VisibilityNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the VisibilityNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v VisibilityNotifyEvent) SeqID() uint16 {
+func (v *VisibilityNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -6147,6 +6180,10 @@ func NewWindowID(c *xgb.XConn) Window {
 	return Window(id)
 }
 
+const (
+	WindowNone = 0
+)
+
 // BadWindow is the error number for a BadWindow.
 const BadWindow = 3
 
@@ -6154,22 +6191,24 @@ type WindowError ValueError
 
 // WindowErrorNew constructs a WindowError value that implements xgb.Error from a byte slice.
 func UnmarshalWindowError(buf []byte) (xgb.XError, error) {
-	return UnmarshalValueError(buf)
+	x, err := UnmarshalValueError(buf)
+	xerr, _ := x.(*ValueError)
+	return (*WindowError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadWindow error.
 // This is mostly used internally.
-func (err WindowError) SeqID() uint16 {
+func (err *WindowError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadWindow error. If no bad value exists, 0 is returned.
-func (err WindowError) BadID() uint32 {
+func (err *WindowError) BadID() uint32 {
 	return err.BadValue
 }
 
 // Error returns a rudimentary string representation of the BadWindow error.
-func (err WindowError) Error() string {
+func (err *WindowError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadWindow{")
@@ -6192,10 +6231,6 @@ func (err WindowError) Error() string {
 func init() {
 	registerError(3, UnmarshalWindowError)
 }
-
-const (
-	WindowNone = 0
-)
 
 const (
 	WindowClassCopyFromParent = 0

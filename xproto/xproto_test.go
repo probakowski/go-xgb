@@ -31,14 +31,23 @@ import (
 )
 
 // The X connection used throughout testing.
-var X *xgb.XConn
+var (
+	X     *xgb.XConn
+	setup *xproto.SetupInfo
+)
 
 // init initializes the X connection, seeds the RNG and starts waiting
 // for events.
 func init() {
+	var buf []byte
 	var err error
 
-	X, err = xgb.NewConn()
+	X, buf, err = xgb.Dial("")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	setup, err = xproto.Setup(X, buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +64,7 @@ func init() {
 // TestSynchronousError purposefully causes a BadWindow error in a
 // MapWindow request, and checks it synchronously.
 func TestSynchronousError(t *testing.T) {
-	err := MapWindowChecked(X, 0).Check() // resource 0 is always invalid
+	err := xproto.MapWindow(X, 0) // resource 0 is always invalid
 	if err == nil {
 		t.Fatalf("MapWindow: A MapWindow request that should return an " +
 			"error has returned a nil error.")
@@ -84,7 +93,7 @@ func TestAsynchronousError(t *testing.T) {
 func TestCookieBuffer(t *testing.T) {
 	n := (1 << 16) + 10
 	for i := 0; i < n; i++ {
-		NoOperation(X)
+		xproto.NoOperation(X)
 	}
 	TestProperty(t)
 }
@@ -95,10 +104,8 @@ func TestCookieBuffer(t *testing.T) {
 func TestSequenceWrap(t *testing.T) {
 	n := (1 << 16) + 10
 	for i := 0; i < n; i++ {
-		cookie, err := xproto.InternAtom(X, false, 5, "RANDO")
+		_, err := xproto.InternAtom(X, false, 5, "RANDO")
 		if err != nil {
-			t.Fatalf("InternAtom: %s", err)
-		} else if _, err := cookie.Reply(); err != nil {
 			t.Fatalf("InternAtom: %s", err)
 		}
 	}
@@ -136,36 +143,27 @@ func TestWindowEvents(t *testing.T) {
 	// The geometry to set the window.
 	gx, gy, gw, gh := 200, 400, 1000, 300
 
-	wid, err := xproto.NewWindowID(X)
-	if err != nil {
-		t.Fatalf("NewId: %s", err)
-	}
+	wid := xproto.NewWindowID(X)
 
-	screen := Setup(X).DefaultScreen(X) // alias
-	cwc, err := xproto.CreateWindowChecked(X, screen.RootDepth, wid, screen.Root,
+	scr := setup.Roots[0]
+	err := xproto.CreateWindow(X, scr.RootDepth, wid, scr.Root,
 		0, 0, 500, 500, 0,
-		xproto.WindowClassInputOutput, screen.RootVisual,
+		xproto.WindowClassInputOutput, scr.RootVisual,
 		xproto.CwBackPixel|xproto.CwOverrideRedirect, []uint32{0xffffffff, 1})
 	if err != nil {
 		t.Fatalf("CreateWindow: %s", err)
-	} else if err := cwc.Check(); err != nil {
-		t.Fatalf("CreateWindow: %s", err)
 	}
 
-	mwc, err := xproto.MapWindowChecked(X, wid)
+	err = xproto.MapWindow(X, wid)
 	if err != nil {
-		t.Fatalf("MapWindow: %s", err)
-	} else if err := mwc.Check(); err != nil {
 		t.Fatalf("MapWindow: %s", err)
 	}
 
 	// We don't listen in the CreateWindow request so that we don't get
 	// a MapNotify event.
-	cwac, err := xproto.ChangeWindowAttributesChecked(X, wid,
-		xproto.CwEventMask, xproto.EventMaskStructureNotify)
+	err = xproto.ChangeWindowAttributes(X, wid,
+		xproto.CwEventMask, []uint32{xproto.EventMaskStructureNotify})
 	if err != nil {
-		t.Fatalf("ChangeWindowAttributes: %s", err)
-	} else if err := cwac.Check(); err != nil {
 		t.Fatalf("ChangeWindowAttributes: %s", err)
 	}
 
@@ -179,7 +177,7 @@ func TestWindowEvents(t *testing.T) {
 
 	evOrErr := waitForEvent(t, 5)
 	switch event := evOrErr.ev.(type) {
-	case ConfigureNotifyEvent:
+	case *xproto.ConfigureNotifyEvent:
 		if event.X != int16(gx) {
 			t.Fatalf("x was set to %d but ConfigureNotify reports %d",
 				gx, event.X)
@@ -201,13 +199,13 @@ func TestWindowEvents(t *testing.T) {
 	}
 
 	// Okay, clean up!
-	err = ChangeWindowAttributesChecked(X, wid,
-		CwEventMask, []uint32{0}).Check()
+	err = xproto.ChangeWindowAttributes(X, wid,
+		xproto.CwEventMask, []uint32{0})
 	if err != nil {
 		t.Fatalf("ChangeWindowAttributes: %s", err)
 	}
 
-	err = DestroyWindowChecked(X, wid).Check()
+	err = xproto.DestroyWindow(X, wid)
 	if err != nil {
 		t.Fatalf("DestroyWindow: %s", err)
 	}
@@ -215,7 +213,7 @@ func TestWindowEvents(t *testing.T) {
 
 // Calls GetFontPath function, Issue #12
 func TestGetFontPath(t *testing.T) {
-	fontPathReply, err := GetFontPath(X).Reply()
+	fontPathReply, err := xproto.GetFontPath(X)
 	if err != nil {
 		t.Fatalf("GetFontPath: %v", err)
 	}
@@ -223,51 +221,51 @@ func TestGetFontPath(t *testing.T) {
 }
 
 func TestListFonts(t *testing.T) {
-	listFontsReply, err := ListFonts(X, 10, 1, "*").Reply()
+	listFontsReply, err := xproto.ListFonts(X, 10, 1, "*")
 	if err != nil {
 		t.Fatalf("ListFonts: %v", err)
 	}
 	_ = listFontsReply
 }
 
-/******************************************************************************/
-// Benchmarks
-/******************************************************************************/
+// /******************************************************************************/
+// // Benchmarks
+// /******************************************************************************/
 
-// BenchmarkInternAtomsGood shows how many requests with replies
-// *should* be sent and gathered from the server. Namely, send as many
-// requests as you can at once, then go back and gather up all the replies.
-// More importantly, this approach can exploit parallelism when
-// GOMAXPROCS > 1.
-// Run with `go test -run 'nomatch' -bench '.*' -cpu 1,2,6` if you have
-// multiple cores to see the improvement that parallelism brings.
-func BenchmarkInternAtomsGood(b *testing.B) {
-	b.StopTimer()
-	names := seqNames(b.N)
+// // BenchmarkInternAtomsGood shows how many requests with replies
+// // *should* be sent and gathered from the server. Namely, send as many
+// // requests as you can at once, then go back and gather up all the replies.
+// // More importantly, this approach can exploit parallelism when
+// // GOMAXPROCS > 1.
+// // Run with `go test -run 'nomatch' -bench '.*' -cpu 1,2,6` if you have
+// // multiple cores to see the improvement that parallelism brings.
+// func BenchmarkInternAtomsGood(b *testing.B) {
+// 	b.StopTimer()
+// 	names := seqNames(b.N)
 
-	b.StartTimer()
-	cookies := make([]InternAtomCookie, b.N)
-	for i := 0; i < b.N; i++ {
-		cookies[i] = InternAtom(X, false, uint16(len(names[i])), names[i])
-	}
-	for _, cookie := range cookies {
-		cookie.Reply()
-	}
-}
+// 	b.StartTimer()
+// 	cookies := make([]InternAtomCookie, b.N)
+// 	for i := 0; i < b.N; i++ {
+// 		cookies[i], _ = xproto.InternAtom(X, false, uint16(len(names[i])), names[i])
+// 	}
+// 	for _, cookie := range cookies {
+// 		cookie.Reply()
+// 	}
+// }
 
-// BenchmarkInternAtomsBad shows how *not* to issue a lot of requests with
-// replies. Namely, each subsequent request isn't issued *until* the last
-// reply is made. This implies a round trip to the X server for every
-// iteration.
-func BenchmarkInternAtomsPoor(b *testing.B) {
-	b.StopTimer()
-	names := seqNames(b.N)
+// // BenchmarkInternAtomsBad shows how *not* to issue a lot of requests with
+// // replies. Namely, each subsequent request isn't issued *until* the last
+// // reply is made. This implies a round trip to the X server for every
+// // iteration.
+// func BenchmarkInternAtomsPoor(b *testing.B) {
+// 	b.StopTimer()
+// 	names := seqNames(b.N)
 
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		InternAtom(X, false, uint16(len(names[i])), names[i]).Reply()
-	}
-}
+// 	b.StartTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		xproto.InternAtom(X, false, uint16(len(names[i])), names[i])
+// 	}
+// }
 
 /******************************************************************************/
 // Helper functions
@@ -279,28 +277,27 @@ func BenchmarkInternAtomsPoor(b *testing.B) {
 // It tests both requests with and without replies (GetProperty and
 // ChangeProperty respectively.)
 func changeAndGetProp(prop, val string) (string, error) {
-	setup := Setup(X)
-	root := setup.DefaultScreen(X).Root
+	root := setup.Roots[0].Root
 
-	propAtom, err := InternAtom(X, false, uint16(len(prop)), prop).Reply()
+	propAtom, err := xproto.InternAtom(X, false, uint16(len(prop)), prop)
 	if err != nil {
 		return "", fmt.Errorf("InternAtom: %s", err)
 	}
 
 	typName := "UTF8_STRING"
-	typAtom, err := InternAtom(X, false, uint16(len(typName)), typName).Reply()
+	typAtom, err := xproto.InternAtom(X, false, uint16(len(typName)), typName)
 	if err != nil {
 		return "", fmt.Errorf("InternAtom: %s", err)
 	}
 
-	err = ChangePropertyChecked(X, PropModeReplace, root, propAtom.Atom,
-		typAtom.Atom, 8, uint32(len(val)), []byte(val)).Check()
+	err = xproto.ChangeProperty(X, xproto.PropModeReplace, root, propAtom.Atom,
+		typAtom.Atom, 8, uint32(len(val)), []byte(val))
 	if err != nil {
 		return "", fmt.Errorf("ChangeProperty: %s", err)
 	}
 
-	reply, err := GetProperty(X, false, root, propAtom.Atom,
-		GetPropertyTypeAny, 0, (1<<32)-1).Reply()
+	reply, err := xproto.GetProperty(X, false, root, propAtom.Atom,
+		xproto.GetPropertyTypeAny, 0, (1<<32)-1)
 	if err != nil {
 		return "", fmt.Errorf("GetProperty: %s", err)
 	}
@@ -317,7 +314,7 @@ func changeAndGetProp(prop, val string) (string, error) {
 // right type and contains the correct values.
 func verifyMapWindowError(t *testing.T, err error) {
 	switch e := err.(type) {
-	case WindowError:
+	case *xproto.WindowError:
 		if e.BadValue != 0 {
 			t.Fatalf("WindowError should report a bad value of 0 but "+
 				"it reports %d instead.", e.BadValue)
@@ -360,8 +357,8 @@ func seqNames(n int) []string {
 
 // evErr represents a value that is either an event or an error.
 type evErr struct {
-	ev  xgb.Event
-	err xgb.Error
+	ev  xgb.XEvent
+	err error
 }
 
 // channel used to pass evErrs.
@@ -372,7 +369,7 @@ var evOrErrChan = make(chan evErr, 0)
 // we can timeout and fail a test.
 func grabEvents() {
 	for {
-		ev, err := X.WaitForEvent()
+		ev, err := X.Recv()
 		evOrErrChan <- evErr{ev, err}
 	}
 }

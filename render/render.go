@@ -324,7 +324,7 @@ func UnmarshalGlyphError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"GlyphError\"", len(buf))
 	}
 
-	v := GlyphError{}
+	v := &GlyphError{}
 	v.NiceName = "Glyph"
 
 	b := 1 // skip error determinant
@@ -338,17 +338,17 @@ func UnmarshalGlyphError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadGlyph error.
 // This is mostly used internally.
-func (err GlyphError) SeqID() uint16 {
+func (err *GlyphError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadGlyph error. If no bad value exists, 0 is returned.
-func (err GlyphError) BadID() uint32 {
+func (err *GlyphError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadGlyph error.
-func (err GlyphError) Error() string {
+func (err *GlyphError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadGlyph{")
@@ -377,7 +377,7 @@ func UnmarshalGlyphSetError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"GlyphSetError\"", len(buf))
 	}
 
-	v := GlyphSetError{}
+	v := &GlyphSetError{}
 	v.NiceName = "GlyphSet"
 
 	b := 1 // skip error determinant
@@ -391,17 +391,17 @@ func UnmarshalGlyphSetError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadGlyphSet error.
 // This is mostly used internally.
-func (err GlyphSetError) SeqID() uint16 {
+func (err *GlyphSetError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadGlyphSet error. If no bad value exists, 0 is returned.
-func (err GlyphSetError) BadID() uint32 {
+func (err *GlyphSetError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadGlyphSet error.
-func (err GlyphSetError) Error() string {
+func (err *GlyphSetError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadGlyphSet{")
@@ -654,7 +654,7 @@ func UnmarshalPictFormatError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"PictFormatError\"", len(buf))
 	}
 
-	v := PictFormatError{}
+	v := &PictFormatError{}
 	v.NiceName = "PictFormat"
 
 	b := 1 // skip error determinant
@@ -668,17 +668,17 @@ func UnmarshalPictFormatError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadPictFormat error.
 // This is mostly used internally.
-func (err PictFormatError) SeqID() uint16 {
+func (err *PictFormatError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadPictFormat error. If no bad value exists, 0 is returned.
-func (err PictFormatError) BadID() uint32 {
+func (err *PictFormatError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadPictFormat error.
-func (err PictFormatError) Error() string {
+func (err *PictFormatError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadPictFormat{")
@@ -763,7 +763,7 @@ func UnmarshalPictOpError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"PictOpError\"", len(buf))
 	}
 
-	v := PictOpError{}
+	v := &PictOpError{}
 	v.NiceName = "PictOp"
 
 	b := 1 // skip error determinant
@@ -777,17 +777,17 @@ func UnmarshalPictOpError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadPictOp error.
 // This is mostly used internally.
-func (err PictOpError) SeqID() uint16 {
+func (err *PictOpError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadPictOp error. If no bad value exists, 0 is returned.
-func (err PictOpError) BadID() uint32 {
+func (err *PictOpError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadPictOp error.
-func (err PictOpError) Error() string {
+func (err *PictOpError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadPictOp{")
@@ -1066,7 +1066,7 @@ func UnmarshalPictureError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"PictureError\"", len(buf))
 	}
 
-	v := PictureError{}
+	v := &PictureError{}
 	v.NiceName = "Picture"
 
 	b := 1 // skip error determinant
@@ -1080,17 +1080,17 @@ func UnmarshalPictureError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadPicture error.
 // This is mostly used internally.
-func (err PictureError) SeqID() uint16 {
+func (err *PictureError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadPicture error. If no bad value exists, 0 is returned.
-func (err PictureError) BadID() uint32 {
+func (err *PictureError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadPicture error.
-func (err PictureError) Error() string {
+func (err *PictureError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadPicture{")

@@ -160,7 +160,7 @@ func UnmarshalBufferSwapCompleteEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BufferSwapCompleteEvent\"", len(buf))
 	}
 
-	v := BufferSwapCompleteEvent{}
+	v := &BufferSwapCompleteEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -195,7 +195,7 @@ func UnmarshalBufferSwapCompleteEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a BufferSwapCompleteEvent value to a byte slice.
-func (v BufferSwapCompleteEvent) Bytes() []byte {
+func (v *BufferSwapCompleteEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -236,7 +236,7 @@ func (v BufferSwapCompleteEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the BufferSwapComplete event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v BufferSwapCompleteEvent) SeqID() uint16 {
+func (v *BufferSwapCompleteEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -343,7 +343,7 @@ func UnmarshalInvalidateBuffersEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"InvalidateBuffersEvent\"", len(buf))
 	}
 
-	v := InvalidateBuffersEvent{}
+	v := &InvalidateBuffersEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -358,7 +358,7 @@ func UnmarshalInvalidateBuffersEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a InvalidateBuffersEvent value to a byte slice.
-func (v InvalidateBuffersEvent) Bytes() []byte {
+func (v *InvalidateBuffersEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -379,7 +379,7 @@ func (v InvalidateBuffersEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the InvalidateBuffers event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v InvalidateBuffersEvent) SeqID() uint16 {
+func (v *InvalidateBuffersEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

@@ -78,22 +78,24 @@ type BadSegError xproto.ValueError
 
 // BadSegErrorNew constructs a BadSegError value that implements xgb.Error from a byte slice.
 func UnmarshalBadSegError(buf []byte) (xgb.XError, error) {
-	return xproto.UnmarshalValueError(buf)
+	x, err := xproto.UnmarshalValueError(buf)
+	xerr, _ := x.(*xproto.ValueError)
+	return (*BadSegError)(xerr), err
 }
 
 // SequenceId returns the sequence id attached to the BadBadSeg error.
 // This is mostly used internally.
-func (err BadSegError) SeqID() uint16 {
+func (err *BadSegError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadId returns the 'BadValue' number if one exists for the BadBadSeg error. If no bad value exists, 0 is returned.
-func (err BadSegError) BadID() uint32 {
+func (err *BadSegError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadSeg error.
-func (err BadSegError) Error() string {
+func (err *BadSegError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadSeg{")
@@ -137,7 +139,7 @@ func UnmarshalCompletionEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"CompletionEvent\"", len(buf))
 	}
 
-	v := CompletionEvent{}
+	v := &CompletionEvent{}
 	b := 1 // don't read event number
 
 	b += 1 // padding
@@ -166,7 +168,7 @@ func UnmarshalCompletionEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a CompletionEvent value to a byte slice.
-func (v CompletionEvent) Bytes() []byte {
+func (v *CompletionEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -201,7 +203,7 @@ func (v CompletionEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the Completion event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v CompletionEvent) SeqID() uint16 {
+func (v *CompletionEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

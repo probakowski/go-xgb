@@ -87,7 +87,7 @@ func UnmarshalBadContextError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadContextError\"", len(buf))
 	}
 
-	v := BadContextError{}
+	v := &BadContextError{}
 	v.NiceName = "BadContext"
 
 	b := 1 // skip error determinant
@@ -104,17 +104,17 @@ func UnmarshalBadContextError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadContext error.
 // This is mostly used internally.
-func (err BadContextError) SeqID() uint16 {
+func (err *BadContextError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadContext error. If no bad value exists, 0 is returned.
-func (err BadContextError) BadID() uint32 {
+func (err *BadContextError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadContext error.
-func (err BadContextError) Error() string {
+func (err *BadContextError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadContext{")

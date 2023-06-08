@@ -97,7 +97,7 @@ func UnmarshalAttributNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"AttributNotifyEvent\"", len(buf))
 	}
 
-	v := AttributNotifyEvent{}
+	v := &AttributNotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = buf[b]
@@ -113,7 +113,7 @@ func UnmarshalAttributNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a AttributNotifyEvent value to a byte slice.
-func (v AttributNotifyEvent) Bytes() []byte {
+func (v *AttributNotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -135,7 +135,7 @@ func (v AttributNotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the AttributNotify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v AttributNotifyEvent) SeqID() uint16 {
+func (v *AttributNotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 
@@ -155,7 +155,7 @@ func UnmarshalBadContextError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadContextError\"", len(buf))
 	}
 
-	v := BadContextError{}
+	v := &BadContextError{}
 	v.NiceName = "BadContext"
 
 	b := 1 // skip error determinant
@@ -169,17 +169,17 @@ func UnmarshalBadContextError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadContext error.
 // This is mostly used internally.
-func (err BadContextError) SeqID() uint16 {
+func (err *BadContextError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadContext error. If no bad value exists, 0 is returned.
-func (err BadContextError) BadID() uint32 {
+func (err *BadContextError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadContext error.
-func (err BadContextError) Error() string {
+func (err *BadContextError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadContext{")
@@ -208,7 +208,7 @@ func UnmarshalBadSequenceError(buf []byte) (xgb.XError, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"BadSequenceError\"", len(buf))
 	}
 
-	v := BadSequenceError{}
+	v := &BadSequenceError{}
 	v.NiceName = "BadSequence"
 
 	b := 1 // skip error determinant
@@ -222,17 +222,17 @@ func UnmarshalBadSequenceError(buf []byte) (xgb.XError, error) {
 
 // SeqID returns the sequence id attached to the BadBadSequence error.
 // This is mostly used internally.
-func (err BadSequenceError) SeqID() uint16 {
+func (err *BadSequenceError) SeqID() uint16 {
 	return err.Sequence
 }
 
 // BadID returns the 'BadValue' number if one exists for the BadBadSequence error. If no bad value exists, 0 is returned.
-func (err BadSequenceError) BadID() uint32 {
+func (err *BadSequenceError) BadID() uint32 {
 	return 0
 }
 
 // Error returns a rudimentary string representation of the BadBadSequence error.
-func (err BadSequenceError) Error() string {
+func (err *BadSequenceError) Error() string {
 	var buf strings.Builder
 
 	buf.WriteString("BadBadSequence{")
@@ -283,7 +283,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 		return nil, fmt.Errorf("invalid data size %d for \"NotifyEvent\"", len(buf))
 	}
 
-	v := NotifyEvent{}
+	v := &NotifyEvent{}
 	b := 1 // don't read event number
 
 	v.Detail = buf[b]
@@ -302,7 +302,7 @@ func UnmarshalNotifyEvent(buf []byte) (xgb.XEvent, error) {
 }
 
 // Bytes writes a NotifyEvent value to a byte slice.
-func (v NotifyEvent) Bytes() []byte {
+func (v *NotifyEvent) Bytes() []byte {
 	buf := make([]byte, 32)
 	b := 0
 
@@ -331,7 +331,7 @@ func (v NotifyEvent) Bytes() []byte {
 // SeqID returns the sequence id attached to the Notify event.
 // Events without a sequence number (KeymapNotify) return 0.
 // This is mostly used internally.
-func (v NotifyEvent) SeqID() uint16 {
+func (v *NotifyEvent) SeqID() uint16 {
 	return v.Sequence
 }
 

@@ -13,6 +13,7 @@ package main
 */
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -368,8 +369,7 @@ func (x *XMLField) Translate(parent interface{}) Field {
 		}
 		return swtch
 	}
-	log.Panicf("Unrecognized field element: %+v", x)
-	panic("unreachable")
+	panic(fmt.Sprintf("Unrecognized field element: %+v", x))
 }
 
 func (x *XMLBitcase) Translate() *Bitcase {
