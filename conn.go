@@ -36,7 +36,7 @@ type XConn struct {
 	mu   sync.Mutex // conn mutex: protects seq,ckQu and writes
 
 	evfn internal.SmallPtrMap        // "map" of registered event no. to event unmarshaler funcs
-	erfn internal.SmallPtrMap        // map of registered error no. to error unmarshaler funcs
+	erfn internal.SmallPtrMap        // "map" of registered error no. to error unmarshaler funcs
 	exts internal.Map[string, uint8] // map of opcodes to extensions
 }
 
