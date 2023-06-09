@@ -44,12 +44,12 @@ func init() {
 
 	X, buf, err = xgb.Dial("")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Dial: %v", err)
 	}
 
 	setup, err = xproto.Setup(X, buf)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Setup: %v", err)
 	}
 
 	rand.Seed(time.Now().UnixNano())

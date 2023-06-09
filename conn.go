@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"unsafe"
 
 	"codeberg.org/gruf/go-byteutil"
 	"codeberg.org/gruf/go-debug"
@@ -34,16 +35,16 @@ type XConn struct {
 	ckQu list.List  // queue of waiting cookies
 	mu   sync.Mutex // conn mutex: protects seq,ckQu and writes
 
-	evfn internal.Map[uint8, EventUnmarshaler] // map of registered event no. to event unmarshaler funcs
-	erfn internal.Map[uint8, ErrorUnmarshaler] // map of registered error no. to error unmarshaler funcs
-	exts internal.Map[string, uint8]           // map of opcodes to extensions
+	evfn internal.SmallPtrMap        // "map" of registered event no. to event unmarshaler funcs
+	erfn internal.SmallPtrMap        // map of registered error no. to error unmarshaler funcs
+	exts internal.Map[string, uint8] // map of opcodes to extensions
 }
 
 // Register querying the X server for support of this extension, and register relevant event / error unmarshalers internally within XConn.
 func (conn *XConn) Register(ext XExtension) error {
-	// Add this extension to our map, erroring on clash.
+	// Attempt to store major op code for this ext name.
 	if !conn.exts.Set(ext.XName, ext.MajorOpcode) {
-		return fmt.Errorf("already registered ext %q", ext.XName)
+		return fmt.Errorf("already registered ext: %s", ext.XName)
 	}
 
 	// Iniitialize X type unmarshalers and store them.
@@ -64,15 +65,19 @@ func (conn *XConn) init(eventFuncs map[uint8]EventUnmarshaler, errorFuncs map[ui
 	}
 
 	// Copy over the extension event unmarshalers
-	for n, fn := range eventFuncs {
-		if !conn.evfn.Set(uint8(n), fn) {
+	for n := range eventFuncs {
+		fn := eventFuncs[n]
+		ptr := unsafe.Pointer(&fn)
+		if !conn.evfn.Set(uint8(n), ptr) {
 			return fmt.Errorf("overlapping event unmarshaler for %d", n)
 		}
 	}
 
 	// Copy over the extension error unmarshalers
-	for n, fn := range errorFuncs {
-		if !conn.erfn.Set(uint8(n), fn) {
+	for n := range errorFuncs {
+		fn := errorFuncs[n]
+		ptr := unsafe.Pointer(&fn)
+		if !conn.erfn.Set(uint8(n), ptr) {
 			return fmt.Errorf("overlapping error unmarshaler for %d", n)
 		}
 	}
@@ -182,16 +187,16 @@ func (conn *XConn) Close() error {
 
 // unmarshalEvent will attempt to unmarshal event data 'b' as event type with number 'n'.
 func (conn *XConn) unmarshalEvent(n uint8, b []byte) (XEvent, error) {
-	if um, ok := conn.evfn.Get(n); ok {
-		return um(b)
+	if ptr := conn.evfn.Get(n); ptr != nil {
+		return (*(*EventUnmarshaler)(ptr))(b)
 	}
 	return nil, fmt.Errorf("unknown event type %d", n)
 }
 
 // unmarshalError will attempt to unmarshal error data 'b' as error type with number 'n'.
 func (conn *XConn) unmarshalError(n uint8, b []byte) (XError, error) {
-	if um, ok := conn.erfn.Get(n); ok {
-		return um(b)
+	if ptr := conn.erfn.Get(n); ptr != nil {
+		return (*(*ErrorUnmarshaler)(ptr))(b)
 	}
 	return nil, fmt.Errorf("unknown error type %d", n)
 }
