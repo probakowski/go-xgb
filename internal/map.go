@@ -17,7 +17,7 @@ func (m *Map[Key, Value]) Get(key Key) (v Value, ok bool) {
 	return
 }
 
-func (m *Map[Key, Value]) Set(key Key, value Value) (ok bool) {
+func (m *Map[Key, Value]) Add(key Key, value Value) (ok bool) {
 	for {
 		var mm map[Key]Value
 
@@ -25,14 +25,17 @@ func (m *Map[Key, Value]) Set(key Key, value Value) (ok bool) {
 		p := atomic.LoadPointer(&m.m)
 
 		if p != nil {
-			// Create a clone of existing map.
-			mm = clone(*(*map[Key]Value)(p))
-		} else {
-			// Map not yet allocated.
-			mm = make(map[Key]Value)
+			// Cast the existing map.
+			mm = *(*map[Key]Value)(p)
 		}
 
-		// Append value.
+		if _, ok := mm[key]; ok {
+			// Already exists.
+			return false
+		}
+
+		// Clone and append.
+		mm = clone(mm)
 		mm[key] = value
 
 		// Create new map pointer.

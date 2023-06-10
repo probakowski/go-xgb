@@ -43,7 +43,7 @@ type XConn struct {
 // Register querying the X server for support of this extension, and register relevant event / error unmarshalers internally within XConn.
 func (conn *XConn) Register(ext XExtension) error {
 	// Attempt to store major op code for this ext name.
-	if !conn.exts.Set(ext.XName, ext.MajorOpcode) {
+	if !conn.exts.Add(ext.XName, ext.MajorOpcode) {
 		return fmt.Errorf("already registered ext: %s", ext.XName)
 	}
 

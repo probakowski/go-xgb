@@ -32,8 +32,8 @@ func (conn *XPropConn) Atom(name string, onlyIfExists bool) (xproto.Atom, error)
 		return 0, fmt.Errorf("atom with name %q returned zero id", name)
 	}
 
-	conn.atoms.Set(name, reply.Atom)
-	conn.names.Set(reply.Atom, name)
+	conn.atoms.Add(name, reply.Atom)
+	conn.names.Add(reply.Atom, name)
 
 	return reply.Atom, nil
 }
@@ -50,8 +50,8 @@ func (conn *XPropConn) AtomName(id xproto.Atom) (string, error) {
 		return "", fmt.Errorf("atom with id '%d' returned empty name", id)
 	}
 
-	conn.atoms.Set(reply.Name, id)
-	conn.names.Set(id, reply.Name)
+	conn.atoms.Add(reply.Name, id)
+	conn.names.Add(id, reply.Name)
 
 	return reply.Name, nil
 }
