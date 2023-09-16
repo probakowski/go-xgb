@@ -43,7 +43,7 @@ func (m *Map[Key, Value]) Add(key Key, value Value) (ok bool) {
 
 		// Attempt to replace existing map with new.
 		if atomic.CompareAndSwapPointer(&m.m, p, p2) {
-			return
+			return true
 		}
 	}
 }
