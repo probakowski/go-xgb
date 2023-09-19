@@ -31,7 +31,9 @@ type XExtension struct {
 	ErrorFuncs  map[uint8]ErrorUnmarshaler
 }
 
-// RawXReply ...
+// RawXReply is a byte slice type alias that
+// fulfills the XReply interface type, allowing
+// you to store an X reply for later decoding.
 type RawXReply []byte
 
 func (rpl *RawXReply) Unmarshal(data []byte) error {
@@ -39,7 +41,7 @@ func (rpl *RawXReply) Unmarshal(data []byte) error {
 	return nil
 }
 
-// ignoreXReply
+// ignoreXReply is a noop XReply implementation.
 type IgnoreXReply struct{}
 
 func (IgnoreXReply) Unmarshal([]byte) error { return nil }
