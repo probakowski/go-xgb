@@ -1,8 +1,4 @@
 codeberg.org/gruf/go-byteutil v1.1.2 h1:TQLZtTxTNca9xEfDIndmo7nBYxeS94nrv/9DS3Nk5Tw=
 codeberg.org/gruf/go-byteutil v1.1.2/go.mod h1:cWM3tgMCroSzqoBXUXMhvxTxYJp+TbCr6ioISRY5vSU=
-codeberg.org/gruf/go-debug v1.3.0 h1:PIRxQiWUFKtGOGZFdZ3Y0pqyfI0Xr87j224IYe2snZs=
-codeberg.org/gruf/go-debug v1.3.0/go.mod h1:N+vSy9uJBQgpQcJUqjctvqFz7tBHJf+S/PIjLILzpLg=
-codeberg.org/gruf/go-kv v1.6.0 h1:mCsERVt1Izsb0ZB7r7y/I6J/5sQhuL2Gmh/SqHWBJUY=
-codeberg.org/gruf/go-kv v1.6.0/go.mod h1:O/YkSvKiS9XsRolM3rqCd9YJmND7dAXu9z+PrlYO4bc=
 codeberg.org/gruf/go-xgbutil v1.0.0 h1:l7BepnVw7JGc+LMYgpL1qHyrJ4qAS471mLMz20skJFs=
 codeberg.org/gruf/go-xgbutil v1.0.0/go.mod h1:WUndKE6hGDnvrgSseqkeyMArGjx7S4+g2NsWSgtdBlA=

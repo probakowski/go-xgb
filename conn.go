@@ -12,7 +12,6 @@ import (
 	"unsafe"
 
 	"codeberg.org/gruf/go-byteutil"
-	"codeberg.org/gruf/go-debug"
 	"codeberg.org/gruf/go-xgb/internal"
 )
 
@@ -459,12 +458,6 @@ func releaseCookie(ck *cookie) {
 
 	// Place in pool
 	cookiePool.Put(ck)
-}
-
-func debugf(format string, args ...any) {
-	if debug.DEBUG {
-		logf(format, args...)
-	}
 }
 
 func logf(format string, args ...any) {

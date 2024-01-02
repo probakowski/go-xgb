@@ -1,15 +1,20 @@
 package ewmh
 
 import (
+	xevent "fmt"
+
 	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/pkg/xevent"
 	"codeberg.org/gruf/go-xgb/pkg/xprop"
 	"codeberg.org/gruf/go-xgb/xproto"
 )
 
+type EwmhConn struct {
+	xprop.XPropConn
+}
+
 // ClientEvent is a convenience function that sends ClientMessage events
 // to the root window as specified by the EWMH spec.
-func ClientEvent(conn *xprop.XPropConn, window xproto.Window, messageType string, data ...interface{}) error {
+func (conn *EwmhConn) ClientEvent(window xproto.Window, messageType string, data ...interface{}) error {
 	mstype, err := conn.Atom(messageType, false)
 	if err != nil {
 		return err
@@ -27,8 +32,8 @@ func ClientEvent(conn *xprop.XPropConn, window xproto.Window, messageType string
 }
 
 // _NET_ACTIVE_WINDOW get
-func ActiveWindowGet(xconn *xgb.XConn, root xproto.Window) (xproto.Window, error) {
-	reply, err := xprop.GetProperty(xconn, root, "_NET_ACTIVE_WINDOW")
+func (conn *EwmhConn) ActiveWindowGet(root xproto.Window) (xproto.Window, error) {
+	reply, err := conn.GetPropName(root, "_NET_ACTIVE_WINDOW")
 	if err != nil {
 		return 0, err
 	}
@@ -36,87 +41,79 @@ func ActiveWindowGet(xconn *xgb.XConn, root xproto.Window) (xproto.Window, error
 }
 
 // _NET_ACTIVE_WINDOW set
-func ActiveWindowSet(xconn *xgb.XConn, root xproto.Window, win xproto.Window) error {
+func (conn *EwmhConn) ActiveWindowSet(root xproto.Window, win xproto.Window) error {
 	return xprop.ChangeProp32(xu, xu.RootWin(), "_NET_ACTIVE_WINDOW", "WINDOW", uint(win))
 }
 
 // _NET_ACTIVE_WINDOW req
-func ActiveWindowReq(xconn *xgb.XConn, root xproto.Window, win xproto.Window) error {
+func (conn *EwmhConn) ActiveWindowReq(xconn *xgb.XConn, root xproto.Window, win xproto.Window) error {
 	return ActiveWindowReqExtra(xu, win, 2, 0, 0)
 }
 
 // _NET_ACTIVE_WINDOW req extra
-func ActiveWindowReqExtra(xconn *xgb.XConn, win xproto.Window, source int, time xproto.Timestamp, currentActive xproto.Window) error {
+func (conn *EwmhConn) ActiveWindowReqExtra(xconn *xgb.XConn, win xproto.Window, source int, time xproto.Timestamp, currentActive xproto.Window) error {
 	return ClientEvent(xu, win, "_NET_ACTIVE_WINDOW", source, int(time), int(currentActive))
 }
 
 // _NET_CLIENT_LIST get
-func ClientListGet(xconn *xgb.XConn) ([]xproto.Window, error) {
+func (conn *EwmhConn) ClientListGet(xconn *xgb.XConn) ([]xproto.Window, error) {
 	return xprop.PropValWindows(xprop.GetProperty(xu, xu.RootWin(), "_NET_CLIENT_LIST"))
 }
 
 // _NET_CLIENT_LIST set
-func ClientListSet(xconn *xgb.XConn, wins []xproto.Window) error {
+func (conn *EwmhConn) ClientListSet(xconn *xgb.XConn, wins []xproto.Window) error {
 	return xprop.ChangeProp32(xu, xu.RootWin(), "_NET_CLIENT_LIST", "WINDOW", xprop.WindowToInt(wins)...)
 }
 
 // _NET_CLIENT_LIST_STACKING get
-func ClientListStackingGet(xconn *xgb.XConn) ([]xproto.Window, error) {
+func (conn *EwmhConn) ClientListStackingGet(xconn *xgb.XConn) ([]xproto.Window, error) {
 	return xprop.PropValWindows(xprop.GetProperty(xu, xu.RootWin(),
 		"_NET_CLIENT_LIST_STACKING"))
 }
 
 // _NET_CLIENT_LIST_STACKING set
-func ClientListStackingSet(xconn *xgb.XConn, wins []xproto.Window) error {
+func (conn *EwmhConn) ClientListStackingSet(xconn *xgb.XConn, wins []xproto.Window) error {
 	return xprop.ChangeProp32(xu, xu.RootWin(), "_NET_CLIENT_LIST_STACKING",
 		"WINDOW", xprop.WindowToInt(wins)...)
 }
 
 // _NET_CLOSE_WINDOW req
-func CloseWindow(xconn *xgb.XConn, win xproto.Window) error {
+func (conn *EwmhConn) CloseWindow(xconn *xgb.XConn, win xproto.Window) error {
 	return CloseWindowExtra(xu, win, 0, 2)
 }
 
 // _NET_CLOSE_WINDOW req extra
-func CloseWindowExtra(xconn *xgb.XConn, win xproto.Window,
-	time xproto.Timestamp, source int,
-) error {
+func (conn *EwmhConn) CloseWindowExtra(xconn *xgb.XConn, win xproto.Window, time xproto.Timestamp, source int) error {
 	return ClientEvent(xu, win, "_NET_CLOSE_WINDOW", int(time), source)
 }
 
 // _NET_CURRENT_DESKTOP get
-func CurrentDesktopGet(xconn *xgb.XConn) (uint, error) {
-	return xprop.PropValNum(xprop.GetProperty(xu, xu.RootWin(),
-		"_NET_CURRENT_DESKTOP"))
+func (conn *EwmhConn) CurrentDesktopGet(xconn *xgb.XConn) (uint, error) {
+	return xprop.PropValNum(xprop.GetProperty(xu, xu.RootWin(), "_NET_CURRENT_DESKTOP"))
 }
 
 // _NET_CURRENT_DESKTOP set
-func CurrentDesktopSet(xconn *xgb.XConn, desk uint) error {
-	return xprop.ChangeProp32(xu, xu.RootWin(), "_NET_CURRENT_DESKTOP",
-		"CARDINAL", desk)
+func (conn *EwmhConn) CurrentDesktopSet(xconn *xgb.XConn, desk uint) error {
+	return xprop.ChangeProp32(xu, xu.RootWin(), "_NET_CURRENT_DESKTOP", "CARDINAL", desk)
 }
 
 // _NET_CURRENT_DESKTOP req
-func CurrentDesktopReq(xconn *xgb.XConn, desk int) error {
+func (conn *EwmhConn) CurrentDesktopReq(xconn *xgb.XConn, desk int) error {
 	return CurrentDesktopReqExtra(xu, desk, 0)
 }
 
 // _NET_CURRENT_DESKTOP req extra
-func CurrentDesktopReqExtra(xconn *xgb.XConn, desk int,
-	time xproto.Timestamp,
-) error {
-	return ClientEvent(xu, xu.RootWin(), "_NET_CURRENT_DESKTOP", desk,
-		int(time))
+func (conn *EwmhConn) CurrentDesktopReqExtra(xconn *xgb.XConn, desk int, time xproto.Timestamp) error {
+	return ClientEvent(xu, xu.RootWin(), "_NET_CURRENT_DESKTOP", desk, int(time))
 }
 
 // _NET_DESKTOP_NAMES get
-func DesktopNamesGet(xconn *xgb.XConn) ([]string, error) {
-	return xprop.PropValStrs(xprop.GetProperty(xu, xu.RootWin(),
-		"_NET_DESKTOP_NAMES"))
+func (conn *EwmhConn) DesktopNamesGet(xconn *xgb.XConn) ([]string, error) {
+	return xprop.PropValStrs(xprop.GetProperty(xu, xu.RootWin(), "_NET_DESKTOP_NAMES"))
 }
 
 // _NET_DESKTOP_NAMES set
-func DesktopNamesSet(xconn *xgb.XConn, names []string) error {
+func (conn *EwmhConn) DesktopNamesSet(xconn *xgb.XConn, names []string) error {
 	nullterm := make([]byte, 0)
 	for _, name := range names {
 		nullterm = append(nullterm, name...)
