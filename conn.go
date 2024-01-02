@@ -279,20 +279,11 @@ func (conn *XConn) popCookie() (*cookie, bool) {
 func (conn *XConn) readloop() {
 	var (
 		// buf is the main read buffer.
-		buf [32]byte
+		buf = make([]byte, 32)
 
-		// lbuf is a larger buffer used when an x reply
-		// is received of size > 32 bytes.
+		// lbuf is a large buf used when an x
+		// reply is received len > 32 bytes.
 		lbuf byteutil.Buffer
-
-		// prepLargeBuf will prepare the larger buffer for
-		// a received x reply of given size, also copying
-		// over the initial 32byte contents of small buf.
-		prepLargeBuf = func(sz uint32) {
-			lbuf.Reset() // ensure empty
-			lbuf.Grow(32 + int(sz)*4)
-			_ = copy(lbuf.B[:32], buf[:])
-		}
 	)
 
 	defer func() {
@@ -305,7 +296,7 @@ func (conn *XConn) readloop() {
 
 	for {
 		// Read next set of data from X into buf
-		_, err := io.ReadFull(conn.conn, buf[:])
+		_, err := io.ReadFull(conn.conn, buf)
 		if err != nil {
 			logf("fatal xconn read error: %v\n", err)
 			return
@@ -314,7 +305,7 @@ func (conn *XConn) readloop() {
 		switch buf[0] {
 		case 0 /* error */ :
 			// Attempt to unmarshal X error type
-			xerr, err := conn.unmarshalError(buf[1], buf[:])
+			xerr, err := conn.unmarshalError(buf[1], buf)
 			if err != nil {
 				logf("unable to unmarshal x error: %v\n", err)
 				continue
@@ -346,7 +337,9 @@ func (conn *XConn) readloop() {
 			if size > 0 {
 				// Prepare large buffer for
 				// expected 32+size bytes.
-				prepLargeBuf(size)
+				lbuf.Reset() // ensure empty
+				lbuf.Grow(32 + int(size)*4)
+				_ = copy(lbuf.B[:32], buf)
 
 				// Read expected bytes into larger buffer.
 				_, err := io.ReadFull(conn.conn, lbuf.B[32:])
@@ -380,7 +373,7 @@ func (conn *XConn) readloop() {
 
 		default /* xevent */ :
 			// Attempt to unmarshal received X event type.
-			xev, err := conn.unmarshalEvent(buf[0]&127, buf[:])
+			xev, err := conn.unmarshalEvent(buf[0]&127, buf)
 			if err != nil {
 				logf("unable to unmarshal x event: %v\n", err)
 				continue
@@ -395,7 +388,7 @@ func (conn *XConn) readloop() {
 				releaseCookie(ck)
 			}
 
-			debugf("recv xevent=%v\n", buf[:])
+			debugf("recv xevent=%v\n", buf)
 
 			select {
 			// Conn closed
@@ -430,14 +423,10 @@ func (conn *XConn) write(data []byte) (seq uint16, err error) {
 	return
 }
 
-// cookiePool is a memory pool of X cookies for use in SendRecv() requests.
-var cookiePool = sync.Pool{
-	New: func() any {
-		return &cookie{err: make(chan error)}
-	},
-}
+// cookiePool is a memory pool of X
+// cookies for use in SendRecv() requests.
+var cookiePool sync.Pool
 
-// cookie ...
 type cookie struct {
 	seq uint16
 	err chan error
@@ -454,7 +443,11 @@ func (ck *cookie) send(err error) {
 
 // acquireCookie will acquire a fresh cookie from the pool.
 func acquireCookie() *cookie {
-	return cookiePool.Get().(*cookie)
+	v := cookiePool.Get()
+	if v == nil {
+		v = &cookie{err: make(chan error)}
+	}
+	return v.(*cookie)
 }
 
 // releaseCookie will reset the cookie, drain it and release to pool.

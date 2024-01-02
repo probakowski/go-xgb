@@ -21,6 +21,7 @@ var DefaultDialer = XDialer{
 	InboundBuffer: 1000,
 }
 
+// XDialer ...
 type XDialer struct {
 	// InboundBuffer ...
 	InboundBuffer int
@@ -29,12 +30,9 @@ type XDialer struct {
 	NetDialer *net.Dialer
 }
 
+// Dial ...
 func Dial(display string) (*XConn, []byte, error) {
 	return DefaultDialer.Dial(display)
-}
-
-func DialContext(ctx context.Context, display string) (*XConn, []byte, error) {
-	return DefaultDialer.DialContext(ctx, display)
 }
 
 // Dial ...
