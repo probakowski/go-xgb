@@ -12,21 +12,24 @@ import (
 	"codeberg.org/gruf/go-xgb/internal"
 )
 
-// defaultNetDialer is the default net.Dialer
-// instance used when none is supplied.
-var defaultNetDialer = net.Dialer{}
+// default net.Dialer.
+var netdialer net.Dialer
 
-// DefaultDialer is the default XDialer instance.
+// DefaultDialer is the
+// default XDialer instance.
 var DefaultDialer = XDialer{
 	InboundBuffer: 1000,
 }
 
 // XDialer ...
 type XDialer struct {
-	// InboundBuffer ...
+	// InboundBuffer allows specifying how
+	// many inbound X messages to buffer
+	// before the connection will block.
 	InboundBuffer int
 
-	// NetDialer allows specifying the underlying net.Dialer to use.
+	// NetDialer allows specifying the
+	// underlying net.Dialer to use.
 	NetDialer *net.Dialer
 }
 
@@ -80,7 +83,6 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 		return nil, nil, fmt.Errorf("bad display string %q", display0)
 	}
 
-	//
 	dotIdx := strings.LastIndex(display, ".")
 	if dotIdx >= 0 {
 		display = display[:dotIdx]
@@ -95,7 +97,7 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 
 	if socket != "" {
 		// Dial unix socket address at display number.
-		conn, err = net.Dial("unix", socket+":"+display)
+		conn, err = d.dial(ctx, "unix", socket+":"+display)
 	} else if host != "" && host != "unix" {
 		// default proto is tcp
 		if protocol == "" {
@@ -103,12 +105,12 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 		}
 
 		// Dial the determined TCP protocol address at determined display no.
-		conn, err = net.Dial(protocol, host+":"+strconv.Itoa(6000+dispNum))
+		conn, err = d.dial(ctx, protocol, host+":"+strconv.Itoa(6000+dispNum))
 	} else {
 		host = ""
 
 		// Dial the default tmp unix X11 generated socket path.
-		conn, err = net.Dial("unix", "/tmp/.X11-unix/X"+display)
+		conn, err = d.dial(ctx, "unix", "/tmp/.X11-unix/X"+display)
 	}
 
 	if err != nil {
@@ -163,7 +165,7 @@ func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XC
 
 	// Prepare buffer for remainder of data.
 	dataLen := le.Uint16(head[6:])
-	data := make([]byte, int(dataLen)*4+8, int(dataLen)*4+8)
+	data := make([]byte, int(dataLen)*4+8)
 	copy(data, head)
 
 	// Read the next group of data into buffer.
@@ -200,4 +202,12 @@ func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XC
 	go xconn.readloop()
 
 	return xconn, data, nil
+}
+
+// dial will dial the given address via network, using supplied dialer or the default.
+func (d *XDialer) dial(ctx context.Context, network, address string) (net.Conn, error) {
+	if d.NetDialer != nil {
+		return d.NetDialer.DialContext(ctx, network, address)
+	}
+	return netdialer.DialContext(ctx, network, address)
 }

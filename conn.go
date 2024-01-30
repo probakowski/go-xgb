@@ -89,7 +89,7 @@ func (conn *XConn) Ext(name string) (op uint8, ok bool) {
 	return conn.exts.Get(name)
 }
 
-// NextID ...
+// NextID returns the next available X ID.
 func (conn *XConn) NewXID() uint32 {
 	return conn.xidg.Next()
 }
@@ -102,17 +102,11 @@ func (conn *XConn) Send(data []byte) error {
 	return err
 }
 
-// SendRecv ...
+// SendRecv sends the given data, and blocks until receipt of XReply into given container.
 func (conn *XConn) SendRecv(data []byte, dst XReply) error {
 	// Acquire cookie from pool
 	ck := acquireCookie()
 	defer releaseCookie(ck)
-
-	// SendRecv is synchronous
-	ck.syn = true
-
-	// Set unmarshal dst
-	ck.dst = dst
 
 	// Acquire conn lock
 	conn.mu.Lock()
@@ -124,9 +118,9 @@ func (conn *XConn) SendRecv(data []byte, dst XReply) error {
 		return err
 	}
 
-	// Register cookie with seq
+	// Setup cookie
+	ck.prime(seq, dst)
 	conn.ckQu.PushBack(ck)
-	ck.seq = seq
 
 	if dst == nil {
 		// Force "sync" with X by sending
@@ -141,10 +135,10 @@ func (conn *XConn) SendRecv(data []byte, dst XReply) error {
 	conn.mu.Unlock()
 
 	// Wait on event/err
-	return <-ck.err
+	return ck.await()
 }
 
-// Recv ...
+// Recv blocks until receipt of next XEvent / error.
 func (conn *XConn) Recv() (XEvent, error) {
 	// Wait on next event
 	v, ok := <-conn.inCh
@@ -158,11 +152,12 @@ func (conn *XConn) Recv() (XEvent, error) {
 	case error:
 		return nil, v
 	default:
-		return nil, fmt.Errorf("BUG: unexpected type %T down cookie channel", v)
+		panic(fmt.Sprintf("BUG: unexpected inbound channel type %T", v))
 	}
 }
 
-// Sync will force a roundtrip to the X server, by sending a GetInputFocus request and blocking on response.
+// Sync will force a roundtrip to X server, by sending
+// a GetInputFocus request and blocking on X response.
 func (conn *XConn) Sync() error {
 	return conn.SendRecv([]byte{
 		0x2b, 0x0, 0x1, 0x0,
@@ -222,10 +217,10 @@ func (conn *XConn) getCookie(seq uint16) (*cookie, bool) {
 		// Out of date cookie (uint16 overflow)
 		case conn.trnc && ck.seq > seq:
 			var err error
-			if ck.dst != nil && ck.syn {
+			if ck.waiting() {
 				err = errors.New("received no reply")
 			}
-			ck.send(err)      // ping
+			ck.trigger(err)   // ping
 			releaseCookie(ck) //
 			conn.trnc = false // reset
 
@@ -239,10 +234,10 @@ func (conn *XConn) getCookie(seq uint16) (*cookie, bool) {
 		// Out of date cookie
 		case ck.seq < seq:
 			var err error
-			if ck.dst != nil && ck.syn {
+			if ck.waiting() {
 				err = errors.New("received no reply")
 			}
-			ck.send(err) // ping
+			ck.trigger(err) // ping
 			releaseCookie(ck)
 
 		// Cookie is ahead
@@ -264,12 +259,11 @@ func (conn *XConn) popCookie() (*cookie, bool) {
 	// Grab first cookie in queue
 	elem := conn.ckQu.Front()
 
-	if elem == nil {
-		// no queued cookies
+	if elem == nil { // none queued
 		return nil, false
 	}
 
-	// Drop front queue element
+	// Drop front queue elem
 	conn.ckQu.Remove(elem)
 
 	return elem.Value.(*cookie), true
@@ -314,7 +308,7 @@ func (conn *XConn) readloop() {
 
 			// Look for a cookie waiting for a response
 			if ck, ok := conn.getCookie(xerr.SeqID()); ok {
-				ck.send(xerr)
+				ck.trigger(xerr)
 				continue
 			}
 
@@ -365,9 +359,8 @@ func (conn *XConn) readloop() {
 					}
 				}
 
-				// Send error
-				// (if any).
-				ck.send(err)
+				// Send err (if any).
+				ck.trigger(err)
 			}
 
 		default /* xevent */ :
@@ -381,9 +374,8 @@ func (conn *XConn) readloop() {
 			// Drop any stale cookies waiting on
 			// replies / errors up-to this event.
 			ck, ok := conn.getCookie(xev.SeqID())
-			if ok {
-				// ping and release
-				ck.send(nil)
+			if ok { // release
+				ck.trigger(nil)
 				releaseCookie(ck)
 			}
 
@@ -401,7 +393,8 @@ func (conn *XConn) readloop() {
 	}
 }
 
-// write ...
+// write will write the given data to underlying connection, update sequence
+// and return the updated sequence number. must be calling within mutex lock.
 func (conn *XConn) write(data []byte) (seq uint16, err error) {
 	// Write data to underlying X connection.
 	if _, err = conn.conn.Write(data); err != nil {
@@ -415,8 +408,7 @@ func (conn *XConn) write(data []byte) (seq uint16, err error) {
 	// Iter sequence.
 	seq = conn.seq
 	if conn.seq += 1; conn.seq < seq {
-		// uint16 overflow
-		conn.trnc = true
+		conn.trnc = true // uint16 overflow
 	}
 
 	return
@@ -427,24 +419,43 @@ func (conn *XConn) write(data []byte) (seq uint16, err error) {
 var cookiePool sync.Pool
 
 type cookie struct {
-	seq uint16
-	err chan error
-	dst XReply
-	syn bool
+	dst XReply     // unmarshal dest
+	err error      // error (if any)
+	mtx sync.Mutex // underlying lock / block
+	seq uint16     // sequence
 }
 
-func (ck *cookie) send(err error) {
-	if !ck.syn {
-		return
-	}
-	ck.err <- err
+func (ck *cookie) prime(seq uint16, dst XReply) {
+	ck.mtx.Lock()
+	ck.seq = seq
+	ck.dst = dst
+}
+
+// trigger triggers the cookie to be released.
+func (ck *cookie) trigger(err error) {
+	ck.err = err
+	ck.mtx.Unlock()
+}
+
+// await blocks on received reply / error.
+func (ck *cookie) await() error {
+	ck.mtx.Lock()
+	err := ck.err
+	ck.mtx.Unlock()
+	return err
+}
+
+// waiting returns whether cookie is
+// expecting a reply but still waiting.
+func (ck *cookie) waiting() bool {
+	return ck.dst != nil
 }
 
 // acquireCookie will acquire a fresh cookie from the pool.
 func acquireCookie() *cookie {
 	v := cookiePool.Get()
 	if v == nil {
-		v = &cookie{err: make(chan error)}
+		v = new(cookie)
 	}
 	return v.(*cookie)
 }
@@ -452,9 +463,9 @@ func acquireCookie() *cookie {
 // releaseCookie will reset the cookie, drain it and release to pool.
 func releaseCookie(ck *cookie) {
 	// Reset fields
-	ck.seq = 0
 	ck.dst = nil
-	ck.syn = false
+	ck.err = nil
+	ck.seq = 0
 
 	// Place in pool
 	cookiePool.Put(ck)
