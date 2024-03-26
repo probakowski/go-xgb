@@ -10,7 +10,6 @@ It is the Go equivalent of XCB, the X protocol C-language Binding
 This is a fork of jezek's `go-xgb` repository. It is not yet complete... 
 - ewmh, xcursor, icccm packages are unsupported
 - tests are not yet updated
-- code commenting not finished
 
 It is a complete rewrite of the dialer, underlying X connection and generated
 code itself. Though the existing `xgbgen` code generator was still used as the
