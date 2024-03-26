@@ -13,8 +13,8 @@ import (
 	"os"
 )
 
-// ReadAuthority reads the X authority file for the DISPLAY. Uses os.Hostname() if hostname empty.
-// Returns the authority name and data, or error
+// ReadAuthority reads the X authority file for the DISPLAY.
+// Uses os.Hostname() if hostname empty. Returns authority name and data.
 func ReadAuthority(hostname, display string) (string, []byte, error) {
 	var err error
 

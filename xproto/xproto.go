@@ -39,7 +39,7 @@ func registerError(n uint8, fn xgb.ErrorUnmarshaler) {
 //go:linkname xproto_init codeberg.org/gruf/go-xgb.xproto_init
 func xproto_init(*xgb.XConn, map[uint8]xgb.EventUnmarshaler, map[uint8]xgb.ErrorUnmarshaler) error
 
-// Setup ...
+// Setup sets up the main xproto library handlers with the given XConn and initial setup bytes.
 func Setup(xconn *xgb.XConn, buf []byte) (*SetupInfo, error) {
 	// Register ourselves with the X server connection
 	if err := xproto_init(xconn, eventFuncs, errorFuncs); err != nil {
@@ -926,9 +926,10 @@ func init() { registerEvent(33, UnmarshalClientMessageEvent) }
 // Note that to *create* a Union, you should *never* create
 // this struct directly (unless you know what you're doing).
 // Instead use one of the following constructors for 'ClientMessageDataUnion':
-//     ClientMessageDataUnionData8New(Data8 []byte) ClientMessageDataUnion
-//     ClientMessageDataUnionData16New(Data16 []uint16) ClientMessageDataUnion
-//     ClientMessageDataUnionData32New(Data32 []uint32) ClientMessageDataUnion
+//
+//	ClientMessageDataUnionData8New(Data8 []byte) ClientMessageDataUnion
+//	ClientMessageDataUnionData16New(Data16 []uint16) ClientMessageDataUnion
+//	ClientMessageDataUnionData32New(Data32 []uint32) ClientMessageDataUnion
 type ClientMessageDataUnion struct {
 	Data8  []byte   // size: 20
 	Data16 []uint16 // size: 20

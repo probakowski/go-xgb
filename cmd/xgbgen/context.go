@@ -162,7 +162,7 @@ func (c *Context) Morph(xmlBytes []byte) {
 		c.Putln("//go:linkname xproto_init codeberg.org/gruf/go-xgb.xproto_init")
 		c.Putln("func xproto_init(*xgb.XConn, map[uint8]xgb.EventUnmarshaler, map[uint8]xgb.ErrorUnmarshaler) error")
 		c.Putln("")
-		c.Putln("// Setup ...")
+		c.Putln("// Setup sets up the main xproto library handlers with the given XConn and initial setup bytes.")
 		c.Putln("func Setup(xconn *xgb.XConn, buf []byte) (*SetupInfo, error) {")
 		c.Putln("	// Register ourselves with the X server connection")
 		c.Putln("	if err := xproto_init(xconn, eventFuncs, errorFuncs); err != nil {")

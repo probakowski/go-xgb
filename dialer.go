@@ -21,8 +21,10 @@ var DefaultDialer = XDialer{
 	InboundBuffer: 1000,
 }
 
-// XDialer ...
+// XDialer provides a dialer
+// for connection to an X server.
 type XDialer struct {
+
 	// InboundBuffer allows specifying how
 	// many inbound X messages to buffer
 	// before the connection will block.
@@ -33,24 +35,25 @@ type XDialer struct {
 	NetDialer *net.Dialer
 }
 
-// Dial ...
+// Dial calls XDialer{}.Dial() on the DefaultDialer instance.
 func Dial(display string) (*XConn, []byte, error) {
 	return DefaultDialer.Dial(display)
 }
 
-// Dial ...
+// Dial calls XDialer{}.DialContext() using background context (non-blocking).
 func (d *XDialer) Dial(display string) (*XConn, []byte, error) {
 	return d.DialContext(context.Background(), display)
 }
 
-// DialContext ...
+// DialContext attempts to open X connection for given display (X format network address) string.
 func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []byte, error) {
 	if display == "" {
 		// By default grab from env.
 		display = os.Getenv("DISPLAY")
 	}
 
-	// Keep original str for errors.
+	// Keep original
+	// str for errors.
 	display0 := display
 
 	// Pull out first colon indicating display no.
@@ -126,9 +129,11 @@ func (d *XDialer) DialContext(ctx context.Context, display string) (*XConn, []by
 		return nil, nil, fmt.Errorf("unsupported auth protocol %q", authName)
 	}
 
+	// Pass to main
 	return d.DialConn(authName, authData, conn)
 }
 
+// DialConn attempts to prepare new X connection (including auth handshake) for an already open network connection.
 func (d *XDialer) DialConn(authName string, authData []byte, conn net.Conn) (*XConn, []byte, error) {
 	// Build the initial authorization request into buffer.
 	buf := make([]byte, 12+internal.Pad4(len(authName))+internal.Pad4(len(authData)))

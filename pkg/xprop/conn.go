@@ -6,9 +6,12 @@ import (
 	"codeberg.org/gruf/go-xgb/xproto"
 )
 
-// XPropConn ...
+// XPropConn wraps an XConn to provide
+// atom / property name caching and a
+// selection of simple utility methods.
 type XPropConn struct {
-	// XConn ...
+	// XConn is the underlying
+	// X connection interface.
 	XConn *xgb.XConn
 
 	// internal caching
