@@ -243,7 +243,8 @@ type QueryInfoReply struct {
 
 // Unmarshal reads a byte slice into a QueryInfoReply value.
 func (v *QueryInfoReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryInfoReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -281,7 +282,7 @@ func (v *QueryInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryInfo
 // queryInfoRequest writes a QueryInfo request to a byte slice.
 func queryInfoRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -332,7 +333,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -360,7 +362,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajorVersion byte, ClientMinorVersion byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -405,7 +407,7 @@ func SelectInputUnchecked(c *xgb.XConn, Drawable xproto.Drawable, EventMask uint
 // Write request to wire for SelectInput
 // selectInputRequest writes a SelectInput request to a byte slice.
 func selectInputRequest(opcode uint8, Drawable xproto.Drawable, EventMask uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -521,7 +523,7 @@ func SuspendUnchecked(c *xgb.XConn, Suspend uint32) error {
 // Write request to wire for Suspend
 // suspendRequest writes a Suspend request to a byte slice.
 func suspendRequest(opcode uint8, Suspend uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -561,7 +563,7 @@ func UnsetAttributesUnchecked(c *xgb.XConn, Drawable xproto.Drawable) error {
 // Write request to wire for UnsetAttributes
 // unsetAttributesRequest writes a UnsetAttributes request to a byte slice.
 func unsetAttributesRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

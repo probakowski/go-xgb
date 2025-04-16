@@ -969,7 +969,7 @@ func ImageFormatInfoListBytes(buf []byte, list []ImageFormatInfo) int {
 // ImageFormatInfoListSize computes the size (bytes) of a list of ImageFormatInfo values.
 func ImageFormatInfoListSize(list []ImageFormatInfo) int {
 	size := 0
-	for _ = range list {
+	for range list {
 		size += 128
 	}
 	return size
@@ -1272,7 +1272,8 @@ type GetPortAttributeReply struct {
 
 // Unmarshal reads a byte slice into a GetPortAttributeReply value.
 func (v *GetPortAttributeReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetPortAttributeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1295,7 +1296,7 @@ func (v *GetPortAttributeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPortAttribute
 // getPortAttributeRequest writes a GetPortAttribute request to a byte slice.
 func getPortAttributeRequest(opcode uint8, Port Port, Attribute xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1338,7 +1339,7 @@ func GetStillUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable, Gc xpr
 // Write request to wire for GetStill
 // getStillRequest writes a GetStill request to a byte slice.
 func getStillRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xproto.Gcontext, VidX int16, VidY int16, VidW uint16, VidH uint16, DrwX int16, DrwY int16, DrwW uint16, DrwH uint16) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1408,7 +1409,7 @@ func GetVideoUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable, Gc xpr
 // Write request to wire for GetVideo
 // getVideoRequest writes a GetVideo request to a byte slice.
 func getVideoRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xproto.Gcontext, VidX int16, VidY int16, VidW uint16, VidH uint16, DrwX int16, DrwY int16, DrwW uint16, DrwH uint16) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1486,7 +1487,8 @@ type GrabPortReply struct {
 
 // Unmarshal reads a byte slice into a GrabPortReply value.
 func (v *GrabPortReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GrabPortReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1507,7 +1509,7 @@ func (v *GrabPortReply) Unmarshal(buf []byte) error {
 // Write request to wire for GrabPort
 // grabPortRequest writes a GrabPort request to a byte slice.
 func grabPortRequest(opcode uint8, Port Port, Time xproto.Timestamp) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1589,7 +1591,7 @@ func (v *ListImageFormatsReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListImageFormats
 // listImageFormatsRequest writes a ListImageFormats request to a byte slice.
 func listImageFormatsRequest(opcode uint8, Port Port) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1684,7 +1686,7 @@ func putImageRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xprot
 	binary.LittleEndian.PutUint16(buf[b:], Height)
 	b += 2
 
-	copy(buf[b:], Data[:len(Data)])
+	copy(buf[b:], Data[:])
 	b += int(len(Data))
 
 	return buf
@@ -1711,7 +1713,7 @@ func PutStillUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable, Gc xpr
 // Write request to wire for PutStill
 // putStillRequest writes a PutStill request to a byte slice.
 func putStillRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xproto.Gcontext, VidX int16, VidY int16, VidW uint16, VidH uint16, DrwX int16, DrwY int16, DrwW uint16, DrwH uint16) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1781,7 +1783,7 @@ func PutVideoUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable, Gc xpr
 // Write request to wire for PutVideo
 // putVideoRequest writes a PutVideo request to a byte slice.
 func putVideoRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xproto.Gcontext, VidX int16, VidY int16, VidW uint16, VidH uint16, DrwX int16, DrwY int16, DrwW uint16, DrwH uint16) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1890,7 +1892,7 @@ func (v *QueryAdaptorsReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryAdaptors
 // queryAdaptorsRequest writes a QueryAdaptors request to a byte slice.
 func queryAdaptorsRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1940,7 +1942,8 @@ type QueryBestSizeReply struct {
 
 // Unmarshal reads a byte slice into a QueryBestSizeReply value.
 func (v *QueryBestSizeReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryBestSizeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1966,7 +1969,7 @@ func (v *QueryBestSizeReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryBestSize
 // queryBestSizeRequest writes a QueryBestSize request to a byte slice.
 func queryBestSizeRequest(opcode uint8, Port Port, VidW uint16, VidH uint16, DrwW uint16, DrwH uint16, Motion bool) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -2066,7 +2069,7 @@ func (v *QueryEncodingsReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryEncodings
 // queryEncodingsRequest writes a QueryEncodings request to a byte slice.
 func queryEncodingsRequest(opcode uint8, Port Port) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2116,7 +2119,8 @@ type QueryExtensionReply struct {
 
 // Unmarshal reads a byte slice into a QueryExtensionReply value.
 func (v *QueryExtensionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryExtensionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -2142,7 +2146,7 @@ func (v *QueryExtensionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryExtension
 // queryExtensionRequest writes a QueryExtension request to a byte slice.
 func queryExtensionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -2243,7 +2247,7 @@ func (v *QueryImageAttributesReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryImageAttributes
 // queryImageAttributesRequest writes a QueryImageAttributes request to a byte slice.
 func queryImageAttributesRequest(opcode uint8, Port Port, Id uint32, Width uint16, Height uint16) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2335,7 +2339,7 @@ func (v *QueryPortAttributesReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryPortAttributes
 // queryPortAttributesRequest writes a QueryPortAttributes request to a byte slice.
 func queryPortAttributesRequest(opcode uint8, Port Port) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2375,7 +2379,7 @@ func SelectPortNotifyUnchecked(c *xgb.XConn, Port Port, Onoff bool) error {
 // Write request to wire for SelectPortNotify
 // selectPortNotifyRequest writes a SelectPortNotify request to a byte slice.
 func selectPortNotifyRequest(opcode uint8, Port Port, Onoff bool) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2424,7 +2428,7 @@ func SelectVideoNotifyUnchecked(c *xgb.XConn, Drawable xproto.Drawable, Onoff bo
 // Write request to wire for SelectVideoNotify
 // selectVideoNotifyRequest writes a SelectVideoNotify request to a byte slice.
 func selectVideoNotifyRequest(opcode uint8, Drawable xproto.Drawable, Onoff bool) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2473,7 +2477,7 @@ func SetPortAttributeUnchecked(c *xgb.XConn, Port Port, Attribute xproto.Atom, V
 // Write request to wire for SetPortAttribute
 // setPortAttributeRequest writes a SetPortAttribute request to a byte slice.
 func setPortAttributeRequest(opcode uint8, Port Port, Attribute xproto.Atom, Value int32) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2519,7 +2523,7 @@ func ShmPutImageUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable, Gc 
 // Write request to wire for ShmPutImage
 // shmPutImageRequest writes a ShmPutImage request to a byte slice.
 func shmPutImageRequest(opcode uint8, Port Port, Drawable xproto.Drawable, Gc xproto.Gcontext, Shmseg shm.Seg, Id uint32, Offset uint32, SrcX int16, SrcY int16, SrcW uint16, SrcH uint16, DrwX int16, DrwY int16, DrwW uint16, DrwH uint16, Width uint16, Height uint16, SendEvent byte) []byte {
-	size := 52
+	const size = 52
 	b := 0
 	buf := make([]byte, size)
 
@@ -2609,7 +2613,7 @@ func StopVideoUnchecked(c *xgb.XConn, Port Port, Drawable xproto.Drawable) error
 // Write request to wire for StopVideo
 // stopVideoRequest writes a StopVideo request to a byte slice.
 func stopVideoRequest(opcode uint8, Port Port, Drawable xproto.Drawable) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2652,7 +2656,7 @@ func UngrabPortUnchecked(c *xgb.XConn, Port Port, Time xproto.Timestamp) error {
 // Write request to wire for UngrabPort
 // ungrabPortRequest writes a UngrabPort request to a byte slice.
 func ungrabPortRequest(opcode uint8, Port Port, Time xproto.Timestamp) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 

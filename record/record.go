@@ -630,7 +630,7 @@ func DisableContextUnchecked(c *xgb.XConn, Context Context) error {
 // Write request to wire for DisableContext
 // disableContextRequest writes a DisableContext request to a byte slice.
 func disableContextRequest(opcode uint8, Context Context) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -730,7 +730,7 @@ func (v *EnableContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for EnableContext
 // enableContextRequest writes a EnableContext request to a byte slice.
 func enableContextRequest(opcode uint8, Context Context) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -770,7 +770,7 @@ func FreeContextUnchecked(c *xgb.XConn, Context Context) error {
 // Write request to wire for FreeContext
 // freeContextRequest writes a FreeContext request to a byte slice.
 func freeContextRequest(opcode uint8, Context Context) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -857,7 +857,7 @@ func (v *GetContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetContext
 // getContextRequest writes a GetContext request to a byte slice.
 func getContextRequest(opcode uint8, Context Context) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -907,7 +907,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -933,7 +934,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, MajorVersion uint16, MinorVersion uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

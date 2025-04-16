@@ -290,7 +290,7 @@ func (v *CreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateContext
 // createContextRequest writes a CreateContext request to a byte slice.
 func createContextRequest(opcode uint8, ContextId Context, PortId xv.Port, SurfaceId Surface, Width uint16, Height uint16, Flags uint32) []byte {
-	size := 24
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -404,7 +404,7 @@ func (v *CreateSubpictureReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateSubpicture
 // createSubpictureRequest writes a CreateSubpicture request to a byte slice.
 func createSubpictureRequest(opcode uint8, SubpictureId Subpicture, Context Context, XvimageId uint32, Width uint16, Height uint16) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -494,7 +494,7 @@ func (v *CreateSurfaceReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateSurface
 // createSurfaceRequest writes a CreateSurface request to a byte slice.
 func createSurfaceRequest(opcode uint8, SurfaceId Surface, ContextId Context) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -537,7 +537,7 @@ func DestroyContextUnchecked(c *xgb.XConn, ContextId Context) error {
 // Write request to wire for DestroyContext
 // destroyContextRequest writes a DestroyContext request to a byte slice.
 func destroyContextRequest(opcode uint8, ContextId Context) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -577,7 +577,7 @@ func DestroySubpictureUnchecked(c *xgb.XConn, SubpictureId Subpicture) error {
 // Write request to wire for DestroySubpicture
 // destroySubpictureRequest writes a DestroySubpicture request to a byte slice.
 func destroySubpictureRequest(opcode uint8, SubpictureId Subpicture) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -617,7 +617,7 @@ func DestroySurfaceUnchecked(c *xgb.XConn, SurfaceId Surface) error {
 // Write request to wire for DestroySurface
 // destroySurfaceRequest writes a DestroySurface request to a byte slice.
 func destroySurfaceRequest(opcode uint8, SurfaceId Surface) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -696,7 +696,7 @@ func (v *ListSubpictureTypesReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListSubpictureTypes
 // listSubpictureTypesRequest writes a ListSubpictureTypes request to a byte slice.
 func listSubpictureTypesRequest(opcode uint8, PortId xv.Port, SurfaceId Surface) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -778,7 +778,7 @@ func (v *ListSurfaceTypesReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListSurfaceTypes
 // listSurfaceTypesRequest writes a ListSurfaceTypes request to a byte slice.
 func listSurfaceTypesRequest(opcode uint8, PortId xv.Port) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -828,7 +828,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -854,7 +855,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 

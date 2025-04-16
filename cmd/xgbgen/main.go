@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -40,7 +39,7 @@ func main() {
 	}
 
 	// Read the single XML file into []byte
-	xmlBytes, err := ioutil.ReadFile(flag.Arg(0))
+	xmlBytes, err := os.ReadFile(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,7 +51,7 @@ func main() {
 	if !*gofmt {
 		c.out.WriteTo(os.Stdout)
 	} else {
-		cmdGofmt := exec.Command("goimports")
+		cmdGofmt := exec.Command("gofumpt")
 		cmdGofmt.Stdin = c.out
 		cmdGofmt.Stdout = os.Stdout
 		cmdGofmt.Stderr = os.Stderr

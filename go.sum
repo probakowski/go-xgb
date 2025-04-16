@@ -1,4 +1,2 @@
-codeberg.org/gruf/go-byteutil v1.1.2 h1:TQLZtTxTNca9xEfDIndmo7nBYxeS94nrv/9DS3Nk5Tw=
-codeberg.org/gruf/go-byteutil v1.1.2/go.mod h1:cWM3tgMCroSzqoBXUXMhvxTxYJp+TbCr6ioISRY5vSU=
-codeberg.org/gruf/go-xgbutil v1.0.0 h1:l7BepnVw7JGc+LMYgpL1qHyrJ4qAS471mLMz20skJFs=
-codeberg.org/gruf/go-xgbutil v1.0.0/go.mod h1:WUndKE6hGDnvrgSseqkeyMArGjx7S4+g2NsWSgtdBlA=
+codeberg.org/gruf/go-byteutil v1.3.0 h1:nRqJnCcRQ7xbfU6azw7zOzJrSMDIJHBqX6FL9vEMYmU=
+codeberg.org/gruf/go-byteutil v1.3.0/go.mod h1:chgnZz1LUcfaObaIFglxF5MRYQkJGjQf4WwVz95ccCM=

@@ -261,7 +261,7 @@ func AttachUnchecked(c *xgb.XConn, Shmseg Seg, Shmid uint32, ReadOnly bool) erro
 // Write request to wire for Attach
 // attachRequest writes a Attach request to a byte slice.
 func attachRequest(opcode uint8, Shmseg Seg, Shmid uint32, ReadOnly bool) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -313,7 +313,7 @@ func AttachFdUnchecked(c *xgb.XConn, Shmseg Seg, ReadOnly bool) error {
 // Write request to wire for AttachFd
 // attachFdRequest writes a AttachFd request to a byte slice.
 func attachFdRequest(opcode uint8, Shmseg Seg, ReadOnly bool) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -362,7 +362,7 @@ func CreatePixmapUnchecked(c *xgb.XConn, Pid xproto.Pixmap, Drawable xproto.Draw
 // Write request to wire for CreatePixmap
 // createPixmapRequest writes a CreatePixmap request to a byte slice.
 func createPixmapRequest(opcode uint8, Pid xproto.Pixmap, Drawable xproto.Drawable, Width uint16, Height uint16, Depth byte, Shmseg Seg, Offset uint32) []byte {
-	size := 28
+	const size = 28
 	b := 0
 	buf := make([]byte, size)
 
@@ -431,7 +431,8 @@ type CreateSegmentReply struct {
 
 // Unmarshal reads a byte slice into a CreateSegmentReply value.
 func (v *CreateSegmentReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CreateSegmentReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -454,7 +455,7 @@ func (v *CreateSegmentReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateSegment
 // createSegmentRequest writes a CreateSegment request to a byte slice.
 func createSegmentRequest(opcode uint8, Shmseg Seg, Size uint32, ReadOnly bool) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -506,7 +507,7 @@ func DetachUnchecked(c *xgb.XConn, Shmseg Seg) error {
 // Write request to wire for Detach
 // detachRequest writes a Detach request to a byte slice.
 func detachRequest(opcode uint8, Shmseg Seg) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -556,7 +557,8 @@ type GetImageReply struct {
 
 // Unmarshal reads a byte slice into a GetImageReply value.
 func (v *GetImageReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetImageReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -583,7 +585,7 @@ func (v *GetImageReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetImage
 // getImageRequest writes a GetImage request to a byte slice.
 func getImageRequest(opcode uint8, Drawable xproto.Drawable, X int16, Y int16, Width uint16, Height uint16, PlaneMask uint32, Format byte, Shmseg Seg, Offset uint32) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -649,7 +651,7 @@ func PutImageUnchecked(c *xgb.XConn, Drawable xproto.Drawable, Gc xproto.Gcontex
 // Write request to wire for PutImage
 // putImageRequest writes a PutImage request to a byte slice.
 func putImageRequest(opcode uint8, Drawable xproto.Drawable, Gc xproto.Gcontext, TotalWidth uint16, TotalHeight uint16, SrcX uint16, SrcY uint16, SrcWidth uint16, SrcHeight uint16, DstX int16, DstY int16, Depth byte, Format byte, SendEvent bool, Shmseg Seg, Offset uint32) []byte {
-	size := 40
+	const size = 40
 	b := 0
 	buf := make([]byte, size)
 
@@ -751,7 +753,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -789,7 +792,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 

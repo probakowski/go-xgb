@@ -125,7 +125,8 @@ type GetVersionReply struct {
 
 // Unmarshal reads a byte slice into a GetVersionReply value.
 func (v *GetVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -151,7 +152,7 @@ func (v *GetVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetVersion
 // getVersionRequest writes a GetVersion request to a byte slice.
 func getVersionRequest(opcode uint8, ClientMajorVersion uint16, ClientMinorVersion uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -236,7 +237,7 @@ func (v *GetXIDListReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetXIDList
 // getXIDListRequest writes a GetXIDList request to a byte slice.
 func getXIDListRequest(opcode uint8, Count uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -286,7 +287,8 @@ type GetXIDRangeReply struct {
 
 // Unmarshal reads a byte slice into a GetXIDRangeReply value.
 func (v *GetXIDRangeReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetXIDRangeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -312,7 +314,7 @@ func (v *GetXIDRangeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetXIDRange
 // getXIDRangeRequest writes a GetXIDRange request to a byte slice.
 func getXIDRangeRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 

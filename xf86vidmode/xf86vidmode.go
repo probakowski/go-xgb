@@ -893,7 +893,7 @@ func (v *GetAllModeLinesReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetAllModeLines
 // getAllModeLinesRequest writes a GetAllModeLines request to a byte slice.
 func getAllModeLinesRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -985,7 +985,7 @@ func (v *GetDotClocksReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetDotClocks
 // getDotClocksRequest writes a GetDotClocks request to a byte slice.
 func getDotClocksRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1039,7 +1039,8 @@ type GetGammaReply struct {
 
 // Unmarshal reads a byte slice into a GetGammaReply value.
 func (v *GetGammaReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetGammaReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1070,7 +1071,7 @@ func (v *GetGammaReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetGamma
 // getGammaRequest writes a GetGamma request to a byte slice.
 func getGammaRequest(opcode uint8, Screen uint16) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1174,7 +1175,7 @@ func (v *GetGammaRampReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetGammaRamp
 // getGammaRampRequest writes a GetGammaRamp request to a byte slice.
 func getGammaRampRequest(opcode uint8, Screen uint16, Size uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1227,7 +1228,8 @@ type GetGammaRampSizeReply struct {
 
 // Unmarshal reads a byte slice into a GetGammaRampSizeReply value.
 func (v *GetGammaRampSizeReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetGammaRampSizeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1252,7 +1254,7 @@ func (v *GetGammaRampSizeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetGammaRampSize
 // getGammaRampSizeRequest writes a GetGammaRampSize request to a byte slice.
 func getGammaRampSizeRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1381,7 +1383,7 @@ func (v *GetModeLineReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetModeLine
 // getModeLineRequest writes a GetModeLine request to a byte slice.
 func getModeLineRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1508,7 +1510,7 @@ func (v *GetMonitorReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetMonitor
 // getMonitorRequest writes a GetMonitor request to a byte slice.
 func getMonitorRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1560,7 +1562,8 @@ type GetPermissionsReply struct {
 
 // Unmarshal reads a byte slice into a GetPermissionsReply value.
 func (v *GetPermissionsReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetPermissionsReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1585,7 +1588,7 @@ func (v *GetPermissionsReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPermissions
 // getPermissionsRequest writes a GetPermissions request to a byte slice.
 func getPermissionsRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1638,7 +1641,8 @@ type GetViewPortReply struct {
 
 // Unmarshal reads a byte slice into a GetViewPortReply value.
 func (v *GetViewPortReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetViewPortReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1666,7 +1670,7 @@ func (v *GetViewPortReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetViewPort
 // getViewPortRequest writes a GetViewPort request to a byte slice.
 func getViewPortRequest(opcode uint8, Screen uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1708,7 +1712,7 @@ func LockModeSwitchUnchecked(c *xgb.XConn, Screen uint16, Lock uint16) error {
 // Write request to wire for LockModeSwitch
 // lockModeSwitchRequest writes a LockModeSwitch request to a byte slice.
 func lockModeSwitchRequest(opcode uint8, Screen uint16, Lock uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1841,7 +1845,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1867,7 +1872,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1904,7 +1909,7 @@ func SetClientVersionUnchecked(c *xgb.XConn, Major uint16, Minor uint16) error {
 // Write request to wire for SetClientVersion
 // setClientVersionRequest writes a SetClientVersion request to a byte slice.
 func setClientVersionRequest(opcode uint8, Major uint16, Minor uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1947,7 +1952,7 @@ func SetGammaUnchecked(c *xgb.XConn, Screen uint16, Red uint32, Green uint32, Bl
 // Write request to wire for SetGamma
 // setGammaRequest writes a SetGamma request to a byte slice.
 func setGammaRequest(opcode uint8, Screen uint16, Red uint32, Green uint32, Blue uint32) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -2064,7 +2069,7 @@ func SetViewPortUnchecked(c *xgb.XConn, Screen uint16, X uint32, Y uint32) error
 // Write request to wire for SetViewPort
 // setViewPortRequest writes a SetViewPort request to a byte slice.
 func setViewPortRequest(opcode uint8, Screen uint16, X uint32, Y uint32) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2112,7 +2117,7 @@ func SwitchModeUnchecked(c *xgb.XConn, Screen uint16, Zoom uint16) error {
 // Write request to wire for SwitchMode
 // switchModeRequest writes a SwitchMode request to a byte slice.
 func switchModeRequest(opcode uint8, Screen uint16, Zoom uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2248,7 +2253,8 @@ type ValidateModeLineReply struct {
 
 // Unmarshal reads a byte slice into a ValidateModeLineReply value.
 func (v *ValidateModeLineReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"ValidateModeLineReply\": have=%d need=%d", len(buf), size)
 	}
 

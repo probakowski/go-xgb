@@ -648,7 +648,8 @@ type QueryClientPixmapBytesReply struct {
 
 // Unmarshal reads a byte slice into a QueryClientPixmapBytesReply value.
 func (v *QueryClientPixmapBytesReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryClientPixmapBytesReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -674,7 +675,7 @@ func (v *QueryClientPixmapBytesReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryClientPixmapBytes
 // queryClientPixmapBytesRequest writes a QueryClientPixmapBytes request to a byte slice.
 func queryClientPixmapBytesRequest(opcode uint8, Xid uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -753,7 +754,7 @@ func (v *QueryClientResourcesReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryClientResources
 // queryClientResourcesRequest writes a QueryClientResources request to a byte slice.
 func queryClientResourcesRequest(opcode uint8, Xid uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -832,7 +833,7 @@ func (v *QueryClientsReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryClients
 // queryClientsRequest writes a QueryClients request to a byte slice.
 func queryClientsRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -963,7 +964,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -989,7 +991,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajor byte, ClientMinor byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

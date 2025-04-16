@@ -120,7 +120,7 @@ func CreateRegionFromBorderClipUnchecked(c *xgb.XConn, Region xfixes.Region, Win
 // Write request to wire for CreateRegionFromBorderClip
 // createRegionFromBorderClipRequest writes a CreateRegionFromBorderClip request to a byte slice.
 func createRegionFromBorderClipRequest(opcode uint8, Region xfixes.Region, Window xproto.Window) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -173,7 +173,8 @@ type GetOverlayWindowReply struct {
 
 // Unmarshal reads a byte slice into a GetOverlayWindowReply value.
 func (v *GetOverlayWindowReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetOverlayWindowReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -198,7 +199,7 @@ func (v *GetOverlayWindowReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetOverlayWindow
 // getOverlayWindowRequest writes a GetOverlayWindow request to a byte slice.
 func getOverlayWindowRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -238,7 +239,7 @@ func NameWindowPixmapUnchecked(c *xgb.XConn, Window xproto.Window, Pixmap xproto
 // Write request to wire for NameWindowPixmap
 // nameWindowPixmapRequest writes a NameWindowPixmap request to a byte slice.
 func nameWindowPixmapRequest(opcode uint8, Window xproto.Window, Pixmap xproto.Pixmap) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -292,7 +293,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -320,7 +322,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajorVersion uint32, ClientMinorVersion uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -363,7 +365,7 @@ func RedirectSubwindowsUnchecked(c *xgb.XConn, Window xproto.Window, Update byte
 // Write request to wire for RedirectSubwindows
 // redirectSubwindowsRequest writes a RedirectSubwindows request to a byte slice.
 func redirectSubwindowsRequest(opcode uint8, Window xproto.Window, Update byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -408,7 +410,7 @@ func RedirectWindowUnchecked(c *xgb.XConn, Window xproto.Window, Update byte) er
 // Write request to wire for RedirectWindow
 // redirectWindowRequest writes a RedirectWindow request to a byte slice.
 func redirectWindowRequest(opcode uint8, Window xproto.Window, Update byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -453,7 +455,7 @@ func ReleaseOverlayWindowUnchecked(c *xgb.XConn, Window xproto.Window) error {
 // Write request to wire for ReleaseOverlayWindow
 // releaseOverlayWindowRequest writes a ReleaseOverlayWindow request to a byte slice.
 func releaseOverlayWindowRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -493,7 +495,7 @@ func UnredirectSubwindowsUnchecked(c *xgb.XConn, Window xproto.Window, Update by
 // Write request to wire for UnredirectSubwindows
 // unredirectSubwindowsRequest writes a UnredirectSubwindows request to a byte slice.
 func unredirectSubwindowsRequest(opcode uint8, Window xproto.Window, Update byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -538,7 +540,7 @@ func UnredirectWindowUnchecked(c *xgb.XConn, Window xproto.Window, Update byte) 
 // Write request to wire for UnredirectWindow
 // unredirectWindowRequest writes a UnredirectWindow request to a byte slice.
 func unredirectWindowRequest(opcode uint8, Window xproto.Window, Update byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 

@@ -123,7 +123,8 @@ type EnableReply struct {
 
 // Unmarshal reads a byte slice into a EnableReply value.
 func (v *EnableReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"EnableReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -146,7 +147,7 @@ func (v *EnableReply) Unmarshal(buf []byte) error {
 // Write request to wire for Enable
 // enableRequest writes a Enable request to a byte slice.
 func enableRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 

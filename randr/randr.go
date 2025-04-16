@@ -2021,7 +2021,7 @@ func AddOutputModeUnchecked(c *xgb.XConn, Output Output, Mode Mode) error {
 // Write request to wire for AddOutputMode
 // addOutputModeRequest writes a AddOutputMode request to a byte slice.
 func addOutputModeRequest(opcode uint8, Output Output, Mode Mode) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2321,7 +2321,8 @@ type CreateLeaseReply struct {
 
 // Unmarshal reads a byte slice into a CreateLeaseReply value.
 func (v *CreateLeaseReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CreateLeaseReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -2417,7 +2418,8 @@ type CreateModeReply struct {
 
 // Unmarshal reads a byte slice into a CreateModeReply value.
 func (v *CreateModeReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CreateModeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -2491,7 +2493,7 @@ func DeleteMonitorUnchecked(c *xgb.XConn, Window xproto.Window, Name xproto.Atom
 // Write request to wire for DeleteMonitor
 // deleteMonitorRequest writes a DeleteMonitor request to a byte slice.
 func deleteMonitorRequest(opcode uint8, Window xproto.Window, Name xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2534,7 +2536,7 @@ func DeleteOutputModeUnchecked(c *xgb.XConn, Output Output, Mode Mode) error {
 // Write request to wire for DeleteOutputMode
 // deleteOutputModeRequest writes a DeleteOutputMode request to a byte slice.
 func deleteOutputModeRequest(opcode uint8, Output Output, Mode Mode) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2577,7 +2579,7 @@ func DeleteOutputPropertyUnchecked(c *xgb.XConn, Output Output, Property xproto.
 // Write request to wire for DeleteOutputProperty
 // deleteOutputPropertyRequest writes a DeleteOutputProperty request to a byte slice.
 func deleteOutputPropertyRequest(opcode uint8, Output Output, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2620,7 +2622,7 @@ func DeleteProviderPropertyUnchecked(c *xgb.XConn, Provider Provider, Property x
 // Write request to wire for DeleteProviderProperty
 // deleteProviderPropertyRequest writes a DeleteProviderProperty request to a byte slice.
 func deleteProviderPropertyRequest(opcode uint8, Provider Provider, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2663,7 +2665,7 @@ func DestroyModeUnchecked(c *xgb.XConn, Mode Mode) error {
 // Write request to wire for DestroyMode
 // destroyModeRequest writes a DestroyMode request to a byte slice.
 func destroyModeRequest(opcode uint8, Mode Mode) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2703,7 +2705,7 @@ func FreeLeaseUnchecked(c *xgb.XConn, Lid Lease, Terminate byte) error {
 // Write request to wire for FreeLease
 // freeLeaseRequest writes a FreeLease request to a byte slice.
 func freeLeaseRequest(opcode uint8, Lid Lease, Terminate byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2808,7 +2810,7 @@ func (v *GetCrtcGammaReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCrtcGamma
 // getCrtcGammaRequest writes a GetCrtcGamma request to a byte slice.
 func getCrtcGammaRequest(opcode uint8, Crtc Crtc) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2858,7 +2860,8 @@ type GetCrtcGammaSizeReply struct {
 
 // Unmarshal reads a byte slice into a GetCrtcGammaSizeReply value.
 func (v *GetCrtcGammaSizeReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetCrtcGammaSizeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -2883,7 +2886,7 @@ func (v *GetCrtcGammaSizeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCrtcGammaSize
 // getCrtcGammaSizeRequest writes a GetCrtcGammaSize request to a byte slice.
 func getCrtcGammaSizeRequest(opcode uint8, Crtc Crtc) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -3009,7 +3012,7 @@ func (v *GetCrtcInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCrtcInfo
 // getCrtcInfoRequest writes a GetCrtcInfo request to a byte slice.
 func getCrtcInfoRequest(opcode uint8, Crtc Crtc, ConfigTimestamp xproto.Timestamp) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3150,7 +3153,7 @@ func (v *GetCrtcTransformReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCrtcTransform
 // getCrtcTransformRequest writes a GetCrtcTransform request to a byte slice.
 func getCrtcTransformRequest(opcode uint8, Crtc Crtc) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -3237,7 +3240,7 @@ func (v *GetMonitorsReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetMonitors
 // getMonitorsRequest writes a GetMonitors request to a byte slice.
 func getMonitorsRequest(opcode uint8, Window xproto.Window, GetActive bool) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3389,7 +3392,7 @@ func (v *GetOutputInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetOutputInfo
 // getOutputInfoRequest writes a GetOutputInfo request to a byte slice.
 func getOutputInfoRequest(opcode uint8, Output Output, ConfigTimestamp xproto.Timestamp) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3441,7 +3444,8 @@ type GetOutputPrimaryReply struct {
 
 // Unmarshal reads a byte slice into a GetOutputPrimaryReply value.
 func (v *GetOutputPrimaryReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetOutputPrimaryReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -3464,7 +3468,7 @@ func (v *GetOutputPrimaryReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetOutputPrimary
 // getOutputPrimaryRequest writes a GetOutputPrimary request to a byte slice.
 func getOutputPrimaryRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -3553,7 +3557,7 @@ func (v *GetOutputPropertyReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetOutputProperty
 // getOutputPropertyRequest writes a GetOutputProperty request to a byte slice.
 func getOutputPropertyRequest(opcode uint8, Output Output, Property xproto.Atom, Type xproto.Atom, LongOffset uint32, LongLength uint32, Delete bool, Pending bool) []byte {
-	size := 28
+	const size = 28
 	b := 0
 	buf := make([]byte, size)
 
@@ -3642,7 +3646,8 @@ type GetPanningReply struct {
 
 // Unmarshal reads a byte slice into a GetPanningReply value.
 func (v *GetPanningReply) Unmarshal(buf []byte) error {
-	if size := 36; len(buf) < size {
+	const size = 36
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetPanningReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -3702,7 +3707,7 @@ func (v *GetPanningReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPanning
 // getPanningRequest writes a GetPanning request to a byte slice.
 func getPanningRequest(opcode uint8, Crtc Crtc) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -3843,7 +3848,7 @@ func (v *GetProviderInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetProviderInfo
 // getProviderInfoRequest writes a GetProviderInfo request to a byte slice.
 func getProviderInfoRequest(opcode uint8, Provider Provider, ConfigTimestamp xproto.Timestamp) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3935,7 +3940,7 @@ func (v *GetProviderPropertyReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetProviderProperty
 // getProviderPropertyRequest writes a GetProviderProperty request to a byte slice.
 func getProviderPropertyRequest(opcode uint8, Provider Provider, Property xproto.Atom, Type xproto.Atom, LongOffset uint32, LongLength uint32, Delete bool, Pending bool) []byte {
-	size := 28
+	const size = 28
 	b := 0
 	buf := make([]byte, size)
 
@@ -4049,7 +4054,7 @@ func (v *GetProvidersReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetProviders
 // getProvidersRequest writes a GetProviders request to a byte slice.
 func getProvidersRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4164,7 +4169,7 @@ func (v *GetScreenInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenInfo
 // getScreenInfoRequest writes a GetScreenInfo request to a byte slice.
 func getScreenInfoRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4288,7 +4293,7 @@ func (v *GetScreenResourcesReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenResources
 // getScreenResourcesRequest writes a GetScreenResources request to a byte slice.
 func getScreenResourcesRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4412,7 +4417,7 @@ func (v *GetScreenResourcesCurrentReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenResourcesCurrent
 // getScreenResourcesCurrentRequest writes a GetScreenResourcesCurrent request to a byte slice.
 func getScreenResourcesCurrentRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4465,7 +4470,8 @@ type GetScreenSizeRangeReply struct {
 
 // Unmarshal reads a byte slice into a GetScreenSizeRangeReply value.
 func (v *GetScreenSizeRangeReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetScreenSizeRangeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -4499,7 +4505,7 @@ func (v *GetScreenSizeRangeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenSizeRange
 // getScreenSizeRangeRequest writes a GetScreenSizeRange request to a byte slice.
 func getScreenSizeRangeRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4581,7 +4587,7 @@ func (v *ListOutputPropertiesReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListOutputProperties
 // listOutputPropertiesRequest writes a ListOutputProperties request to a byte slice.
 func listOutputPropertiesRequest(opcode uint8, Output Output) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4663,7 +4669,7 @@ func (v *ListProviderPropertiesReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListProviderProperties
 // listProviderPropertiesRequest writes a ListProviderProperties request to a byte slice.
 func listProviderPropertiesRequest(opcode uint8, Provider Provider) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -4753,7 +4759,7 @@ func (v *QueryOutputPropertyReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryOutputProperty
 // queryOutputPropertyRequest writes a QueryOutputProperty request to a byte slice.
 func queryOutputPropertyRequest(opcode uint8, Output Output, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -4846,7 +4852,7 @@ func (v *QueryProviderPropertyReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryProviderProperty
 // queryProviderPropertyRequest writes a QueryProviderProperty request to a byte slice.
 func queryProviderPropertyRequest(opcode uint8, Provider Provider, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -4900,7 +4906,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -4928,7 +4935,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, MajorVersion uint32, MinorVersion uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -4971,7 +4978,7 @@ func SelectInputUnchecked(c *xgb.XConn, Window xproto.Window, Enable uint16) err
 // Write request to wire for SelectInput
 // selectInputRequest writes a SelectInput request to a byte slice.
 func selectInputRequest(opcode uint8, Window xproto.Window, Enable uint16) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -5026,7 +5033,8 @@ type SetCrtcConfigReply struct {
 
 // Unmarshal reads a byte slice into a SetCrtcConfigReply value.
 func (v *SetCrtcConfigReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SetCrtcConfigReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -5290,7 +5298,7 @@ func SetOutputPrimaryUnchecked(c *xgb.XConn, Window xproto.Window, Output Output
 // Write request to wire for SetOutputPrimary
 // setOutputPrimaryRequest writes a SetOutputPrimary request to a byte slice.
 func setOutputPrimaryRequest(opcode uint8, Window xproto.Window, Output Output) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -5342,7 +5350,8 @@ type SetPanningReply struct {
 
 // Unmarshal reads a byte slice into a SetPanningReply value.
 func (v *SetPanningReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SetPanningReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -5366,7 +5375,7 @@ func (v *SetPanningReply) Unmarshal(buf []byte) error {
 // Write request to wire for SetPanning
 // setPanningRequest writes a SetPanning request to a byte slice.
 func setPanningRequest(opcode uint8, Crtc Crtc, Timestamp xproto.Timestamp, Left uint16, Top uint16, Width uint16, Height uint16, TrackLeft uint16, TrackTop uint16, TrackWidth uint16, TrackHeight uint16, BorderLeft int16, BorderTop int16, BorderRight int16, BorderBottom int16) []byte {
-	size := 36
+	const size = 36
 	b := 0
 	buf := make([]byte, size)
 
@@ -5445,7 +5454,7 @@ func SetProviderOffloadSinkUnchecked(c *xgb.XConn, Provider Provider, SinkProvid
 // Write request to wire for SetProviderOffloadSink
 // setProviderOffloadSinkRequest writes a SetProviderOffloadSink request to a byte slice.
 func setProviderOffloadSinkRequest(opcode uint8, Provider Provider, SinkProvider Provider, ConfigTimestamp xproto.Timestamp) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -5491,7 +5500,7 @@ func SetProviderOutputSourceUnchecked(c *xgb.XConn, Provider Provider, SourcePro
 // Write request to wire for SetProviderOutputSource
 // setProviderOutputSourceRequest writes a SetProviderOutputSource request to a byte slice.
 func setProviderOutputSourceRequest(opcode uint8, Provider Provider, SourceProvider Provider, ConfigTimestamp xproto.Timestamp) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -5550,7 +5559,8 @@ type SetScreenConfigReply struct {
 
 // Unmarshal reads a byte slice into a SetScreenConfigReply value.
 func (v *SetScreenConfigReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SetScreenConfigReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -5585,7 +5595,7 @@ func (v *SetScreenConfigReply) Unmarshal(buf []byte) error {
 // Write request to wire for SetScreenConfig
 // setScreenConfigRequest writes a SetScreenConfig request to a byte slice.
 func setScreenConfigRequest(opcode uint8, Window xproto.Window, Timestamp xproto.Timestamp, ConfigTimestamp xproto.Timestamp, SizeID uint16, Rotation uint16, Rate uint16) []byte {
-	size := 24
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -5642,7 +5652,7 @@ func SetScreenSizeUnchecked(c *xgb.XConn, Window xproto.Window, Width uint16, He
 // Write request to wire for SetScreenSize
 // setScreenSizeRequest writes a SetScreenSize request to a byte slice.
 func setScreenSizeRequest(opcode uint8, Window xproto.Window, Width uint16, Height uint16, MmWidth uint32, MmHeight uint32) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 

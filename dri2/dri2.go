@@ -439,7 +439,8 @@ type AuthenticateReply struct {
 
 // Unmarshal reads a byte slice into a AuthenticateReply value.
 func (v *AuthenticateReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"AuthenticateReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -462,7 +463,7 @@ func (v *AuthenticateReply) Unmarshal(buf []byte) error {
 // Write request to wire for Authenticate
 // authenticateRequest writes a Authenticate request to a byte slice.
 func authenticateRequest(opcode uint8, Window xproto.Window, Magic uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -565,7 +566,7 @@ func (v *ConnectReply) Unmarshal(buf []byte) error {
 // Write request to wire for Connect
 // connectRequest writes a Connect request to a byte slice.
 func connectRequest(opcode uint8, Window xproto.Window, DriverType uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -616,7 +617,8 @@ type CopyRegionReply struct {
 
 // Unmarshal reads a byte slice into a CopyRegionReply value.
 func (v *CopyRegionReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CopyRegionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -636,7 +638,7 @@ func (v *CopyRegionReply) Unmarshal(buf []byte) error {
 // Write request to wire for CopyRegion
 // copyRegionRequest writes a CopyRegion request to a byte slice.
 func copyRegionRequest(opcode uint8, Drawable xproto.Drawable, Region uint32, Dest uint32, Src uint32) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -685,7 +687,7 @@ func CreateDrawableUnchecked(c *xgb.XConn, Drawable xproto.Drawable) error {
 // Write request to wire for CreateDrawable
 // createDrawableRequest writes a CreateDrawable request to a byte slice.
 func createDrawableRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -725,7 +727,7 @@ func DestroyDrawableUnchecked(c *xgb.XConn, Drawable xproto.Drawable) error {
 // Write request to wire for DestroyDrawable
 // destroyDrawableRequest writes a DestroyDrawable request to a byte slice.
 func destroyDrawableRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -966,7 +968,8 @@ type GetMSCReply struct {
 
 // Unmarshal reads a byte slice into a GetMSCReply value.
 func (v *GetMSCReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetMSCReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1004,7 +1007,7 @@ func (v *GetMSCReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetMSC
 // getMSCRequest writes a GetMSC request to a byte slice.
 func getMSCRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1054,7 +1057,8 @@ type GetParamReply struct {
 
 // Unmarshal reads a byte slice into a GetParamReply value.
 func (v *GetParamReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetParamReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1081,7 +1085,7 @@ func (v *GetParamReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetParam
 // getParamRequest writes a GetParam request to a byte slice.
 func getParamRequest(opcode uint8, Drawable xproto.Drawable, Param uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1134,7 +1138,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1160,7 +1165,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, MajorVersion uint32, MinorVersion uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1213,7 +1218,8 @@ type SwapBuffersReply struct {
 
 // Unmarshal reads a byte slice into a SwapBuffersReply value.
 func (v *SwapBuffersReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SwapBuffersReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1239,7 +1245,7 @@ func (v *SwapBuffersReply) Unmarshal(buf []byte) error {
 // Write request to wire for SwapBuffers
 // swapBuffersRequest writes a SwapBuffers request to a byte slice.
 func swapBuffersRequest(opcode uint8, Drawable xproto.Drawable, TargetMscHi uint32, TargetMscLo uint32, DivisorHi uint32, DivisorLo uint32, RemainderHi uint32, RemainderLo uint32) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1297,7 +1303,7 @@ func SwapIntervalUnchecked(c *xgb.XConn, Drawable xproto.Drawable, Interval uint
 // Write request to wire for SwapInterval
 // swapIntervalRequest writes a SwapInterval request to a byte slice.
 func swapIntervalRequest(opcode uint8, Drawable xproto.Drawable, Interval uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1354,7 +1360,8 @@ type WaitMSCReply struct {
 
 // Unmarshal reads a byte slice into a WaitMSCReply value.
 func (v *WaitMSCReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"WaitMSCReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1392,7 +1399,7 @@ func (v *WaitMSCReply) Unmarshal(buf []byte) error {
 // Write request to wire for WaitMSC
 // waitMSCRequest writes a WaitMSC request to a byte slice.
 func waitMSCRequest(opcode uint8, Drawable xproto.Drawable, TargetMscHi uint32, TargetMscLo uint32, DivisorHi uint32, DivisorLo uint32, RemainderHi uint32, RemainderLo uint32) []byte {
-	size := 32
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -1464,7 +1471,8 @@ type WaitSBCReply struct {
 
 // Unmarshal reads a byte slice into a WaitSBCReply value.
 func (v *WaitSBCReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"WaitSBCReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1502,7 +1510,7 @@ func (v *WaitSBCReply) Unmarshal(buf []byte) error {
 // Write request to wire for WaitSBC
 // waitSBCRequest writes a WaitSBC request to a byte slice.
 func waitSBCRequest(opcode uint8, Drawable xproto.Drawable, TargetSbcHi uint32, TargetSbcLo uint32) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 

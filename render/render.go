@@ -1684,7 +1684,7 @@ func addGlyphsRequest(opcode uint8, Glyphset Glyphset, GlyphsLen uint32, Glyphid
 
 	b += GlyphinfoListBytes(buf[b:], Glyphs)
 
-	copy(buf[b:], Data[:len(Data)])
+	copy(buf[b:], Data[:])
 	b += int(len(Data))
 
 	b = internal.Pad4(b)
@@ -1810,7 +1810,7 @@ func CompositeUnchecked(c *xgb.XConn, Op byte, Src Picture, Mask Picture, Dst Pi
 // Write request to wire for Composite
 // compositeRequest writes a Composite request to a byte slice.
 func compositeRequest(opcode uint8, Op byte, Src Picture, Mask Picture, Dst Picture, SrcX int16, SrcY int16, MaskX int16, MaskY int16, DstX int16, DstY int16, Width uint16, Height uint16) []byte {
-	size := 36
+	const size = 36
 	b := 0
 	buf := make([]byte, size)
 
@@ -1921,7 +1921,7 @@ func compositeGlyphs16Request(opcode uint8, Op byte, Src Picture, Dst Picture, M
 	binary.LittleEndian.PutUint16(buf[b:], uint16(SrcY))
 	b += 2
 
-	copy(buf[b:], Glyphcmds[:len(Glyphcmds)])
+	copy(buf[b:], Glyphcmds[:])
 	b += int(len(Glyphcmds))
 
 	return buf
@@ -1984,7 +1984,7 @@ func compositeGlyphs32Request(opcode uint8, Op byte, Src Picture, Dst Picture, M
 	binary.LittleEndian.PutUint16(buf[b:], uint16(SrcY))
 	b += 2
 
-	copy(buf[b:], Glyphcmds[:len(Glyphcmds)])
+	copy(buf[b:], Glyphcmds[:])
 	b += int(len(Glyphcmds))
 
 	return buf
@@ -2047,7 +2047,7 @@ func compositeGlyphs8Request(opcode uint8, Op byte, Src Picture, Dst Picture, Ma
 	binary.LittleEndian.PutUint16(buf[b:], uint16(SrcY))
 	b += 2
 
-	copy(buf[b:], Glyphcmds[:len(Glyphcmds)])
+	copy(buf[b:], Glyphcmds[:])
 	b += int(len(Glyphcmds))
 
 	return buf
@@ -2179,7 +2179,7 @@ func CreateCursorUnchecked(c *xgb.XConn, Cid xproto.Cursor, Source Picture, X ui
 // Write request to wire for CreateCursor
 // createCursorRequest writes a CreateCursor request to a byte slice.
 func createCursorRequest(opcode uint8, Cid xproto.Cursor, Source Picture, X uint16, Y uint16) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2228,7 +2228,7 @@ func CreateGlyphSetUnchecked(c *xgb.XConn, Gsid Glyphset, Format Pictformat) err
 // Write request to wire for CreateGlyphSet
 // createGlyphSetRequest writes a CreateGlyphSet request to a byte slice.
 func createGlyphSetRequest(opcode uint8, Gsid Glyphset, Format Pictformat) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2464,7 +2464,7 @@ func CreateSolidFillUnchecked(c *xgb.XConn, Picture Picture, Color Color) error 
 // Write request to wire for CreateSolidFill
 // createSolidFillRequest writes a CreateSolidFill request to a byte slice.
 func createSolidFillRequest(opcode uint8, Picture Picture, Color Color) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2563,7 +2563,7 @@ func FreeGlyphSetUnchecked(c *xgb.XConn, Glyphset Glyphset) error {
 // Write request to wire for FreeGlyphSet
 // freeGlyphSetRequest writes a FreeGlyphSet request to a byte slice.
 func freeGlyphSetRequest(opcode uint8, Glyphset Glyphset) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2648,7 +2648,7 @@ func FreePictureUnchecked(c *xgb.XConn, Picture Picture) error {
 // Write request to wire for FreePicture
 // freePictureRequest writes a FreePicture request to a byte slice.
 func freePictureRequest(opcode uint8, Picture Picture) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2738,7 +2738,7 @@ func (v *QueryFiltersReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryFilters
 // queryFiltersRequest writes a QueryFilters request to a byte slice.
 func queryFiltersRequest(opcode uint8, Drawable xproto.Drawable) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2850,7 +2850,7 @@ func (v *QueryPictFormatsReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryPictFormats
 // queryPictFormatsRequest writes a QueryPictFormats request to a byte slice.
 func queryPictFormatsRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -2926,7 +2926,7 @@ func (v *QueryPictIndexValuesReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryPictIndexValues
 // queryPictIndexValuesRequest writes a QueryPictIndexValues request to a byte slice.
 func queryPictIndexValuesRequest(opcode uint8, Format Pictformat) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2977,7 +2977,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -3005,7 +3006,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajorVersion uint32, ClientMinorVersion uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3048,7 +3049,7 @@ func ReferenceGlyphSetUnchecked(c *xgb.XConn, Gsid Glyphset, Existing Glyphset) 
 // Write request to wire for ReferenceGlyphSet
 // referenceGlyphSetRequest writes a ReferenceGlyphSet request to a byte slice.
 func referenceGlyphSetRequest(opcode uint8, Gsid Glyphset, Existing Glyphset) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -3194,7 +3195,7 @@ func SetPictureTransformUnchecked(c *xgb.XConn, Picture Picture, Transform Trans
 // Write request to wire for SetPictureTransform
 // setPictureTransformRequest writes a SetPictureTransform request to a byte slice.
 func setPictureTransformRequest(opcode uint8, Picture Picture, Transform Transform) []byte {
-	size := 44
+	const size = 44
 	b := 0
 	buf := make([]byte, size)
 

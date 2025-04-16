@@ -260,7 +260,7 @@ func (v *GetClientContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetClientContext
 // getClientContextRequest writes a GetClientContext request to a byte slice.
 func getClientContextRequest(opcode uint8, Resource uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -343,7 +343,7 @@ func (v *GetDeviceContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetDeviceContext
 // getDeviceContextRequest writes a GetDeviceContext request to a byte slice.
 func getDeviceContextRequest(opcode uint8, Device uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -426,7 +426,7 @@ func (v *GetDeviceCreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetDeviceCreateContext
 // getDeviceCreateContextRequest writes a GetDeviceCreateContext request to a byte slice.
 func getDeviceCreateContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -506,7 +506,7 @@ func (v *GetPropertyContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPropertyContext
 // getPropertyContextRequest writes a GetPropertyContext request to a byte slice.
 func getPropertyContextRequest(opcode uint8, Window xproto.Window, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -592,7 +592,7 @@ func (v *GetPropertyCreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPropertyCreateContext
 // getPropertyCreateContextRequest writes a GetPropertyCreateContext request to a byte slice.
 func getPropertyCreateContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -672,7 +672,7 @@ func (v *GetPropertyDataContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPropertyDataContext
 // getPropertyDataContextRequest writes a GetPropertyDataContext request to a byte slice.
 func getPropertyDataContextRequest(opcode uint8, Window xproto.Window, Property xproto.Atom) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -758,7 +758,7 @@ func (v *GetPropertyUseContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetPropertyUseContext
 // getPropertyUseContextRequest writes a GetPropertyUseContext request to a byte slice.
 func getPropertyUseContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -838,7 +838,7 @@ func (v *GetSelectionContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetSelectionContext
 // getSelectionContextRequest writes a GetSelectionContext request to a byte slice.
 func getSelectionContextRequest(opcode uint8, Selection xproto.Atom) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -921,7 +921,7 @@ func (v *GetSelectionCreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetSelectionCreateContext
 // getSelectionCreateContextRequest writes a GetSelectionCreateContext request to a byte slice.
 func getSelectionCreateContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1001,7 +1001,7 @@ func (v *GetSelectionDataContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetSelectionDataContext
 // getSelectionDataContextRequest writes a GetSelectionDataContext request to a byte slice.
 func getSelectionDataContextRequest(opcode uint8, Selection xproto.Atom) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1084,7 +1084,7 @@ func (v *GetSelectionUseContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetSelectionUseContext
 // getSelectionUseContextRequest writes a GetSelectionUseContext request to a byte slice.
 func getSelectionUseContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1164,7 +1164,7 @@ func (v *GetWindowContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetWindowContext
 // getWindowContextRequest writes a GetWindowContext request to a byte slice.
 func getWindowContextRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1247,7 +1247,7 @@ func (v *GetWindowCreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetWindowCreateContext
 // getWindowCreateContextRequest writes a GetWindowCreateContext request to a byte slice.
 func getWindowCreateContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1323,7 +1323,7 @@ func (v *ListPropertiesReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListProperties
 // listPropertiesRequest writes a ListProperties request to a byte slice.
 func listPropertiesRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1402,7 +1402,7 @@ func (v *ListSelectionsReply) Unmarshal(buf []byte) error {
 // Write request to wire for ListSelections
 // listSelectionsRequest writes a ListSelections request to a byte slice.
 func listSelectionsRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1449,7 +1449,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1475,7 +1476,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajor byte, ClientMinor byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

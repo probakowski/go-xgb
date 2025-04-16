@@ -174,7 +174,8 @@ type EndReply struct {
 
 // Unmarshal reads a byte slice into a EndReply value.
 func (v *EndReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"EndReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -196,7 +197,7 @@ func (v *EndReply) Unmarshal(buf []byte) error {
 // Write request to wire for End
 // endRequest writes a End request to a byte slice.
 func endRequest(opcode uint8, Cmap uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -247,7 +248,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -275,7 +277,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajorVersion uint16, ClientMinorVersion uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -327,7 +329,8 @@ type SelectInputReply struct {
 
 // Unmarshal reads a byte slice into a SelectInputReply value.
 func (v *SelectInputReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SelectInputReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -349,7 +352,7 @@ func (v *SelectInputReply) Unmarshal(buf []byte) error {
 // Write request to wire for SelectInput
 // selectInputRequest writes a SelectInput request to a byte slice.
 func selectInputRequest(opcode uint8, EventMask uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -398,7 +401,8 @@ type SendReply struct {
 
 // Unmarshal reads a byte slice into a SendReply value.
 func (v *SendReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SendReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -420,7 +424,7 @@ func (v *SendReply) Unmarshal(buf []byte) error {
 // Write request to wire for Send
 // sendRequest writes a Send request to a byte slice.
 func sendRequest(opcode uint8, Event Event, DataType uint32) []byte {
-	size := 104
+	const size = 104
 	b := 0
 	buf := make([]byte, size)
 
@@ -477,7 +481,8 @@ type StartReply struct {
 
 // Unmarshal reads a byte slice into a StartReply value.
 func (v *StartReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"StartReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -499,7 +504,7 @@ func (v *StartReply) Unmarshal(buf []byte) error {
 // Write request to wire for Start
 // startRequest writes a Start request to a byte slice.
 func startRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

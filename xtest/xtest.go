@@ -127,7 +127,8 @@ type CompareCursorReply struct {
 
 // Unmarshal reads a byte slice into a CompareCursorReply value.
 func (v *CompareCursorReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CompareCursorReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -148,7 +149,7 @@ func (v *CompareCursorReply) Unmarshal(buf []byte) error {
 // Write request to wire for CompareCursor
 // compareCursorRequest writes a CompareCursor request to a byte slice.
 func compareCursorRequest(opcode uint8, Window xproto.Window, Cursor xproto.Cursor) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -191,7 +192,7 @@ func FakeInputUnchecked(c *xgb.XConn, Type byte, Detail byte, Time uint32, Root 
 // Write request to wire for FakeInput
 // fakeInputRequest writes a FakeInput request to a byte slice.
 func fakeInputRequest(opcode uint8, Type byte, Detail byte, Time uint32, Root xproto.Window, RootX int16, RootY int16, Deviceid byte) []byte {
-	size := 36
+	const size = 36
 	b := 0
 	buf := make([]byte, size)
 
@@ -264,7 +265,8 @@ type GetVersionReply struct {
 
 // Unmarshal reads a byte slice into a GetVersionReply value.
 func (v *GetVersionReply) Unmarshal(buf []byte) error {
-	if size := 10; len(buf) < size {
+	const size = 10
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -288,7 +290,7 @@ func (v *GetVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetVersion
 // getVersionRequest writes a GetVersion request to a byte slice.
 func getVersionRequest(opcode uint8, MajorVersion byte, MinorVersion uint16) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -333,7 +335,7 @@ func GrabControlUnchecked(c *xgb.XConn, Impervious bool) error {
 // Write request to wire for GrabControl
 // grabControlRequest writes a GrabControl request to a byte slice.
 func grabControlRequest(opcode uint8, Impervious bool) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

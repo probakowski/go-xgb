@@ -6266,15 +6266,13 @@ const (
 // AllocColor sends a checked request.
 func AllocColor(c *xgb.XConn, Cmap Colormap, Red uint16, Green uint16, Blue uint16) (AllocColorReply, error) {
 	var reply AllocColorReply
-	var op uint8
-	err := c.SendRecv(allocColorRequest(op, Cmap, Red, Green, Blue), &reply)
+	err := c.SendRecv(allocColorRequest(Cmap, Red, Green, Blue), &reply)
 	return reply, err
 }
 
 // AllocColorUnchecked sends an unchecked request.
 func AllocColorUnchecked(c *xgb.XConn, Cmap Colormap, Red uint16, Green uint16, Blue uint16) error {
-	var op uint8
-	return c.Send(allocColorRequest(op, Cmap, Red, Green, Blue))
+	return c.Send(allocColorRequest(Cmap, Red, Green, Blue))
 }
 
 // AllocColorReply represents the data returned from a AllocColor request.
@@ -6291,7 +6289,8 @@ type AllocColorReply struct {
 
 // Unmarshal reads a byte slice into a AllocColorReply value.
 func (v *AllocColorReply) Unmarshal(buf []byte) error {
-	if size := 20; len(buf) < size {
+	const size = 20
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"AllocColorReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -6324,8 +6323,8 @@ func (v *AllocColorReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for AllocColor
 // allocColorRequest writes a AllocColor request to a byte slice.
-func allocColorRequest(opcode uint8, Cmap Colormap, Red uint16, Green uint16, Blue uint16) []byte {
-	size := 16
+func allocColorRequest(Cmap Colormap, Red uint16, Green uint16, Blue uint16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -6357,15 +6356,13 @@ func allocColorRequest(opcode uint8, Cmap Colormap, Red uint16, Green uint16, Bl
 // AllocColorCells sends a checked request.
 func AllocColorCells(c *xgb.XConn, Contiguous bool, Cmap Colormap, Colors uint16, Planes uint16) (AllocColorCellsReply, error) {
 	var reply AllocColorCellsReply
-	var op uint8
-	err := c.SendRecv(allocColorCellsRequest(op, Contiguous, Cmap, Colors, Planes), &reply)
+	err := c.SendRecv(allocColorCellsRequest(Contiguous, Cmap, Colors, Planes), &reply)
 	return reply, err
 }
 
 // AllocColorCellsUnchecked sends an unchecked request.
 func AllocColorCellsUnchecked(c *xgb.XConn, Contiguous bool, Cmap Colormap, Colors uint16, Planes uint16) error {
-	var op uint8
-	return c.Send(allocColorCellsRequest(op, Contiguous, Cmap, Colors, Planes))
+	return c.Send(allocColorCellsRequest(Contiguous, Cmap, Colors, Planes))
 }
 
 // AllocColorCellsReply represents the data returned from a AllocColorCells request.
@@ -6424,8 +6421,8 @@ func (v *AllocColorCellsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for AllocColorCells
 // allocColorCellsRequest writes a AllocColorCells request to a byte slice.
-func allocColorCellsRequest(opcode uint8, Contiguous bool, Cmap Colormap, Colors uint16, Planes uint16) []byte {
-	size := 12
+func allocColorCellsRequest(Contiguous bool, Cmap Colormap, Colors uint16, Planes uint16) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -6457,15 +6454,13 @@ func allocColorCellsRequest(opcode uint8, Contiguous bool, Cmap Colormap, Colors
 // AllocColorPlanes sends a checked request.
 func AllocColorPlanes(c *xgb.XConn, Contiguous bool, Cmap Colormap, Colors uint16, Reds uint16, Greens uint16, Blues uint16) (AllocColorPlanesReply, error) {
 	var reply AllocColorPlanesReply
-	var op uint8
-	err := c.SendRecv(allocColorPlanesRequest(op, Contiguous, Cmap, Colors, Reds, Greens, Blues), &reply)
+	err := c.SendRecv(allocColorPlanesRequest(Contiguous, Cmap, Colors, Reds, Greens, Blues), &reply)
 	return reply, err
 }
 
 // AllocColorPlanesUnchecked sends an unchecked request.
 func AllocColorPlanesUnchecked(c *xgb.XConn, Contiguous bool, Cmap Colormap, Colors uint16, Reds uint16, Greens uint16, Blues uint16) error {
-	var op uint8
-	return c.Send(allocColorPlanesRequest(op, Contiguous, Cmap, Colors, Reds, Greens, Blues))
+	return c.Send(allocColorPlanesRequest(Contiguous, Cmap, Colors, Reds, Greens, Blues))
 }
 
 // AllocColorPlanesReply represents the data returned from a AllocColorPlanes request.
@@ -6525,8 +6520,8 @@ func (v *AllocColorPlanesReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for AllocColorPlanes
 // allocColorPlanesRequest writes a AllocColorPlanes request to a byte slice.
-func allocColorPlanesRequest(opcode uint8, Contiguous bool, Cmap Colormap, Colors uint16, Reds uint16, Greens uint16, Blues uint16) []byte {
-	size := 16
+func allocColorPlanesRequest(Contiguous bool, Cmap Colormap, Colors uint16, Reds uint16, Greens uint16, Blues uint16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -6564,15 +6559,13 @@ func allocColorPlanesRequest(opcode uint8, Contiguous bool, Cmap Colormap, Color
 // AllocNamedColor sends a checked request.
 func AllocNamedColor(c *xgb.XConn, Cmap Colormap, NameLen uint16, Name string) (AllocNamedColorReply, error) {
 	var reply AllocNamedColorReply
-	var op uint8
-	err := c.SendRecv(allocNamedColorRequest(op, Cmap, NameLen, Name), &reply)
+	err := c.SendRecv(allocNamedColorRequest(Cmap, NameLen, Name), &reply)
 	return reply, err
 }
 
 // AllocNamedColorUnchecked sends an unchecked request.
 func AllocNamedColorUnchecked(c *xgb.XConn, Cmap Colormap, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(allocNamedColorRequest(op, Cmap, NameLen, Name))
+	return c.Send(allocNamedColorRequest(Cmap, NameLen, Name))
 }
 
 // AllocNamedColorReply represents the data returned from a AllocNamedColor request.
@@ -6591,7 +6584,8 @@ type AllocNamedColorReply struct {
 
 // Unmarshal reads a byte slice into a AllocNamedColorReply value.
 func (v *AllocNamedColorReply) Unmarshal(buf []byte) error {
-	if size := 24; len(buf) < size {
+	const size = 24
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"AllocNamedColorReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -6631,7 +6625,7 @@ func (v *AllocNamedColorReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for AllocNamedColor
 // allocNamedColorRequest writes a AllocNamedColor request to a byte slice.
-func allocNamedColorRequest(opcode uint8, Cmap Colormap, NameLen uint16, Name string) []byte {
+func allocNamedColorRequest(Cmap Colormap, NameLen uint16, Name string) []byte {
 	size := internal.Pad4((12 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -6660,20 +6654,18 @@ func allocNamedColorRequest(opcode uint8, Cmap Colormap, NameLen uint16, Name st
 
 // AllowEvents sends a checked request.
 func AllowEvents(c *xgb.XConn, Mode byte, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(allowEventsRequest(op, Mode, Time), nil)
+	return c.SendRecv(allowEventsRequest(Mode, Time), nil)
 }
 
 // AllowEventsUnchecked sends an unchecked request.
 func AllowEventsUnchecked(c *xgb.XConn, Mode byte, Time Timestamp) error {
-	var op uint8
-	return c.Send(allowEventsRequest(op, Mode, Time))
+	return c.Send(allowEventsRequest(Mode, Time))
 }
 
 // Write request to wire for AllowEvents
 // allowEventsRequest writes a AllowEvents request to a byte slice.
-func allowEventsRequest(opcode uint8, Mode byte, Time Timestamp) []byte {
-	size := 8
+func allowEventsRequest(Mode byte, Time Timestamp) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -6694,20 +6686,18 @@ func allowEventsRequest(opcode uint8, Mode byte, Time Timestamp) []byte {
 
 // Bell sends a checked request.
 func Bell(c *xgb.XConn, Percent int8) error {
-	var op uint8
-	return c.SendRecv(bellRequest(op, Percent), nil)
+	return c.SendRecv(bellRequest(Percent), nil)
 }
 
 // BellUnchecked sends an unchecked request.
 func BellUnchecked(c *xgb.XConn, Percent int8) error {
-	var op uint8
-	return c.Send(bellRequest(op, Percent))
+	return c.Send(bellRequest(Percent))
 }
 
 // Write request to wire for Bell
 // bellRequest writes a Bell request to a byte slice.
-func bellRequest(opcode uint8, Percent int8) []byte {
-	size := 4
+func bellRequest(Percent int8) []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -6725,20 +6715,18 @@ func bellRequest(opcode uint8, Percent int8) []byte {
 
 // ChangeActivePointerGrab sends a checked request.
 func ChangeActivePointerGrab(c *xgb.XConn, Cursor Cursor, Time Timestamp, EventMask uint16) error {
-	var op uint8
-	return c.SendRecv(changeActivePointerGrabRequest(op, Cursor, Time, EventMask), nil)
+	return c.SendRecv(changeActivePointerGrabRequest(Cursor, Time, EventMask), nil)
 }
 
 // ChangeActivePointerGrabUnchecked sends an unchecked request.
 func ChangeActivePointerGrabUnchecked(c *xgb.XConn, Cursor Cursor, Time Timestamp, EventMask uint16) error {
-	var op uint8
-	return c.Send(changeActivePointerGrabRequest(op, Cursor, Time, EventMask))
+	return c.Send(changeActivePointerGrabRequest(Cursor, Time, EventMask))
 }
 
 // Write request to wire for ChangeActivePointerGrab
 // changeActivePointerGrabRequest writes a ChangeActivePointerGrab request to a byte slice.
-func changeActivePointerGrabRequest(opcode uint8, Cursor Cursor, Time Timestamp, EventMask uint16) []byte {
-	size := 16
+func changeActivePointerGrabRequest(Cursor Cursor, Time Timestamp, EventMask uint16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -6766,19 +6754,17 @@ func changeActivePointerGrabRequest(opcode uint8, Cursor Cursor, Time Timestamp,
 
 // ChangeGC sends a checked request.
 func ChangeGC(c *xgb.XConn, Gc Gcontext, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(changeGCRequest(op, Gc, ValueMask, ValueList), nil)
+	return c.SendRecv(changeGCRequest(Gc, ValueMask, ValueList), nil)
 }
 
 // ChangeGCUnchecked sends an unchecked request.
 func ChangeGCUnchecked(c *xgb.XConn, Gc Gcontext, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.Send(changeGCRequest(op, Gc, ValueMask, ValueList))
+	return c.Send(changeGCRequest(Gc, ValueMask, ValueList))
 }
 
 // Write request to wire for ChangeGC
 // changeGCRequest writes a ChangeGC request to a byte slice.
-func changeGCRequest(opcode uint8, Gc Gcontext, ValueMask uint32, ValueList []uint32) []byte {
+func changeGCRequest(Gc Gcontext, ValueMask uint32, ValueList []uint32) []byte {
 	size := internal.Pad4((12 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -6808,19 +6794,17 @@ func changeGCRequest(opcode uint8, Gc Gcontext, ValueMask uint32, ValueList []ui
 
 // ChangeHosts sends a checked request.
 func ChangeHosts(c *xgb.XConn, Mode byte, Family byte, AddressLen uint16, Address []byte) error {
-	var op uint8
-	return c.SendRecv(changeHostsRequest(op, Mode, Family, AddressLen, Address), nil)
+	return c.SendRecv(changeHostsRequest(Mode, Family, AddressLen, Address), nil)
 }
 
 // ChangeHostsUnchecked sends an unchecked request.
 func ChangeHostsUnchecked(c *xgb.XConn, Mode byte, Family byte, AddressLen uint16, Address []byte) error {
-	var op uint8
-	return c.Send(changeHostsRequest(op, Mode, Family, AddressLen, Address))
+	return c.Send(changeHostsRequest(Mode, Family, AddressLen, Address))
 }
 
 // Write request to wire for ChangeHosts
 // changeHostsRequest writes a ChangeHosts request to a byte slice.
-func changeHostsRequest(opcode uint8, Mode byte, Family byte, AddressLen uint16, Address []byte) []byte {
+func changeHostsRequest(Mode byte, Family byte, AddressLen uint16, Address []byte) []byte {
 	size := internal.Pad4((8 + internal.Pad4((int(AddressLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -6850,19 +6834,17 @@ func changeHostsRequest(opcode uint8, Mode byte, Family byte, AddressLen uint16,
 
 // ChangeKeyboardControl sends a checked request.
 func ChangeKeyboardControl(c *xgb.XConn, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(changeKeyboardControlRequest(op, ValueMask, ValueList), nil)
+	return c.SendRecv(changeKeyboardControlRequest(ValueMask, ValueList), nil)
 }
 
 // ChangeKeyboardControlUnchecked sends an unchecked request.
 func ChangeKeyboardControlUnchecked(c *xgb.XConn, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.Send(changeKeyboardControlRequest(op, ValueMask, ValueList))
+	return c.Send(changeKeyboardControlRequest(ValueMask, ValueList))
 }
 
 // Write request to wire for ChangeKeyboardControl
 // changeKeyboardControlRequest writes a ChangeKeyboardControl request to a byte slice.
-func changeKeyboardControlRequest(opcode uint8, ValueMask uint32, ValueList []uint32) []byte {
+func changeKeyboardControlRequest(ValueMask uint32, ValueList []uint32) []byte {
 	size := internal.Pad4((8 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -6889,19 +6871,17 @@ func changeKeyboardControlRequest(opcode uint8, ValueMask uint32, ValueList []ui
 
 // ChangeKeyboardMapping sends a checked request.
 func ChangeKeyboardMapping(c *xgb.XConn, KeycodeCount byte, FirstKeycode Keycode, KeysymsPerKeycode byte, Keysyms []Keysym) error {
-	var op uint8
-	return c.SendRecv(changeKeyboardMappingRequest(op, KeycodeCount, FirstKeycode, KeysymsPerKeycode, Keysyms), nil)
+	return c.SendRecv(changeKeyboardMappingRequest(KeycodeCount, FirstKeycode, KeysymsPerKeycode, Keysyms), nil)
 }
 
 // ChangeKeyboardMappingUnchecked sends an unchecked request.
 func ChangeKeyboardMappingUnchecked(c *xgb.XConn, KeycodeCount byte, FirstKeycode Keycode, KeysymsPerKeycode byte, Keysyms []Keysym) error {
-	var op uint8
-	return c.Send(changeKeyboardMappingRequest(op, KeycodeCount, FirstKeycode, KeysymsPerKeycode, Keysyms))
+	return c.Send(changeKeyboardMappingRequest(KeycodeCount, FirstKeycode, KeysymsPerKeycode, Keysyms))
 }
 
 // Write request to wire for ChangeKeyboardMapping
 // changeKeyboardMappingRequest writes a ChangeKeyboardMapping request to a byte slice.
-func changeKeyboardMappingRequest(opcode uint8, KeycodeCount byte, FirstKeycode Keycode, KeysymsPerKeycode byte, Keysyms []Keysym) []byte {
+func changeKeyboardMappingRequest(KeycodeCount byte, FirstKeycode Keycode, KeysymsPerKeycode byte, Keysyms []Keysym) []byte {
 	size := internal.Pad4((8 + internal.Pad4(((int(KeycodeCount) * int(KeysymsPerKeycode)) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -6933,20 +6913,18 @@ func changeKeyboardMappingRequest(opcode uint8, KeycodeCount byte, FirstKeycode 
 
 // ChangePointerControl sends a checked request.
 func ChangePointerControl(c *xgb.XConn, AccelerationNumerator int16, AccelerationDenominator int16, Threshold int16, DoAcceleration bool, DoThreshold bool) error {
-	var op uint8
-	return c.SendRecv(changePointerControlRequest(op, AccelerationNumerator, AccelerationDenominator, Threshold, DoAcceleration, DoThreshold), nil)
+	return c.SendRecv(changePointerControlRequest(AccelerationNumerator, AccelerationDenominator, Threshold, DoAcceleration, DoThreshold), nil)
 }
 
 // ChangePointerControlUnchecked sends an unchecked request.
 func ChangePointerControlUnchecked(c *xgb.XConn, AccelerationNumerator int16, AccelerationDenominator int16, Threshold int16, DoAcceleration bool, DoThreshold bool) error {
-	var op uint8
-	return c.Send(changePointerControlRequest(op, AccelerationNumerator, AccelerationDenominator, Threshold, DoAcceleration, DoThreshold))
+	return c.Send(changePointerControlRequest(AccelerationNumerator, AccelerationDenominator, Threshold, DoAcceleration, DoThreshold))
 }
 
 // Write request to wire for ChangePointerControl
 // changePointerControlRequest writes a ChangePointerControl request to a byte slice.
-func changePointerControlRequest(opcode uint8, AccelerationNumerator int16, AccelerationDenominator int16, Threshold int16, DoAcceleration bool, DoThreshold bool) []byte {
-	size := 12
+func changePointerControlRequest(AccelerationNumerator int16, AccelerationDenominator int16, Threshold int16, DoAcceleration bool, DoThreshold bool) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -6986,19 +6964,17 @@ func changePointerControlRequest(opcode uint8, AccelerationNumerator int16, Acce
 
 // ChangeProperty sends a checked request.
 func ChangeProperty(c *xgb.XConn, Mode byte, Window Window, Property Atom, Type Atom, Format byte, DataLen uint32, Data []byte) error {
-	var op uint8
-	return c.SendRecv(changePropertyRequest(op, Mode, Window, Property, Type, Format, DataLen, Data), nil)
+	return c.SendRecv(changePropertyRequest(Mode, Window, Property, Type, Format, DataLen, Data), nil)
 }
 
 // ChangePropertyUnchecked sends an unchecked request.
 func ChangePropertyUnchecked(c *xgb.XConn, Mode byte, Window Window, Property Atom, Type Atom, Format byte, DataLen uint32, Data []byte) error {
-	var op uint8
-	return c.Send(changePropertyRequest(op, Mode, Window, Property, Type, Format, DataLen, Data))
+	return c.Send(changePropertyRequest(Mode, Window, Property, Type, Format, DataLen, Data))
 }
 
 // Write request to wire for ChangeProperty
 // changePropertyRequest writes a ChangeProperty request to a byte slice.
-func changePropertyRequest(opcode uint8, Mode byte, Window Window, Property Atom, Type Atom, Format byte, DataLen uint32, Data []byte) []byte {
+func changePropertyRequest(Mode byte, Window Window, Property Atom, Type Atom, Format byte, DataLen uint32, Data []byte) []byte {
 	size := internal.Pad4((24 + internal.Pad4((((int(DataLen) * int(Format)) / 8) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -7037,20 +7013,18 @@ func changePropertyRequest(opcode uint8, Mode byte, Window Window, Property Atom
 
 // ChangeSaveSet sends a checked request.
 func ChangeSaveSet(c *xgb.XConn, Mode byte, Window Window) error {
-	var op uint8
-	return c.SendRecv(changeSaveSetRequest(op, Mode, Window), nil)
+	return c.SendRecv(changeSaveSetRequest(Mode, Window), nil)
 }
 
 // ChangeSaveSetUnchecked sends an unchecked request.
 func ChangeSaveSetUnchecked(c *xgb.XConn, Mode byte, Window Window) error {
-	var op uint8
-	return c.Send(changeSaveSetRequest(op, Mode, Window))
+	return c.Send(changeSaveSetRequest(Mode, Window))
 }
 
 // Write request to wire for ChangeSaveSet
 // changeSaveSetRequest writes a ChangeSaveSet request to a byte slice.
-func changeSaveSetRequest(opcode uint8, Mode byte, Window Window) []byte {
-	size := 8
+func changeSaveSetRequest(Mode byte, Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -7071,19 +7045,17 @@ func changeSaveSetRequest(opcode uint8, Mode byte, Window Window) []byte {
 
 // ChangeWindowAttributes sends a checked request.
 func ChangeWindowAttributes(c *xgb.XConn, Window Window, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(changeWindowAttributesRequest(op, Window, ValueMask, ValueList), nil)
+	return c.SendRecv(changeWindowAttributesRequest(Window, ValueMask, ValueList), nil)
 }
 
 // ChangeWindowAttributesUnchecked sends an unchecked request.
 func ChangeWindowAttributesUnchecked(c *xgb.XConn, Window Window, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.Send(changeWindowAttributesRequest(op, Window, ValueMask, ValueList))
+	return c.Send(changeWindowAttributesRequest(Window, ValueMask, ValueList))
 }
 
 // Write request to wire for ChangeWindowAttributes
 // changeWindowAttributesRequest writes a ChangeWindowAttributes request to a byte slice.
-func changeWindowAttributesRequest(opcode uint8, Window Window, ValueMask uint32, ValueList []uint32) []byte {
+func changeWindowAttributesRequest(Window Window, ValueMask uint32, ValueList []uint32) []byte {
 	size := internal.Pad4((12 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -7113,20 +7085,18 @@ func changeWindowAttributesRequest(opcode uint8, Window Window, ValueMask uint32
 
 // CirculateWindow sends a checked request.
 func CirculateWindow(c *xgb.XConn, Direction byte, Window Window) error {
-	var op uint8
-	return c.SendRecv(circulateWindowRequest(op, Direction, Window), nil)
+	return c.SendRecv(circulateWindowRequest(Direction, Window), nil)
 }
 
 // CirculateWindowUnchecked sends an unchecked request.
 func CirculateWindowUnchecked(c *xgb.XConn, Direction byte, Window Window) error {
-	var op uint8
-	return c.Send(circulateWindowRequest(op, Direction, Window))
+	return c.Send(circulateWindowRequest(Direction, Window))
 }
 
 // Write request to wire for CirculateWindow
 // circulateWindowRequest writes a CirculateWindow request to a byte slice.
-func circulateWindowRequest(opcode uint8, Direction byte, Window Window) []byte {
-	size := 8
+func circulateWindowRequest(Direction byte, Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -7147,20 +7117,18 @@ func circulateWindowRequest(opcode uint8, Direction byte, Window Window) []byte 
 
 // ClearArea sends a checked request.
 func ClearArea(c *xgb.XConn, Exposures bool, Window Window, X int16, Y int16, Width uint16, Height uint16) error {
-	var op uint8
-	return c.SendRecv(clearAreaRequest(op, Exposures, Window, X, Y, Width, Height), nil)
+	return c.SendRecv(clearAreaRequest(Exposures, Window, X, Y, Width, Height), nil)
 }
 
 // ClearAreaUnchecked sends an unchecked request.
 func ClearAreaUnchecked(c *xgb.XConn, Exposures bool, Window Window, X int16, Y int16, Width uint16, Height uint16) error {
-	var op uint8
-	return c.Send(clearAreaRequest(op, Exposures, Window, X, Y, Width, Height))
+	return c.Send(clearAreaRequest(Exposures, Window, X, Y, Width, Height))
 }
 
 // Write request to wire for ClearArea
 // clearAreaRequest writes a ClearArea request to a byte slice.
-func clearAreaRequest(opcode uint8, Exposures bool, Window Window, X int16, Y int16, Width uint16, Height uint16) []byte {
-	size := 16
+func clearAreaRequest(Exposures bool, Window Window, X int16, Y int16, Width uint16, Height uint16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -7197,20 +7165,18 @@ func clearAreaRequest(opcode uint8, Exposures bool, Window Window, X int16, Y in
 
 // CloseFont sends a checked request.
 func CloseFont(c *xgb.XConn, Font Font) error {
-	var op uint8
-	return c.SendRecv(closeFontRequest(op, Font), nil)
+	return c.SendRecv(closeFontRequest(Font), nil)
 }
 
 // CloseFontUnchecked sends an unchecked request.
 func CloseFontUnchecked(c *xgb.XConn, Font Font) error {
-	var op uint8
-	return c.Send(closeFontRequest(op, Font))
+	return c.Send(closeFontRequest(Font))
 }
 
 // Write request to wire for CloseFont
 // closeFontRequest writes a CloseFont request to a byte slice.
-func closeFontRequest(opcode uint8, Font Font) []byte {
-	size := 8
+func closeFontRequest(Font Font) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -7230,19 +7196,17 @@ func closeFontRequest(opcode uint8, Font Font) []byte {
 
 // ConfigureWindow sends a checked request.
 func ConfigureWindow(c *xgb.XConn, Window Window, ValueMask uint16, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(configureWindowRequest(op, Window, ValueMask, ValueList), nil)
+	return c.SendRecv(configureWindowRequest(Window, ValueMask, ValueList), nil)
 }
 
 // ConfigureWindowUnchecked sends an unchecked request.
 func ConfigureWindowUnchecked(c *xgb.XConn, Window Window, ValueMask uint16, ValueList []uint32) error {
-	var op uint8
-	return c.Send(configureWindowRequest(op, Window, ValueMask, ValueList))
+	return c.Send(configureWindowRequest(Window, ValueMask, ValueList))
 }
 
 // Write request to wire for ConfigureWindow
 // configureWindowRequest writes a ConfigureWindow request to a byte slice.
-func configureWindowRequest(opcode uint8, Window Window, ValueMask uint16, ValueList []uint32) []byte {
+func configureWindowRequest(Window Window, ValueMask uint16, ValueList []uint32) []byte {
 	size := internal.Pad4((12 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -7274,20 +7238,18 @@ func configureWindowRequest(opcode uint8, Window Window, ValueMask uint16, Value
 
 // ConvertSelection sends a checked request.
 func ConvertSelection(c *xgb.XConn, Requestor Window, Selection Atom, Target Atom, Property Atom, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(convertSelectionRequest(op, Requestor, Selection, Target, Property, Time), nil)
+	return c.SendRecv(convertSelectionRequest(Requestor, Selection, Target, Property, Time), nil)
 }
 
 // ConvertSelectionUnchecked sends an unchecked request.
 func ConvertSelectionUnchecked(c *xgb.XConn, Requestor Window, Selection Atom, Target Atom, Property Atom, Time Timestamp) error {
-	var op uint8
-	return c.Send(convertSelectionRequest(op, Requestor, Selection, Target, Property, Time))
+	return c.Send(convertSelectionRequest(Requestor, Selection, Target, Property, Time))
 }
 
 // Write request to wire for ConvertSelection
 // convertSelectionRequest writes a ConvertSelection request to a byte slice.
-func convertSelectionRequest(opcode uint8, Requestor Window, Selection Atom, Target Atom, Property Atom, Time Timestamp) []byte {
-	size := 24
+func convertSelectionRequest(Requestor Window, Selection Atom, Target Atom, Property Atom, Time Timestamp) []byte {
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -7319,20 +7281,18 @@ func convertSelectionRequest(opcode uint8, Requestor Window, Selection Atom, Tar
 
 // CopyArea sends a checked request.
 func CopyArea(c *xgb.XConn, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16) error {
-	var op uint8
-	return c.SendRecv(copyAreaRequest(op, SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height), nil)
+	return c.SendRecv(copyAreaRequest(SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height), nil)
 }
 
 // CopyAreaUnchecked sends an unchecked request.
 func CopyAreaUnchecked(c *xgb.XConn, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16) error {
-	var op uint8
-	return c.Send(copyAreaRequest(op, SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height))
+	return c.Send(copyAreaRequest(SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height))
 }
 
 // Write request to wire for CopyArea
 // copyAreaRequest writes a CopyArea request to a byte slice.
-func copyAreaRequest(opcode uint8, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16) []byte {
-	size := 28
+func copyAreaRequest(SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16) []byte {
+	const size = 28
 	b := 0
 	buf := make([]byte, size)
 
@@ -7376,20 +7336,18 @@ func copyAreaRequest(opcode uint8, SrcDrawable Drawable, DstDrawable Drawable, G
 
 // CopyColormapAndFree sends a checked request.
 func CopyColormapAndFree(c *xgb.XConn, Mid Colormap, SrcCmap Colormap) error {
-	var op uint8
-	return c.SendRecv(copyColormapAndFreeRequest(op, Mid, SrcCmap), nil)
+	return c.SendRecv(copyColormapAndFreeRequest(Mid, SrcCmap), nil)
 }
 
 // CopyColormapAndFreeUnchecked sends an unchecked request.
 func CopyColormapAndFreeUnchecked(c *xgb.XConn, Mid Colormap, SrcCmap Colormap) error {
-	var op uint8
-	return c.Send(copyColormapAndFreeRequest(op, Mid, SrcCmap))
+	return c.Send(copyColormapAndFreeRequest(Mid, SrcCmap))
 }
 
 // Write request to wire for CopyColormapAndFree
 // copyColormapAndFreeRequest writes a CopyColormapAndFree request to a byte slice.
-func copyColormapAndFreeRequest(opcode uint8, Mid Colormap, SrcCmap Colormap) []byte {
-	size := 12
+func copyColormapAndFreeRequest(Mid Colormap, SrcCmap Colormap) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -7412,20 +7370,18 @@ func copyColormapAndFreeRequest(opcode uint8, Mid Colormap, SrcCmap Colormap) []
 
 // CopyGC sends a checked request.
 func CopyGC(c *xgb.XConn, SrcGc Gcontext, DstGc Gcontext, ValueMask uint32) error {
-	var op uint8
-	return c.SendRecv(copyGCRequest(op, SrcGc, DstGc, ValueMask), nil)
+	return c.SendRecv(copyGCRequest(SrcGc, DstGc, ValueMask), nil)
 }
 
 // CopyGCUnchecked sends an unchecked request.
 func CopyGCUnchecked(c *xgb.XConn, SrcGc Gcontext, DstGc Gcontext, ValueMask uint32) error {
-	var op uint8
-	return c.Send(copyGCRequest(op, SrcGc, DstGc, ValueMask))
+	return c.Send(copyGCRequest(SrcGc, DstGc, ValueMask))
 }
 
 // Write request to wire for CopyGC
 // copyGCRequest writes a CopyGC request to a byte slice.
-func copyGCRequest(opcode uint8, SrcGc Gcontext, DstGc Gcontext, ValueMask uint32) []byte {
-	size := 16
+func copyGCRequest(SrcGc Gcontext, DstGc Gcontext, ValueMask uint32) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -7451,20 +7407,18 @@ func copyGCRequest(opcode uint8, SrcGc Gcontext, DstGc Gcontext, ValueMask uint3
 
 // CopyPlane sends a checked request.
 func CopyPlane(c *xgb.XConn, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16, BitPlane uint32) error {
-	var op uint8
-	return c.SendRecv(copyPlaneRequest(op, SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height, BitPlane), nil)
+	return c.SendRecv(copyPlaneRequest(SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height, BitPlane), nil)
 }
 
 // CopyPlaneUnchecked sends an unchecked request.
 func CopyPlaneUnchecked(c *xgb.XConn, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16, BitPlane uint32) error {
-	var op uint8
-	return c.Send(copyPlaneRequest(op, SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height, BitPlane))
+	return c.Send(copyPlaneRequest(SrcDrawable, DstDrawable, Gc, SrcX, SrcY, DstX, DstY, Width, Height, BitPlane))
 }
 
 // Write request to wire for CopyPlane
 // copyPlaneRequest writes a CopyPlane request to a byte slice.
-func copyPlaneRequest(opcode uint8, SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16, BitPlane uint32) []byte {
-	size := 32
+func copyPlaneRequest(SrcDrawable Drawable, DstDrawable Drawable, Gc Gcontext, SrcX int16, SrcY int16, DstX int16, DstY int16, Width uint16, Height uint16, BitPlane uint32) []byte {
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -7511,20 +7465,18 @@ func copyPlaneRequest(opcode uint8, SrcDrawable Drawable, DstDrawable Drawable, 
 
 // CreateColormap sends a checked request.
 func CreateColormap(c *xgb.XConn, Alloc byte, Mid Colormap, Window Window, Visual Visualid) error {
-	var op uint8
-	return c.SendRecv(createColormapRequest(op, Alloc, Mid, Window, Visual), nil)
+	return c.SendRecv(createColormapRequest(Alloc, Mid, Window, Visual), nil)
 }
 
 // CreateColormapUnchecked sends an unchecked request.
 func CreateColormapUnchecked(c *xgb.XConn, Alloc byte, Mid Colormap, Window Window, Visual Visualid) error {
-	var op uint8
-	return c.Send(createColormapRequest(op, Alloc, Mid, Window, Visual))
+	return c.Send(createColormapRequest(Alloc, Mid, Window, Visual))
 }
 
 // Write request to wire for CreateColormap
 // createColormapRequest writes a CreateColormap request to a byte slice.
-func createColormapRequest(opcode uint8, Alloc byte, Mid Colormap, Window Window, Visual Visualid) []byte {
-	size := 16
+func createColormapRequest(Alloc byte, Mid Colormap, Window Window, Visual Visualid) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -7551,20 +7503,18 @@ func createColormapRequest(opcode uint8, Alloc byte, Mid Colormap, Window Window
 
 // CreateCursor sends a checked request.
 func CreateCursor(c *xgb.XConn, Cid Cursor, Source Pixmap, Mask Pixmap, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16, X uint16, Y uint16) error {
-	var op uint8
-	return c.SendRecv(createCursorRequest(op, Cid, Source, Mask, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue, X, Y), nil)
+	return c.SendRecv(createCursorRequest(Cid, Source, Mask, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue, X, Y), nil)
 }
 
 // CreateCursorUnchecked sends an unchecked request.
 func CreateCursorUnchecked(c *xgb.XConn, Cid Cursor, Source Pixmap, Mask Pixmap, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16, X uint16, Y uint16) error {
-	var op uint8
-	return c.Send(createCursorRequest(op, Cid, Source, Mask, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue, X, Y))
+	return c.Send(createCursorRequest(Cid, Source, Mask, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue, X, Y))
 }
 
 // Write request to wire for CreateCursor
 // createCursorRequest writes a CreateCursor request to a byte slice.
-func createCursorRequest(opcode uint8, Cid Cursor, Source Pixmap, Mask Pixmap, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16, X uint16, Y uint16) []byte {
-	size := 32
+func createCursorRequest(Cid Cursor, Source Pixmap, Mask Pixmap, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16, X uint16, Y uint16) []byte {
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -7614,19 +7564,17 @@ func createCursorRequest(opcode uint8, Cid Cursor, Source Pixmap, Mask Pixmap, F
 
 // CreateGC sends a checked request.
 func CreateGC(c *xgb.XConn, Cid Gcontext, Drawable Drawable, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(createGCRequest(op, Cid, Drawable, ValueMask, ValueList), nil)
+	return c.SendRecv(createGCRequest(Cid, Drawable, ValueMask, ValueList), nil)
 }
 
 // CreateGCUnchecked sends an unchecked request.
 func CreateGCUnchecked(c *xgb.XConn, Cid Gcontext, Drawable Drawable, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.Send(createGCRequest(op, Cid, Drawable, ValueMask, ValueList))
+	return c.Send(createGCRequest(Cid, Drawable, ValueMask, ValueList))
 }
 
 // Write request to wire for CreateGC
 // createGCRequest writes a CreateGC request to a byte slice.
-func createGCRequest(opcode uint8, Cid Gcontext, Drawable Drawable, ValueMask uint32, ValueList []uint32) []byte {
+func createGCRequest(Cid Gcontext, Drawable Drawable, ValueMask uint32, ValueList []uint32) []byte {
 	size := internal.Pad4((16 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -7659,20 +7607,18 @@ func createGCRequest(opcode uint8, Cid Gcontext, Drawable Drawable, ValueMask ui
 
 // CreateGlyphCursor sends a checked request.
 func CreateGlyphCursor(c *xgb.XConn, Cid Cursor, SourceFont Font, MaskFont Font, SourceChar uint16, MaskChar uint16, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) error {
-	var op uint8
-	return c.SendRecv(createGlyphCursorRequest(op, Cid, SourceFont, MaskFont, SourceChar, MaskChar, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue), nil)
+	return c.SendRecv(createGlyphCursorRequest(Cid, SourceFont, MaskFont, SourceChar, MaskChar, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue), nil)
 }
 
 // CreateGlyphCursorUnchecked sends an unchecked request.
 func CreateGlyphCursorUnchecked(c *xgb.XConn, Cid Cursor, SourceFont Font, MaskFont Font, SourceChar uint16, MaskChar uint16, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) error {
-	var op uint8
-	return c.Send(createGlyphCursorRequest(op, Cid, SourceFont, MaskFont, SourceChar, MaskChar, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue))
+	return c.Send(createGlyphCursorRequest(Cid, SourceFont, MaskFont, SourceChar, MaskChar, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue))
 }
 
 // Write request to wire for CreateGlyphCursor
 // createGlyphCursorRequest writes a CreateGlyphCursor request to a byte slice.
-func createGlyphCursorRequest(opcode uint8, Cid Cursor, SourceFont Font, MaskFont Font, SourceChar uint16, MaskChar uint16, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) []byte {
-	size := 32
+func createGlyphCursorRequest(Cid Cursor, SourceFont Font, MaskFont Font, SourceChar uint16, MaskChar uint16, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) []byte {
+	const size = 32
 	b := 0
 	buf := make([]byte, size)
 
@@ -7722,20 +7668,18 @@ func createGlyphCursorRequest(opcode uint8, Cid Cursor, SourceFont Font, MaskFon
 
 // CreatePixmap sends a checked request.
 func CreatePixmap(c *xgb.XConn, Depth byte, Pid Pixmap, Drawable Drawable, Width uint16, Height uint16) error {
-	var op uint8
-	return c.SendRecv(createPixmapRequest(op, Depth, Pid, Drawable, Width, Height), nil)
+	return c.SendRecv(createPixmapRequest(Depth, Pid, Drawable, Width, Height), nil)
 }
 
 // CreatePixmapUnchecked sends an unchecked request.
 func CreatePixmapUnchecked(c *xgb.XConn, Depth byte, Pid Pixmap, Drawable Drawable, Width uint16, Height uint16) error {
-	var op uint8
-	return c.Send(createPixmapRequest(op, Depth, Pid, Drawable, Width, Height))
+	return c.Send(createPixmapRequest(Depth, Pid, Drawable, Width, Height))
 }
 
 // Write request to wire for CreatePixmap
 // createPixmapRequest writes a CreatePixmap request to a byte slice.
-func createPixmapRequest(opcode uint8, Depth byte, Pid Pixmap, Drawable Drawable, Width uint16, Height uint16) []byte {
-	size := 16
+func createPixmapRequest(Depth byte, Pid Pixmap, Drawable Drawable, Width uint16, Height uint16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -7765,19 +7709,17 @@ func createPixmapRequest(opcode uint8, Depth byte, Pid Pixmap, Drawable Drawable
 
 // CreateWindow sends a checked request.
 func CreateWindow(c *xgb.XConn, Depth byte, Wid Window, Parent Window, X int16, Y int16, Width uint16, Height uint16, BorderWidth uint16, Class uint16, Visual Visualid, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.SendRecv(createWindowRequest(op, Depth, Wid, Parent, X, Y, Width, Height, BorderWidth, Class, Visual, ValueMask, ValueList), nil)
+	return c.SendRecv(createWindowRequest(Depth, Wid, Parent, X, Y, Width, Height, BorderWidth, Class, Visual, ValueMask, ValueList), nil)
 }
 
 // CreateWindowUnchecked sends an unchecked request.
 func CreateWindowUnchecked(c *xgb.XConn, Depth byte, Wid Window, Parent Window, X int16, Y int16, Width uint16, Height uint16, BorderWidth uint16, Class uint16, Visual Visualid, ValueMask uint32, ValueList []uint32) error {
-	var op uint8
-	return c.Send(createWindowRequest(op, Depth, Wid, Parent, X, Y, Width, Height, BorderWidth, Class, Visual, ValueMask, ValueList))
+	return c.Send(createWindowRequest(Depth, Wid, Parent, X, Y, Width, Height, BorderWidth, Class, Visual, ValueMask, ValueList))
 }
 
 // Write request to wire for CreateWindow
 // createWindowRequest writes a CreateWindow request to a byte slice.
-func createWindowRequest(opcode uint8, Depth byte, Wid Window, Parent Window, X int16, Y int16, Width uint16, Height uint16, BorderWidth uint16, Class uint16, Visual Visualid, ValueMask uint32, ValueList []uint32) []byte {
+func createWindowRequest(Depth byte, Wid Window, Parent Window, X int16, Y int16, Width uint16, Height uint16, BorderWidth uint16, Class uint16, Visual Visualid, ValueMask uint32, ValueList []uint32) []byte {
 	size := internal.Pad4((32 + internal.Pad4((4 * internal.PopCount(int(ValueMask))))))
 	b := 0
 	buf := make([]byte, size)
@@ -7832,20 +7774,18 @@ func createWindowRequest(opcode uint8, Depth byte, Wid Window, Parent Window, X 
 
 // DeleteProperty sends a checked request.
 func DeleteProperty(c *xgb.XConn, Window Window, Property Atom) error {
-	var op uint8
-	return c.SendRecv(deletePropertyRequest(op, Window, Property), nil)
+	return c.SendRecv(deletePropertyRequest(Window, Property), nil)
 }
 
 // DeletePropertyUnchecked sends an unchecked request.
 func DeletePropertyUnchecked(c *xgb.XConn, Window Window, Property Atom) error {
-	var op uint8
-	return c.Send(deletePropertyRequest(op, Window, Property))
+	return c.Send(deletePropertyRequest(Window, Property))
 }
 
 // Write request to wire for DeleteProperty
 // deletePropertyRequest writes a DeleteProperty request to a byte slice.
-func deletePropertyRequest(opcode uint8, Window Window, Property Atom) []byte {
-	size := 12
+func deletePropertyRequest(Window Window, Property Atom) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -7868,20 +7808,18 @@ func deletePropertyRequest(opcode uint8, Window Window, Property Atom) []byte {
 
 // DestroySubwindows sends a checked request.
 func DestroySubwindows(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(destroySubwindowsRequest(op, Window), nil)
+	return c.SendRecv(destroySubwindowsRequest(Window), nil)
 }
 
 // DestroySubwindowsUnchecked sends an unchecked request.
 func DestroySubwindowsUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(destroySubwindowsRequest(op, Window))
+	return c.Send(destroySubwindowsRequest(Window))
 }
 
 // Write request to wire for DestroySubwindows
 // destroySubwindowsRequest writes a DestroySubwindows request to a byte slice.
-func destroySubwindowsRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func destroySubwindowsRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -7901,20 +7839,18 @@ func destroySubwindowsRequest(opcode uint8, Window Window) []byte {
 
 // DestroyWindow sends a checked request.
 func DestroyWindow(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(destroyWindowRequest(op, Window), nil)
+	return c.SendRecv(destroyWindowRequest(Window), nil)
 }
 
 // DestroyWindowUnchecked sends an unchecked request.
 func DestroyWindowUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(destroyWindowRequest(op, Window))
+	return c.Send(destroyWindowRequest(Window))
 }
 
 // Write request to wire for DestroyWindow
 // destroyWindowRequest writes a DestroyWindow request to a byte slice.
-func destroyWindowRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func destroyWindowRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -7934,19 +7870,17 @@ func destroyWindowRequest(opcode uint8, Window Window) []byte {
 
 // FillPoly sends a checked request.
 func FillPoly(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Shape byte, CoordinateMode byte, Points []Point) error {
-	var op uint8
-	return c.SendRecv(fillPolyRequest(op, Drawable, Gc, Shape, CoordinateMode, Points), nil)
+	return c.SendRecv(fillPolyRequest(Drawable, Gc, Shape, CoordinateMode, Points), nil)
 }
 
 // FillPolyUnchecked sends an unchecked request.
 func FillPolyUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Shape byte, CoordinateMode byte, Points []Point) error {
-	var op uint8
-	return c.Send(fillPolyRequest(op, Drawable, Gc, Shape, CoordinateMode, Points))
+	return c.Send(fillPolyRequest(Drawable, Gc, Shape, CoordinateMode, Points))
 }
 
 // Write request to wire for FillPoly
 // fillPolyRequest writes a FillPoly request to a byte slice.
-func fillPolyRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Shape byte, CoordinateMode byte, Points []Point) []byte {
+func fillPolyRequest(Drawable Drawable, Gc Gcontext, Shape byte, CoordinateMode byte, Points []Point) []byte {
 	size := internal.Pad4((16 + internal.Pad4((len(Points) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -7980,20 +7914,18 @@ func fillPolyRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Shape byte, C
 
 // ForceScreenSaver sends a checked request.
 func ForceScreenSaver(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.SendRecv(forceScreenSaverRequest(op, Mode), nil)
+	return c.SendRecv(forceScreenSaverRequest(Mode), nil)
 }
 
 // ForceScreenSaverUnchecked sends an unchecked request.
 func ForceScreenSaverUnchecked(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.Send(forceScreenSaverRequest(op, Mode))
+	return c.Send(forceScreenSaverRequest(Mode))
 }
 
 // Write request to wire for ForceScreenSaver
 // forceScreenSaverRequest writes a ForceScreenSaver request to a byte slice.
-func forceScreenSaverRequest(opcode uint8, Mode byte) []byte {
-	size := 4
+func forceScreenSaverRequest(Mode byte) []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8011,20 +7943,18 @@ func forceScreenSaverRequest(opcode uint8, Mode byte) []byte {
 
 // FreeColormap sends a checked request.
 func FreeColormap(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.SendRecv(freeColormapRequest(op, Cmap), nil)
+	return c.SendRecv(freeColormapRequest(Cmap), nil)
 }
 
 // FreeColormapUnchecked sends an unchecked request.
 func FreeColormapUnchecked(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.Send(freeColormapRequest(op, Cmap))
+	return c.Send(freeColormapRequest(Cmap))
 }
 
 // Write request to wire for FreeColormap
 // freeColormapRequest writes a FreeColormap request to a byte slice.
-func freeColormapRequest(opcode uint8, Cmap Colormap) []byte {
-	size := 8
+func freeColormapRequest(Cmap Colormap) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8044,19 +7974,17 @@ func freeColormapRequest(opcode uint8, Cmap Colormap) []byte {
 
 // FreeColors sends a checked request.
 func FreeColors(c *xgb.XConn, Cmap Colormap, PlaneMask uint32, Pixels []uint32) error {
-	var op uint8
-	return c.SendRecv(freeColorsRequest(op, Cmap, PlaneMask, Pixels), nil)
+	return c.SendRecv(freeColorsRequest(Cmap, PlaneMask, Pixels), nil)
 }
 
 // FreeColorsUnchecked sends an unchecked request.
 func FreeColorsUnchecked(c *xgb.XConn, Cmap Colormap, PlaneMask uint32, Pixels []uint32) error {
-	var op uint8
-	return c.Send(freeColorsRequest(op, Cmap, PlaneMask, Pixels))
+	return c.Send(freeColorsRequest(Cmap, PlaneMask, Pixels))
 }
 
 // Write request to wire for FreeColors
 // freeColorsRequest writes a FreeColors request to a byte slice.
-func freeColorsRequest(opcode uint8, Cmap Colormap, PlaneMask uint32, Pixels []uint32) []byte {
+func freeColorsRequest(Cmap Colormap, PlaneMask uint32, Pixels []uint32) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Pixels) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -8085,20 +8013,18 @@ func freeColorsRequest(opcode uint8, Cmap Colormap, PlaneMask uint32, Pixels []u
 
 // FreeCursor sends a checked request.
 func FreeCursor(c *xgb.XConn, Cursor Cursor) error {
-	var op uint8
-	return c.SendRecv(freeCursorRequest(op, Cursor), nil)
+	return c.SendRecv(freeCursorRequest(Cursor), nil)
 }
 
 // FreeCursorUnchecked sends an unchecked request.
 func FreeCursorUnchecked(c *xgb.XConn, Cursor Cursor) error {
-	var op uint8
-	return c.Send(freeCursorRequest(op, Cursor))
+	return c.Send(freeCursorRequest(Cursor))
 }
 
 // Write request to wire for FreeCursor
 // freeCursorRequest writes a FreeCursor request to a byte slice.
-func freeCursorRequest(opcode uint8, Cursor Cursor) []byte {
-	size := 8
+func freeCursorRequest(Cursor Cursor) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8118,20 +8044,18 @@ func freeCursorRequest(opcode uint8, Cursor Cursor) []byte {
 
 // FreeGC sends a checked request.
 func FreeGC(c *xgb.XConn, Gc Gcontext) error {
-	var op uint8
-	return c.SendRecv(freeGCRequest(op, Gc), nil)
+	return c.SendRecv(freeGCRequest(Gc), nil)
 }
 
 // FreeGCUnchecked sends an unchecked request.
 func FreeGCUnchecked(c *xgb.XConn, Gc Gcontext) error {
-	var op uint8
-	return c.Send(freeGCRequest(op, Gc))
+	return c.Send(freeGCRequest(Gc))
 }
 
 // Write request to wire for FreeGC
 // freeGCRequest writes a FreeGC request to a byte slice.
-func freeGCRequest(opcode uint8, Gc Gcontext) []byte {
-	size := 8
+func freeGCRequest(Gc Gcontext) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8151,20 +8075,18 @@ func freeGCRequest(opcode uint8, Gc Gcontext) []byte {
 
 // FreePixmap sends a checked request.
 func FreePixmap(c *xgb.XConn, Pixmap Pixmap) error {
-	var op uint8
-	return c.SendRecv(freePixmapRequest(op, Pixmap), nil)
+	return c.SendRecv(freePixmapRequest(Pixmap), nil)
 }
 
 // FreePixmapUnchecked sends an unchecked request.
 func FreePixmapUnchecked(c *xgb.XConn, Pixmap Pixmap) error {
-	var op uint8
-	return c.Send(freePixmapRequest(op, Pixmap))
+	return c.Send(freePixmapRequest(Pixmap))
 }
 
 // Write request to wire for FreePixmap
 // freePixmapRequest writes a FreePixmap request to a byte slice.
-func freePixmapRequest(opcode uint8, Pixmap Pixmap) []byte {
-	size := 8
+func freePixmapRequest(Pixmap Pixmap) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8185,15 +8107,13 @@ func freePixmapRequest(opcode uint8, Pixmap Pixmap) []byte {
 // GetAtomName sends a checked request.
 func GetAtomName(c *xgb.XConn, Atom Atom) (GetAtomNameReply, error) {
 	var reply GetAtomNameReply
-	var op uint8
-	err := c.SendRecv(getAtomNameRequest(op, Atom), &reply)
+	err := c.SendRecv(getAtomNameRequest(Atom), &reply)
 	return reply, err
 }
 
 // GetAtomNameUnchecked sends an unchecked request.
 func GetAtomNameUnchecked(c *xgb.XConn, Atom Atom) error {
-	var op uint8
-	return c.Send(getAtomNameRequest(op, Atom))
+	return c.Send(getAtomNameRequest(Atom))
 }
 
 // GetAtomNameReply represents the data returned from a GetAtomName request.
@@ -8239,8 +8159,8 @@ func (v *GetAtomNameReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetAtomName
 // getAtomNameRequest writes a GetAtomName request to a byte slice.
-func getAtomNameRequest(opcode uint8, Atom Atom) []byte {
-	size := 8
+func getAtomNameRequest(Atom Atom) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8261,15 +8181,13 @@ func getAtomNameRequest(opcode uint8, Atom Atom) []byte {
 // GetFontPath sends a checked request.
 func GetFontPath(c *xgb.XConn) (GetFontPathReply, error) {
 	var reply GetFontPathReply
-	var op uint8
-	err := c.SendRecv(getFontPathRequest(op), &reply)
+	err := c.SendRecv(getFontPathRequest(), &reply)
 	return reply, err
 }
 
 // GetFontPathUnchecked sends an unchecked request.
 func GetFontPathUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getFontPathRequest(op))
+	return c.Send(getFontPathRequest())
 }
 
 // GetFontPathReply represents the data returned from a GetFontPath request.
@@ -8311,8 +8229,8 @@ func (v *GetFontPathReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetFontPath
 // getFontPathRequest writes a GetFontPath request to a byte slice.
-func getFontPathRequest(opcode uint8) []byte {
-	size := 4
+func getFontPathRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8329,15 +8247,13 @@ func getFontPathRequest(opcode uint8) []byte {
 // GetGeometry sends a checked request.
 func GetGeometry(c *xgb.XConn, Drawable Drawable) (GetGeometryReply, error) {
 	var reply GetGeometryReply
-	var op uint8
-	err := c.SendRecv(getGeometryRequest(op, Drawable), &reply)
+	err := c.SendRecv(getGeometryRequest(Drawable), &reply)
 	return reply, err
 }
 
 // GetGeometryUnchecked sends an unchecked request.
 func GetGeometryUnchecked(c *xgb.XConn, Drawable Drawable) error {
-	var op uint8
-	return c.Send(getGeometryRequest(op, Drawable))
+	return c.Send(getGeometryRequest(Drawable))
 }
 
 // GetGeometryReply represents the data returned from a GetGeometry request.
@@ -8356,7 +8272,8 @@ type GetGeometryReply struct {
 
 // Unmarshal reads a byte slice into a GetGeometryReply value.
 func (v *GetGeometryReply) Unmarshal(buf []byte) error {
-	if size := 24; len(buf) < size {
+	const size = 24
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetGeometryReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -8396,8 +8313,8 @@ func (v *GetGeometryReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetGeometry
 // getGeometryRequest writes a GetGeometry request to a byte slice.
-func getGeometryRequest(opcode uint8, Drawable Drawable) []byte {
-	size := 8
+func getGeometryRequest(Drawable Drawable) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8418,15 +8335,13 @@ func getGeometryRequest(opcode uint8, Drawable Drawable) []byte {
 // GetImage sends a checked request.
 func GetImage(c *xgb.XConn, Format byte, Drawable Drawable, X int16, Y int16, Width uint16, Height uint16, PlaneMask uint32) (GetImageReply, error) {
 	var reply GetImageReply
-	var op uint8
-	err := c.SendRecv(getImageRequest(op, Format, Drawable, X, Y, Width, Height, PlaneMask), &reply)
+	err := c.SendRecv(getImageRequest(Format, Drawable, X, Y, Width, Height, PlaneMask), &reply)
 	return reply, err
 }
 
 // GetImageUnchecked sends an unchecked request.
 func GetImageUnchecked(c *xgb.XConn, Format byte, Drawable Drawable, X int16, Y int16, Width uint16, Height uint16, PlaneMask uint32) error {
-	var op uint8
-	return c.Send(getImageRequest(op, Format, Drawable, X, Y, Width, Height, PlaneMask))
+	return c.Send(getImageRequest(Format, Drawable, X, Y, Width, Height, PlaneMask))
 }
 
 // GetImageReply represents the data returned from a GetImage request.
@@ -8470,8 +8385,8 @@ func (v *GetImageReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetImage
 // getImageRequest writes a GetImage request to a byte slice.
-func getImageRequest(opcode uint8, Format byte, Drawable Drawable, X int16, Y int16, Width uint16, Height uint16, PlaneMask uint32) []byte {
-	size := 20
+func getImageRequest(Format byte, Drawable Drawable, X int16, Y int16, Width uint16, Height uint16, PlaneMask uint32) []byte {
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -8508,15 +8423,13 @@ func getImageRequest(opcode uint8, Format byte, Drawable Drawable, X int16, Y in
 // GetInputFocus sends a checked request.
 func GetInputFocus(c *xgb.XConn) (GetInputFocusReply, error) {
 	var reply GetInputFocusReply
-	var op uint8
-	err := c.SendRecv(getInputFocusRequest(op), &reply)
+	err := c.SendRecv(getInputFocusRequest(), &reply)
 	return reply, err
 }
 
 // GetInputFocusUnchecked sends an unchecked request.
 func GetInputFocusUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getInputFocusRequest(op))
+	return c.Send(getInputFocusRequest())
 }
 
 // GetInputFocusReply represents the data returned from a GetInputFocus request.
@@ -8529,7 +8442,8 @@ type GetInputFocusReply struct {
 
 // Unmarshal reads a byte slice into a GetInputFocusReply value.
 func (v *GetInputFocusReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetInputFocusReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -8552,8 +8466,8 @@ func (v *GetInputFocusReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetInputFocus
 // getInputFocusRequest writes a GetInputFocus request to a byte slice.
-func getInputFocusRequest(opcode uint8) []byte {
-	size := 4
+func getInputFocusRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8570,15 +8484,13 @@ func getInputFocusRequest(opcode uint8) []byte {
 // GetKeyboardControl sends a checked request.
 func GetKeyboardControl(c *xgb.XConn) (GetKeyboardControlReply, error) {
 	var reply GetKeyboardControlReply
-	var op uint8
-	err := c.SendRecv(getKeyboardControlRequest(op), &reply)
+	err := c.SendRecv(getKeyboardControlRequest(), &reply)
 	return reply, err
 }
 
 // GetKeyboardControlUnchecked sends an unchecked request.
 func GetKeyboardControlUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getKeyboardControlRequest(op))
+	return c.Send(getKeyboardControlRequest())
 }
 
 // GetKeyboardControlReply represents the data returned from a GetKeyboardControl request.
@@ -8597,7 +8509,8 @@ type GetKeyboardControlReply struct {
 
 // Unmarshal reads a byte slice into a GetKeyboardControlReply value.
 func (v *GetKeyboardControlReply) Unmarshal(buf []byte) error {
-	if size := 52; len(buf) < size {
+	const size = 52
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetKeyboardControlReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -8638,8 +8551,8 @@ func (v *GetKeyboardControlReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetKeyboardControl
 // getKeyboardControlRequest writes a GetKeyboardControl request to a byte slice.
-func getKeyboardControlRequest(opcode uint8) []byte {
-	size := 4
+func getKeyboardControlRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8656,15 +8569,13 @@ func getKeyboardControlRequest(opcode uint8) []byte {
 // GetKeyboardMapping sends a checked request.
 func GetKeyboardMapping(c *xgb.XConn, FirstKeycode Keycode, Count byte) (GetKeyboardMappingReply, error) {
 	var reply GetKeyboardMappingReply
-	var op uint8
-	err := c.SendRecv(getKeyboardMappingRequest(op, FirstKeycode, Count), &reply)
+	err := c.SendRecv(getKeyboardMappingRequest(FirstKeycode, Count), &reply)
 	return reply, err
 }
 
 // GetKeyboardMappingUnchecked sends an unchecked request.
 func GetKeyboardMappingUnchecked(c *xgb.XConn, FirstKeycode Keycode, Count byte) error {
-	var op uint8
-	return c.Send(getKeyboardMappingRequest(op, FirstKeycode, Count))
+	return c.Send(getKeyboardMappingRequest(FirstKeycode, Count))
 }
 
 // GetKeyboardMappingReply represents the data returned from a GetKeyboardMapping request.
@@ -8706,8 +8617,8 @@ func (v *GetKeyboardMappingReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetKeyboardMapping
 // getKeyboardMappingRequest writes a GetKeyboardMapping request to a byte slice.
-func getKeyboardMappingRequest(opcode uint8, FirstKeycode Keycode, Count byte) []byte {
-	size := 8
+func getKeyboardMappingRequest(FirstKeycode Keycode, Count byte) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -8731,15 +8642,13 @@ func getKeyboardMappingRequest(opcode uint8, FirstKeycode Keycode, Count byte) [
 // GetModifierMapping sends a checked request.
 func GetModifierMapping(c *xgb.XConn) (GetModifierMappingReply, error) {
 	var reply GetModifierMappingReply
-	var op uint8
-	err := c.SendRecv(getModifierMappingRequest(op), &reply)
+	err := c.SendRecv(getModifierMappingRequest(), &reply)
 	return reply, err
 }
 
 // GetModifierMappingUnchecked sends an unchecked request.
 func GetModifierMappingUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getModifierMappingRequest(op))
+	return c.Send(getModifierMappingRequest())
 }
 
 // GetModifierMappingReply represents the data returned from a GetModifierMapping request.
@@ -8781,8 +8690,8 @@ func (v *GetModifierMappingReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetModifierMapping
 // getModifierMappingRequest writes a GetModifierMapping request to a byte slice.
-func getModifierMappingRequest(opcode uint8) []byte {
-	size := 4
+func getModifierMappingRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8799,15 +8708,13 @@ func getModifierMappingRequest(opcode uint8) []byte {
 // GetMotionEvents sends a checked request.
 func GetMotionEvents(c *xgb.XConn, Window Window, Start Timestamp, Stop Timestamp) (GetMotionEventsReply, error) {
 	var reply GetMotionEventsReply
-	var op uint8
-	err := c.SendRecv(getMotionEventsRequest(op, Window, Start, Stop), &reply)
+	err := c.SendRecv(getMotionEventsRequest(Window, Start, Stop), &reply)
 	return reply, err
 }
 
 // GetMotionEventsUnchecked sends an unchecked request.
 func GetMotionEventsUnchecked(c *xgb.XConn, Window Window, Start Timestamp, Stop Timestamp) error {
-	var op uint8
-	return c.Send(getMotionEventsRequest(op, Window, Start, Stop))
+	return c.Send(getMotionEventsRequest(Window, Start, Stop))
 }
 
 // GetMotionEventsReply represents the data returned from a GetMotionEvents request.
@@ -8849,8 +8756,8 @@ func (v *GetMotionEventsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetMotionEvents
 // getMotionEventsRequest writes a GetMotionEvents request to a byte slice.
-func getMotionEventsRequest(opcode uint8, Window Window, Start Timestamp, Stop Timestamp) []byte {
-	size := 16
+func getMotionEventsRequest(Window Window, Start Timestamp, Stop Timestamp) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -8877,15 +8784,13 @@ func getMotionEventsRequest(opcode uint8, Window Window, Start Timestamp, Stop T
 // GetPointerControl sends a checked request.
 func GetPointerControl(c *xgb.XConn) (GetPointerControlReply, error) {
 	var reply GetPointerControlReply
-	var op uint8
-	err := c.SendRecv(getPointerControlRequest(op), &reply)
+	err := c.SendRecv(getPointerControlRequest(), &reply)
 	return reply, err
 }
 
 // GetPointerControlUnchecked sends an unchecked request.
 func GetPointerControlUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getPointerControlRequest(op))
+	return c.Send(getPointerControlRequest())
 }
 
 // GetPointerControlReply represents the data returned from a GetPointerControl request.
@@ -8901,7 +8806,8 @@ type GetPointerControlReply struct {
 
 // Unmarshal reads a byte slice into a GetPointerControlReply value.
 func (v *GetPointerControlReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetPointerControlReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -8931,8 +8837,8 @@ func (v *GetPointerControlReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetPointerControl
 // getPointerControlRequest writes a GetPointerControl request to a byte slice.
-func getPointerControlRequest(opcode uint8) []byte {
-	size := 4
+func getPointerControlRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -8949,15 +8855,13 @@ func getPointerControlRequest(opcode uint8) []byte {
 // GetPointerMapping sends a checked request.
 func GetPointerMapping(c *xgb.XConn) (GetPointerMappingReply, error) {
 	var reply GetPointerMappingReply
-	var op uint8
-	err := c.SendRecv(getPointerMappingRequest(op), &reply)
+	err := c.SendRecv(getPointerMappingRequest(), &reply)
 	return reply, err
 }
 
 // GetPointerMappingUnchecked sends an unchecked request.
 func GetPointerMappingUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getPointerMappingRequest(op))
+	return c.Send(getPointerMappingRequest())
 }
 
 // GetPointerMappingReply represents the data returned from a GetPointerMapping request.
@@ -8997,8 +8901,8 @@ func (v *GetPointerMappingReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetPointerMapping
 // getPointerMappingRequest writes a GetPointerMapping request to a byte slice.
-func getPointerMappingRequest(opcode uint8) []byte {
-	size := 4
+func getPointerMappingRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -9015,15 +8919,13 @@ func getPointerMappingRequest(opcode uint8) []byte {
 // GetProperty sends a checked request.
 func GetProperty(c *xgb.XConn, Delete bool, Window Window, Property Atom, Type Atom, LongOffset uint32, LongLength uint32) (GetPropertyReply, error) {
 	var reply GetPropertyReply
-	var op uint8
-	err := c.SendRecv(getPropertyRequest(op, Delete, Window, Property, Type, LongOffset, LongLength), &reply)
+	err := c.SendRecv(getPropertyRequest(Delete, Window, Property, Type, LongOffset, LongLength), &reply)
 	return reply, err
 }
 
 // GetPropertyUnchecked sends an unchecked request.
 func GetPropertyUnchecked(c *xgb.XConn, Delete bool, Window Window, Property Atom, Type Atom, LongOffset uint32, LongLength uint32) error {
-	var op uint8
-	return c.Send(getPropertyRequest(op, Delete, Window, Property, Type, LongOffset, LongLength))
+	return c.Send(getPropertyRequest(Delete, Window, Property, Type, LongOffset, LongLength))
 }
 
 // GetPropertyReply represents the data returned from a GetProperty request.
@@ -9075,8 +8977,8 @@ func (v *GetPropertyReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetProperty
 // getPropertyRequest writes a GetProperty request to a byte slice.
-func getPropertyRequest(opcode uint8, Delete bool, Window Window, Property Atom, Type Atom, LongOffset uint32, LongLength uint32) []byte {
-	size := 24
+func getPropertyRequest(Delete bool, Window Window, Property Atom, Type Atom, LongOffset uint32, LongLength uint32) []byte {
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -9114,15 +9016,13 @@ func getPropertyRequest(opcode uint8, Delete bool, Window Window, Property Atom,
 // GetScreenSaver sends a checked request.
 func GetScreenSaver(c *xgb.XConn) (GetScreenSaverReply, error) {
 	var reply GetScreenSaverReply
-	var op uint8
-	err := c.SendRecv(getScreenSaverRequest(op), &reply)
+	err := c.SendRecv(getScreenSaverRequest(), &reply)
 	return reply, err
 }
 
 // GetScreenSaverUnchecked sends an unchecked request.
 func GetScreenSaverUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(getScreenSaverRequest(op))
+	return c.Send(getScreenSaverRequest())
 }
 
 // GetScreenSaverReply represents the data returned from a GetScreenSaver request.
@@ -9139,7 +9039,8 @@ type GetScreenSaverReply struct {
 
 // Unmarshal reads a byte slice into a GetScreenSaverReply value.
 func (v *GetScreenSaverReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetScreenSaverReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9172,8 +9073,8 @@ func (v *GetScreenSaverReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetScreenSaver
 // getScreenSaverRequest writes a GetScreenSaver request to a byte slice.
-func getScreenSaverRequest(opcode uint8) []byte {
-	size := 4
+func getScreenSaverRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -9190,15 +9091,13 @@ func getScreenSaverRequest(opcode uint8) []byte {
 // GetSelectionOwner sends a checked request.
 func GetSelectionOwner(c *xgb.XConn, Selection Atom) (GetSelectionOwnerReply, error) {
 	var reply GetSelectionOwnerReply
-	var op uint8
-	err := c.SendRecv(getSelectionOwnerRequest(op, Selection), &reply)
+	err := c.SendRecv(getSelectionOwnerRequest(Selection), &reply)
 	return reply, err
 }
 
 // GetSelectionOwnerUnchecked sends an unchecked request.
 func GetSelectionOwnerUnchecked(c *xgb.XConn, Selection Atom) error {
-	var op uint8
-	return c.Send(getSelectionOwnerRequest(op, Selection))
+	return c.Send(getSelectionOwnerRequest(Selection))
 }
 
 // GetSelectionOwnerReply represents the data returned from a GetSelectionOwner request.
@@ -9211,7 +9110,8 @@ type GetSelectionOwnerReply struct {
 
 // Unmarshal reads a byte slice into a GetSelectionOwnerReply value.
 func (v *GetSelectionOwnerReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetSelectionOwnerReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9233,8 +9133,8 @@ func (v *GetSelectionOwnerReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetSelectionOwner
 // getSelectionOwnerRequest writes a GetSelectionOwner request to a byte slice.
-func getSelectionOwnerRequest(opcode uint8, Selection Atom) []byte {
-	size := 8
+func getSelectionOwnerRequest(Selection Atom) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -9255,15 +9155,13 @@ func getSelectionOwnerRequest(opcode uint8, Selection Atom) []byte {
 // GetWindowAttributes sends a checked request.
 func GetWindowAttributes(c *xgb.XConn, Window Window) (GetWindowAttributesReply, error) {
 	var reply GetWindowAttributesReply
-	var op uint8
-	err := c.SendRecv(getWindowAttributesRequest(op, Window), &reply)
+	err := c.SendRecv(getWindowAttributesRequest(Window), &reply)
 	return reply, err
 }
 
 // GetWindowAttributesUnchecked sends an unchecked request.
 func GetWindowAttributesUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(getWindowAttributesRequest(op, Window))
+	return c.Send(getWindowAttributesRequest(Window))
 }
 
 // GetWindowAttributesReply represents the data returned from a GetWindowAttributes request.
@@ -9290,7 +9188,8 @@ type GetWindowAttributesReply struct {
 
 // Unmarshal reads a byte slice into a GetWindowAttributesReply value.
 func (v *GetWindowAttributesReply) Unmarshal(buf []byte) error {
-	if size := 44; len(buf) < size {
+	const size = 44
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetWindowAttributesReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9354,8 +9253,8 @@ func (v *GetWindowAttributesReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GetWindowAttributes
 // getWindowAttributesRequest writes a GetWindowAttributes request to a byte slice.
-func getWindowAttributesRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func getWindowAttributesRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -9375,20 +9274,18 @@ func getWindowAttributesRequest(opcode uint8, Window Window) []byte {
 
 // GrabButton sends a checked request.
 func GrabButton(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Button byte, Modifiers uint16) error {
-	var op uint8
-	return c.SendRecv(grabButtonRequest(op, OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Button, Modifiers), nil)
+	return c.SendRecv(grabButtonRequest(OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Button, Modifiers), nil)
 }
 
 // GrabButtonUnchecked sends an unchecked request.
 func GrabButtonUnchecked(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Button byte, Modifiers uint16) error {
-	var op uint8
-	return c.Send(grabButtonRequest(op, OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Button, Modifiers))
+	return c.Send(grabButtonRequest(OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Button, Modifiers))
 }
 
 // Write request to wire for GrabButton
 // grabButtonRequest writes a GrabButton request to a byte slice.
-func grabButtonRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Button byte, Modifiers uint16) []byte {
-	size := 24
+func grabButtonRequest(OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Button byte, Modifiers uint16) []byte {
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -9436,20 +9333,18 @@ func grabButtonRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, EventM
 
 // GrabKey sends a checked request.
 func GrabKey(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, Modifiers uint16, Key Keycode, PointerMode byte, KeyboardMode byte) error {
-	var op uint8
-	return c.SendRecv(grabKeyRequest(op, OwnerEvents, GrabWindow, Modifiers, Key, PointerMode, KeyboardMode), nil)
+	return c.SendRecv(grabKeyRequest(OwnerEvents, GrabWindow, Modifiers, Key, PointerMode, KeyboardMode), nil)
 }
 
 // GrabKeyUnchecked sends an unchecked request.
 func GrabKeyUnchecked(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, Modifiers uint16, Key Keycode, PointerMode byte, KeyboardMode byte) error {
-	var op uint8
-	return c.Send(grabKeyRequest(op, OwnerEvents, GrabWindow, Modifiers, Key, PointerMode, KeyboardMode))
+	return c.Send(grabKeyRequest(OwnerEvents, GrabWindow, Modifiers, Key, PointerMode, KeyboardMode))
 }
 
 // Write request to wire for GrabKey
 // grabKeyRequest writes a GrabKey request to a byte slice.
-func grabKeyRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, Modifiers uint16, Key Keycode, PointerMode byte, KeyboardMode byte) []byte {
-	size := 16
+func grabKeyRequest(OwnerEvents bool, GrabWindow Window, Modifiers uint16, Key Keycode, PointerMode byte, KeyboardMode byte) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -9489,15 +9384,13 @@ func grabKeyRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, Modifiers
 // GrabKeyboard sends a checked request.
 func GrabKeyboard(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, Time Timestamp, PointerMode byte, KeyboardMode byte) (GrabKeyboardReply, error) {
 	var reply GrabKeyboardReply
-	var op uint8
-	err := c.SendRecv(grabKeyboardRequest(op, OwnerEvents, GrabWindow, Time, PointerMode, KeyboardMode), &reply)
+	err := c.SendRecv(grabKeyboardRequest(OwnerEvents, GrabWindow, Time, PointerMode, KeyboardMode), &reply)
 	return reply, err
 }
 
 // GrabKeyboardUnchecked sends an unchecked request.
 func GrabKeyboardUnchecked(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, Time Timestamp, PointerMode byte, KeyboardMode byte) error {
-	var op uint8
-	return c.Send(grabKeyboardRequest(op, OwnerEvents, GrabWindow, Time, PointerMode, KeyboardMode))
+	return c.Send(grabKeyboardRequest(OwnerEvents, GrabWindow, Time, PointerMode, KeyboardMode))
 }
 
 // GrabKeyboardReply represents the data returned from a GrabKeyboard request.
@@ -9509,7 +9402,8 @@ type GrabKeyboardReply struct {
 
 // Unmarshal reads a byte slice into a GrabKeyboardReply value.
 func (v *GrabKeyboardReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GrabKeyboardReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9529,8 +9423,8 @@ func (v *GrabKeyboardReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GrabKeyboard
 // grabKeyboardRequest writes a GrabKeyboard request to a byte slice.
-func grabKeyboardRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, Time Timestamp, PointerMode byte, KeyboardMode byte) []byte {
-	size := 16
+func grabKeyboardRequest(OwnerEvents bool, GrabWindow Window, Time Timestamp, PointerMode byte, KeyboardMode byte) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -9567,15 +9461,13 @@ func grabKeyboardRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, Time
 // GrabPointer sends a checked request.
 func GrabPointer(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Time Timestamp) (GrabPointerReply, error) {
 	var reply GrabPointerReply
-	var op uint8
-	err := c.SendRecv(grabPointerRequest(op, OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Time), &reply)
+	err := c.SendRecv(grabPointerRequest(OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Time), &reply)
 	return reply, err
 }
 
 // GrabPointerUnchecked sends an unchecked request.
 func GrabPointerUnchecked(c *xgb.XConn, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Time Timestamp) error {
-	var op uint8
-	return c.Send(grabPointerRequest(op, OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Time))
+	return c.Send(grabPointerRequest(OwnerEvents, GrabWindow, EventMask, PointerMode, KeyboardMode, ConfineTo, Cursor, Time))
 }
 
 // GrabPointerReply represents the data returned from a GrabPointer request.
@@ -9587,7 +9479,8 @@ type GrabPointerReply struct {
 
 // Unmarshal reads a byte slice into a GrabPointerReply value.
 func (v *GrabPointerReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GrabPointerReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9607,8 +9500,8 @@ func (v *GrabPointerReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for GrabPointer
 // grabPointerRequest writes a GrabPointer request to a byte slice.
-func grabPointerRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Time Timestamp) []byte {
-	size := 24
+func grabPointerRequest(OwnerEvents bool, GrabWindow Window, EventMask uint16, PointerMode byte, KeyboardMode byte, ConfineTo Window, Cursor Cursor, Time Timestamp) []byte {
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 
@@ -9651,20 +9544,18 @@ func grabPointerRequest(opcode uint8, OwnerEvents bool, GrabWindow Window, Event
 
 // GrabServer sends a checked request.
 func GrabServer(c *xgb.XConn) error {
-	var op uint8
-	return c.SendRecv(grabServerRequest(op), nil)
+	return c.SendRecv(grabServerRequest(), nil)
 }
 
 // GrabServerUnchecked sends an unchecked request.
 func GrabServerUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(grabServerRequest(op))
+	return c.Send(grabServerRequest())
 }
 
 // Write request to wire for GrabServer
 // grabServerRequest writes a GrabServer request to a byte slice.
-func grabServerRequest(opcode uint8) []byte {
-	size := 4
+func grabServerRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -9680,19 +9571,17 @@ func grabServerRequest(opcode uint8) []byte {
 
 // ImageText16 sends a checked request.
 func ImageText16(c *xgb.XConn, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String []Char2b) error {
-	var op uint8
-	return c.SendRecv(imageText16Request(op, StringLen, Drawable, Gc, X, Y, String), nil)
+	return c.SendRecv(imageText16Request(StringLen, Drawable, Gc, X, Y, String), nil)
 }
 
 // ImageText16Unchecked sends an unchecked request.
 func ImageText16Unchecked(c *xgb.XConn, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String []Char2b) error {
-	var op uint8
-	return c.Send(imageText16Request(op, StringLen, Drawable, Gc, X, Y, String))
+	return c.Send(imageText16Request(StringLen, Drawable, Gc, X, Y, String))
 }
 
 // Write request to wire for ImageText16
 // imageText16Request writes a ImageText16 request to a byte slice.
-func imageText16Request(opcode uint8, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String []Char2b) []byte {
+func imageText16Request(StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String []Char2b) []byte {
 	size := internal.Pad4((16 + internal.Pad4((int(StringLen) * 2))))
 	b := 0
 	buf := make([]byte, size)
@@ -9725,19 +9614,17 @@ func imageText16Request(opcode uint8, StringLen byte, Drawable Drawable, Gc Gcon
 
 // ImageText8 sends a checked request.
 func ImageText8(c *xgb.XConn, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String string) error {
-	var op uint8
-	return c.SendRecv(imageText8Request(op, StringLen, Drawable, Gc, X, Y, String), nil)
+	return c.SendRecv(imageText8Request(StringLen, Drawable, Gc, X, Y, String), nil)
 }
 
 // ImageText8Unchecked sends an unchecked request.
 func ImageText8Unchecked(c *xgb.XConn, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String string) error {
-	var op uint8
-	return c.Send(imageText8Request(op, StringLen, Drawable, Gc, X, Y, String))
+	return c.Send(imageText8Request(StringLen, Drawable, Gc, X, Y, String))
 }
 
 // Write request to wire for ImageText8
 // imageText8Request writes a ImageText8 request to a byte slice.
-func imageText8Request(opcode uint8, StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String string) []byte {
+func imageText8Request(StringLen byte, Drawable Drawable, Gc Gcontext, X int16, Y int16, String string) []byte {
 	size := internal.Pad4((16 + internal.Pad4((int(StringLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -9771,20 +9658,18 @@ func imageText8Request(opcode uint8, StringLen byte, Drawable Drawable, Gc Gcont
 
 // InstallColormap sends a checked request.
 func InstallColormap(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.SendRecv(installColormapRequest(op, Cmap), nil)
+	return c.SendRecv(installColormapRequest(Cmap), nil)
 }
 
 // InstallColormapUnchecked sends an unchecked request.
 func InstallColormapUnchecked(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.Send(installColormapRequest(op, Cmap))
+	return c.Send(installColormapRequest(Cmap))
 }
 
 // Write request to wire for InstallColormap
 // installColormapRequest writes a InstallColormap request to a byte slice.
-func installColormapRequest(opcode uint8, Cmap Colormap) []byte {
-	size := 8
+func installColormapRequest(Cmap Colormap) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -9805,15 +9690,13 @@ func installColormapRequest(opcode uint8, Cmap Colormap) []byte {
 // InternAtom sends a checked request.
 func InternAtom(c *xgb.XConn, OnlyIfExists bool, NameLen uint16, Name string) (InternAtomReply, error) {
 	var reply InternAtomReply
-	var op uint8
-	err := c.SendRecv(internAtomRequest(op, OnlyIfExists, NameLen, Name), &reply)
+	err := c.SendRecv(internAtomRequest(OnlyIfExists, NameLen, Name), &reply)
 	return reply, err
 }
 
 // InternAtomUnchecked sends an unchecked request.
 func InternAtomUnchecked(c *xgb.XConn, OnlyIfExists bool, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(internAtomRequest(op, OnlyIfExists, NameLen, Name))
+	return c.Send(internAtomRequest(OnlyIfExists, NameLen, Name))
 }
 
 // InternAtomReply represents the data returned from a InternAtom request.
@@ -9826,7 +9709,8 @@ type InternAtomReply struct {
 
 // Unmarshal reads a byte slice into a InternAtomReply value.
 func (v *InternAtomReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"InternAtomReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -9848,7 +9732,7 @@ func (v *InternAtomReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for InternAtom
 // internAtomRequest writes a InternAtom request to a byte slice.
-func internAtomRequest(opcode uint8, OnlyIfExists bool, NameLen uint16, Name string) []byte {
+func internAtomRequest(OnlyIfExists bool, NameLen uint16, Name string) []byte {
 	size := internal.Pad4((8 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -9879,20 +9763,18 @@ func internAtomRequest(opcode uint8, OnlyIfExists bool, NameLen uint16, Name str
 
 // KillClient sends a checked request.
 func KillClient(c *xgb.XConn, Resource uint32) error {
-	var op uint8
-	return c.SendRecv(killClientRequest(op, Resource), nil)
+	return c.SendRecv(killClientRequest(Resource), nil)
 }
 
 // KillClientUnchecked sends an unchecked request.
 func KillClientUnchecked(c *xgb.XConn, Resource uint32) error {
-	var op uint8
-	return c.Send(killClientRequest(op, Resource))
+	return c.Send(killClientRequest(Resource))
 }
 
 // Write request to wire for KillClient
 // killClientRequest writes a KillClient request to a byte slice.
-func killClientRequest(opcode uint8, Resource uint32) []byte {
-	size := 8
+func killClientRequest(Resource uint32) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -9913,15 +9795,13 @@ func killClientRequest(opcode uint8, Resource uint32) []byte {
 // ListExtensions sends a checked request.
 func ListExtensions(c *xgb.XConn) (ListExtensionsReply, error) {
 	var reply ListExtensionsReply
-	var op uint8
-	err := c.SendRecv(listExtensionsRequest(op), &reply)
+	err := c.SendRecv(listExtensionsRequest(), &reply)
 	return reply, err
 }
 
 // ListExtensionsUnchecked sends an unchecked request.
 func ListExtensionsUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(listExtensionsRequest(op))
+	return c.Send(listExtensionsRequest())
 }
 
 // ListExtensionsReply represents the data returned from a ListExtensions request.
@@ -9960,8 +9840,8 @@ func (v *ListExtensionsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListExtensions
 // listExtensionsRequest writes a ListExtensions request to a byte slice.
-func listExtensionsRequest(opcode uint8) []byte {
-	size := 4
+func listExtensionsRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -9978,15 +9858,13 @@ func listExtensionsRequest(opcode uint8) []byte {
 // ListFonts sends a checked request.
 func ListFonts(c *xgb.XConn, MaxNames uint16, PatternLen uint16, Pattern string) (ListFontsReply, error) {
 	var reply ListFontsReply
-	var op uint8
-	err := c.SendRecv(listFontsRequest(op, MaxNames, PatternLen, Pattern), &reply)
+	err := c.SendRecv(listFontsRequest(MaxNames, PatternLen, Pattern), &reply)
 	return reply, err
 }
 
 // ListFontsUnchecked sends an unchecked request.
 func ListFontsUnchecked(c *xgb.XConn, MaxNames uint16, PatternLen uint16, Pattern string) error {
-	var op uint8
-	return c.Send(listFontsRequest(op, MaxNames, PatternLen, Pattern))
+	return c.Send(listFontsRequest(MaxNames, PatternLen, Pattern))
 }
 
 // ListFontsReply represents the data returned from a ListFonts request.
@@ -10028,7 +9906,7 @@ func (v *ListFontsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListFonts
 // listFontsRequest writes a ListFonts request to a byte slice.
-func listFontsRequest(opcode uint8, MaxNames uint16, PatternLen uint16, Pattern string) []byte {
+func listFontsRequest(MaxNames uint16, PatternLen uint16, Pattern string) []byte {
 	size := internal.Pad4((8 + internal.Pad4((int(PatternLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10056,15 +9934,13 @@ func listFontsRequest(opcode uint8, MaxNames uint16, PatternLen uint16, Pattern 
 // ListFontsWithInfo sends a checked request.
 func ListFontsWithInfo(c *xgb.XConn, MaxNames uint16, PatternLen uint16, Pattern string) (ListFontsWithInfoReply, error) {
 	var reply ListFontsWithInfoReply
-	var op uint8
-	err := c.SendRecv(listFontsWithInfoRequest(op, MaxNames, PatternLen, Pattern), &reply)
+	err := c.SendRecv(listFontsWithInfoRequest(MaxNames, PatternLen, Pattern), &reply)
 	return reply, err
 }
 
 // ListFontsWithInfoUnchecked sends an unchecked request.
 func ListFontsWithInfoUnchecked(c *xgb.XConn, MaxNames uint16, PatternLen uint16, Pattern string) error {
-	var op uint8
-	return c.Send(listFontsWithInfoRequest(op, MaxNames, PatternLen, Pattern))
+	return c.Send(listFontsWithInfoRequest(MaxNames, PatternLen, Pattern))
 }
 
 // ListFontsWithInfoReply represents the data returned from a ListFontsWithInfo request.
@@ -10166,7 +10042,7 @@ func (v *ListFontsWithInfoReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListFontsWithInfo
 // listFontsWithInfoRequest writes a ListFontsWithInfo request to a byte slice.
-func listFontsWithInfoRequest(opcode uint8, MaxNames uint16, PatternLen uint16, Pattern string) []byte {
+func listFontsWithInfoRequest(MaxNames uint16, PatternLen uint16, Pattern string) []byte {
 	size := internal.Pad4((8 + internal.Pad4((int(PatternLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10194,15 +10070,13 @@ func listFontsWithInfoRequest(opcode uint8, MaxNames uint16, PatternLen uint16, 
 // ListHosts sends a checked request.
 func ListHosts(c *xgb.XConn) (ListHostsReply, error) {
 	var reply ListHostsReply
-	var op uint8
-	err := c.SendRecv(listHostsRequest(op), &reply)
+	err := c.SendRecv(listHostsRequest(), &reply)
 	return reply, err
 }
 
 // ListHostsUnchecked sends an unchecked request.
 func ListHostsUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(listHostsRequest(op))
+	return c.Send(listHostsRequest())
 }
 
 // ListHostsReply represents the data returned from a ListHosts request.
@@ -10245,8 +10119,8 @@ func (v *ListHostsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListHosts
 // listHostsRequest writes a ListHosts request to a byte slice.
-func listHostsRequest(opcode uint8) []byte {
-	size := 4
+func listHostsRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -10263,15 +10137,13 @@ func listHostsRequest(opcode uint8) []byte {
 // ListInstalledColormaps sends a checked request.
 func ListInstalledColormaps(c *xgb.XConn, Window Window) (ListInstalledColormapsReply, error) {
 	var reply ListInstalledColormapsReply
-	var op uint8
-	err := c.SendRecv(listInstalledColormapsRequest(op, Window), &reply)
+	err := c.SendRecv(listInstalledColormapsRequest(Window), &reply)
 	return reply, err
 }
 
 // ListInstalledColormapsUnchecked sends an unchecked request.
 func ListInstalledColormapsUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(listInstalledColormapsRequest(op, Window))
+	return c.Send(listInstalledColormapsRequest(Window))
 }
 
 // ListInstalledColormapsReply represents the data returned from a ListInstalledColormaps request.
@@ -10316,8 +10188,8 @@ func (v *ListInstalledColormapsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListInstalledColormaps
 // listInstalledColormapsRequest writes a ListInstalledColormaps request to a byte slice.
-func listInstalledColormapsRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func listInstalledColormapsRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -10338,15 +10210,13 @@ func listInstalledColormapsRequest(opcode uint8, Window Window) []byte {
 // ListProperties sends a checked request.
 func ListProperties(c *xgb.XConn, Window Window) (ListPropertiesReply, error) {
 	var reply ListPropertiesReply
-	var op uint8
-	err := c.SendRecv(listPropertiesRequest(op, Window), &reply)
+	err := c.SendRecv(listPropertiesRequest(Window), &reply)
 	return reply, err
 }
 
 // ListPropertiesUnchecked sends an unchecked request.
 func ListPropertiesUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(listPropertiesRequest(op, Window))
+	return c.Send(listPropertiesRequest(Window))
 }
 
 // ListPropertiesReply represents the data returned from a ListProperties request.
@@ -10391,8 +10261,8 @@ func (v *ListPropertiesReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for ListProperties
 // listPropertiesRequest writes a ListProperties request to a byte slice.
-func listPropertiesRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func listPropertiesRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -10413,15 +10283,13 @@ func listPropertiesRequest(opcode uint8, Window Window) []byte {
 // LookupColor sends a checked request.
 func LookupColor(c *xgb.XConn, Cmap Colormap, NameLen uint16, Name string) (LookupColorReply, error) {
 	var reply LookupColorReply
-	var op uint8
-	err := c.SendRecv(lookupColorRequest(op, Cmap, NameLen, Name), &reply)
+	err := c.SendRecv(lookupColorRequest(Cmap, NameLen, Name), &reply)
 	return reply, err
 }
 
 // LookupColorUnchecked sends an unchecked request.
 func LookupColorUnchecked(c *xgb.XConn, Cmap Colormap, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(lookupColorRequest(op, Cmap, NameLen, Name))
+	return c.Send(lookupColorRequest(Cmap, NameLen, Name))
 }
 
 // LookupColorReply represents the data returned from a LookupColor request.
@@ -10439,7 +10307,8 @@ type LookupColorReply struct {
 
 // Unmarshal reads a byte slice into a LookupColorReply value.
 func (v *LookupColorReply) Unmarshal(buf []byte) error {
-	if size := 20; len(buf) < size {
+	const size = 20
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"LookupColorReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -10476,7 +10345,7 @@ func (v *LookupColorReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for LookupColor
 // lookupColorRequest writes a LookupColor request to a byte slice.
-func lookupColorRequest(opcode uint8, Cmap Colormap, NameLen uint16, Name string) []byte {
+func lookupColorRequest(Cmap Colormap, NameLen uint16, Name string) []byte {
 	size := internal.Pad4((12 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10505,20 +10374,18 @@ func lookupColorRequest(opcode uint8, Cmap Colormap, NameLen uint16, Name string
 
 // MapSubwindows sends a checked request.
 func MapSubwindows(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(mapSubwindowsRequest(op, Window), nil)
+	return c.SendRecv(mapSubwindowsRequest(Window), nil)
 }
 
 // MapSubwindowsUnchecked sends an unchecked request.
 func MapSubwindowsUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(mapSubwindowsRequest(op, Window))
+	return c.Send(mapSubwindowsRequest(Window))
 }
 
 // Write request to wire for MapSubwindows
 // mapSubwindowsRequest writes a MapSubwindows request to a byte slice.
-func mapSubwindowsRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func mapSubwindowsRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -10538,20 +10405,18 @@ func mapSubwindowsRequest(opcode uint8, Window Window) []byte {
 
 // MapWindow sends a checked request.
 func MapWindow(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(mapWindowRequest(op, Window), nil)
+	return c.SendRecv(mapWindowRequest(Window), nil)
 }
 
 // MapWindowUnchecked sends an unchecked request.
 func MapWindowUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(mapWindowRequest(op, Window))
+	return c.Send(mapWindowRequest(Window))
 }
 
 // Write request to wire for MapWindow
 // mapWindowRequest writes a MapWindow request to a byte slice.
-func mapWindowRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func mapWindowRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -10571,20 +10436,18 @@ func mapWindowRequest(opcode uint8, Window Window) []byte {
 
 // NoOperation sends a checked request.
 func NoOperation(c *xgb.XConn) error {
-	var op uint8
-	return c.SendRecv(noOperationRequest(op), nil)
+	return c.SendRecv(noOperationRequest(), nil)
 }
 
 // NoOperationUnchecked sends an unchecked request.
 func NoOperationUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(noOperationRequest(op))
+	return c.Send(noOperationRequest())
 }
 
 // Write request to wire for NoOperation
 // noOperationRequest writes a NoOperation request to a byte slice.
-func noOperationRequest(opcode uint8) []byte {
-	size := 4
+func noOperationRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -10600,19 +10463,17 @@ func noOperationRequest(opcode uint8) []byte {
 
 // OpenFont sends a checked request.
 func OpenFont(c *xgb.XConn, Fid Font, NameLen uint16, Name string) error {
-	var op uint8
-	return c.SendRecv(openFontRequest(op, Fid, NameLen, Name), nil)
+	return c.SendRecv(openFontRequest(Fid, NameLen, Name), nil)
 }
 
 // OpenFontUnchecked sends an unchecked request.
 func OpenFontUnchecked(c *xgb.XConn, Fid Font, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(openFontRequest(op, Fid, NameLen, Name))
+	return c.Send(openFontRequest(Fid, NameLen, Name))
 }
 
 // Write request to wire for OpenFont
 // openFontRequest writes a OpenFont request to a byte slice.
-func openFontRequest(opcode uint8, Fid Font, NameLen uint16, Name string) []byte {
+func openFontRequest(Fid Font, NameLen uint16, Name string) []byte {
 	size := internal.Pad4((12 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10641,19 +10502,17 @@ func openFontRequest(opcode uint8, Fid Font, NameLen uint16, Name string) []byte
 
 // PolyArc sends a checked request.
 func PolyArc(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Arcs []Arc) error {
-	var op uint8
-	return c.SendRecv(polyArcRequest(op, Drawable, Gc, Arcs), nil)
+	return c.SendRecv(polyArcRequest(Drawable, Gc, Arcs), nil)
 }
 
 // PolyArcUnchecked sends an unchecked request.
 func PolyArcUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Arcs []Arc) error {
-	var op uint8
-	return c.Send(polyArcRequest(op, Drawable, Gc, Arcs))
+	return c.Send(polyArcRequest(Drawable, Gc, Arcs))
 }
 
 // Write request to wire for PolyArc
 // polyArcRequest writes a PolyArc request to a byte slice.
-func polyArcRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Arcs []Arc) []byte {
+func polyArcRequest(Drawable Drawable, Gc Gcontext, Arcs []Arc) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Arcs) * 12))))
 	b := 0
 	buf := make([]byte, size)
@@ -10679,19 +10538,17 @@ func polyArcRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Arcs []Arc) []
 
 // PolyFillArc sends a checked request.
 func PolyFillArc(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Arcs []Arc) error {
-	var op uint8
-	return c.SendRecv(polyFillArcRequest(op, Drawable, Gc, Arcs), nil)
+	return c.SendRecv(polyFillArcRequest(Drawable, Gc, Arcs), nil)
 }
 
 // PolyFillArcUnchecked sends an unchecked request.
 func PolyFillArcUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Arcs []Arc) error {
-	var op uint8
-	return c.Send(polyFillArcRequest(op, Drawable, Gc, Arcs))
+	return c.Send(polyFillArcRequest(Drawable, Gc, Arcs))
 }
 
 // Write request to wire for PolyFillArc
 // polyFillArcRequest writes a PolyFillArc request to a byte slice.
-func polyFillArcRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Arcs []Arc) []byte {
+func polyFillArcRequest(Drawable Drawable, Gc Gcontext, Arcs []Arc) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Arcs) * 12))))
 	b := 0
 	buf := make([]byte, size)
@@ -10717,19 +10574,17 @@ func polyFillArcRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Arcs []Arc
 
 // PolyFillRectangle sends a checked request.
 func PolyFillRectangle(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) error {
-	var op uint8
-	return c.SendRecv(polyFillRectangleRequest(op, Drawable, Gc, Rectangles), nil)
+	return c.SendRecv(polyFillRectangleRequest(Drawable, Gc, Rectangles), nil)
 }
 
 // PolyFillRectangleUnchecked sends an unchecked request.
 func PolyFillRectangleUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) error {
-	var op uint8
-	return c.Send(polyFillRectangleRequest(op, Drawable, Gc, Rectangles))
+	return c.Send(polyFillRectangleRequest(Drawable, Gc, Rectangles))
 }
 
 // Write request to wire for PolyFillRectangle
 // polyFillRectangleRequest writes a PolyFillRectangle request to a byte slice.
-func polyFillRectangleRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) []byte {
+func polyFillRectangleRequest(Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Rectangles) * 8))))
 	b := 0
 	buf := make([]byte, size)
@@ -10755,19 +10610,17 @@ func polyFillRectangleRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Rect
 
 // PolyLine sends a checked request.
 func PolyLine(c *xgb.XConn, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) error {
-	var op uint8
-	return c.SendRecv(polyLineRequest(op, CoordinateMode, Drawable, Gc, Points), nil)
+	return c.SendRecv(polyLineRequest(CoordinateMode, Drawable, Gc, Points), nil)
 }
 
 // PolyLineUnchecked sends an unchecked request.
 func PolyLineUnchecked(c *xgb.XConn, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) error {
-	var op uint8
-	return c.Send(polyLineRequest(op, CoordinateMode, Drawable, Gc, Points))
+	return c.Send(polyLineRequest(CoordinateMode, Drawable, Gc, Points))
 }
 
 // Write request to wire for PolyLine
 // polyLineRequest writes a PolyLine request to a byte slice.
-func polyLineRequest(opcode uint8, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) []byte {
+func polyLineRequest(CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Points) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -10794,19 +10647,17 @@ func polyLineRequest(opcode uint8, CoordinateMode byte, Drawable Drawable, Gc Gc
 
 // PolyPoint sends a checked request.
 func PolyPoint(c *xgb.XConn, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) error {
-	var op uint8
-	return c.SendRecv(polyPointRequest(op, CoordinateMode, Drawable, Gc, Points), nil)
+	return c.SendRecv(polyPointRequest(CoordinateMode, Drawable, Gc, Points), nil)
 }
 
 // PolyPointUnchecked sends an unchecked request.
 func PolyPointUnchecked(c *xgb.XConn, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) error {
-	var op uint8
-	return c.Send(polyPointRequest(op, CoordinateMode, Drawable, Gc, Points))
+	return c.Send(polyPointRequest(CoordinateMode, Drawable, Gc, Points))
 }
 
 // Write request to wire for PolyPoint
 // polyPointRequest writes a PolyPoint request to a byte slice.
-func polyPointRequest(opcode uint8, CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) []byte {
+func polyPointRequest(CoordinateMode byte, Drawable Drawable, Gc Gcontext, Points []Point) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Points) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -10833,19 +10684,17 @@ func polyPointRequest(opcode uint8, CoordinateMode byte, Drawable Drawable, Gc G
 
 // PolyRectangle sends a checked request.
 func PolyRectangle(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) error {
-	var op uint8
-	return c.SendRecv(polyRectangleRequest(op, Drawable, Gc, Rectangles), nil)
+	return c.SendRecv(polyRectangleRequest(Drawable, Gc, Rectangles), nil)
 }
 
 // PolyRectangleUnchecked sends an unchecked request.
 func PolyRectangleUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) error {
-	var op uint8
-	return c.Send(polyRectangleRequest(op, Drawable, Gc, Rectangles))
+	return c.Send(polyRectangleRequest(Drawable, Gc, Rectangles))
 }
 
 // Write request to wire for PolyRectangle
 // polyRectangleRequest writes a PolyRectangle request to a byte slice.
-func polyRectangleRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) []byte {
+func polyRectangleRequest(Drawable Drawable, Gc Gcontext, Rectangles []Rectangle) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Rectangles) * 8))))
 	b := 0
 	buf := make([]byte, size)
@@ -10871,19 +10720,17 @@ func polyRectangleRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Rectangl
 
 // PolySegment sends a checked request.
 func PolySegment(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Segments []Segment) error {
-	var op uint8
-	return c.SendRecv(polySegmentRequest(op, Drawable, Gc, Segments), nil)
+	return c.SendRecv(polySegmentRequest(Drawable, Gc, Segments), nil)
 }
 
 // PolySegmentUnchecked sends an unchecked request.
 func PolySegmentUnchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, Segments []Segment) error {
-	var op uint8
-	return c.Send(polySegmentRequest(op, Drawable, Gc, Segments))
+	return c.Send(polySegmentRequest(Drawable, Gc, Segments))
 }
 
 // Write request to wire for PolySegment
 // polySegmentRequest writes a PolySegment request to a byte slice.
-func polySegmentRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Segments []Segment) []byte {
+func polySegmentRequest(Drawable Drawable, Gc Gcontext, Segments []Segment) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Segments) * 8))))
 	b := 0
 	buf := make([]byte, size)
@@ -10909,19 +10756,17 @@ func polySegmentRequest(opcode uint8, Drawable Drawable, Gc Gcontext, Segments [
 
 // PolyText16 sends a checked request.
 func PolyText16(c *xgb.XConn, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) error {
-	var op uint8
-	return c.SendRecv(polyText16Request(op, Drawable, Gc, X, Y, Items), nil)
+	return c.SendRecv(polyText16Request(Drawable, Gc, X, Y, Items), nil)
 }
 
 // PolyText16Unchecked sends an unchecked request.
 func PolyText16Unchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) error {
-	var op uint8
-	return c.Send(polyText16Request(op, Drawable, Gc, X, Y, Items))
+	return c.Send(polyText16Request(Drawable, Gc, X, Y, Items))
 }
 
 // Write request to wire for PolyText16
 // polyText16Request writes a PolyText16 request to a byte slice.
-func polyText16Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) []byte {
+func polyText16Request(Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) []byte {
 	size := internal.Pad4((16 + internal.Pad4((len(Items) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10946,7 +10791,7 @@ func polyText16Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y 
 	binary.LittleEndian.PutUint16(buf[b:], uint16(Y))
 	b += 2
 
-	copy(buf[b:], Items[:len(Items)])
+	copy(buf[b:], Items[:])
 	b += int(len(Items))
 
 	return buf
@@ -10954,19 +10799,17 @@ func polyText16Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y 
 
 // PolyText8 sends a checked request.
 func PolyText8(c *xgb.XConn, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) error {
-	var op uint8
-	return c.SendRecv(polyText8Request(op, Drawable, Gc, X, Y, Items), nil)
+	return c.SendRecv(polyText8Request(Drawable, Gc, X, Y, Items), nil)
 }
 
 // PolyText8Unchecked sends an unchecked request.
 func PolyText8Unchecked(c *xgb.XConn, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) error {
-	var op uint8
-	return c.Send(polyText8Request(op, Drawable, Gc, X, Y, Items))
+	return c.Send(polyText8Request(Drawable, Gc, X, Y, Items))
 }
 
 // Write request to wire for PolyText8
 // polyText8Request writes a PolyText8 request to a byte slice.
-func polyText8Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) []byte {
+func polyText8Request(Drawable Drawable, Gc Gcontext, X int16, Y int16, Items []byte) []byte {
 	size := internal.Pad4((16 + internal.Pad4((len(Items) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -10991,7 +10834,7 @@ func polyText8Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y i
 	binary.LittleEndian.PutUint16(buf[b:], uint16(Y))
 	b += 2
 
-	copy(buf[b:], Items[:len(Items)])
+	copy(buf[b:], Items[:])
 	b += int(len(Items))
 
 	return buf
@@ -10999,19 +10842,17 @@ func polyText8Request(opcode uint8, Drawable Drawable, Gc Gcontext, X int16, Y i
 
 // PutImage sends a checked request.
 func PutImage(c *xgb.XConn, Format byte, Drawable Drawable, Gc Gcontext, Width uint16, Height uint16, DstX int16, DstY int16, LeftPad byte, Depth byte, Data []byte) error {
-	var op uint8
-	return c.SendRecv(putImageRequest(op, Format, Drawable, Gc, Width, Height, DstX, DstY, LeftPad, Depth, Data), nil)
+	return c.SendRecv(putImageRequest(Format, Drawable, Gc, Width, Height, DstX, DstY, LeftPad, Depth, Data), nil)
 }
 
 // PutImageUnchecked sends an unchecked request.
 func PutImageUnchecked(c *xgb.XConn, Format byte, Drawable Drawable, Gc Gcontext, Width uint16, Height uint16, DstX int16, DstY int16, LeftPad byte, Depth byte, Data []byte) error {
-	var op uint8
-	return c.Send(putImageRequest(op, Format, Drawable, Gc, Width, Height, DstX, DstY, LeftPad, Depth, Data))
+	return c.Send(putImageRequest(Format, Drawable, Gc, Width, Height, DstX, DstY, LeftPad, Depth, Data))
 }
 
 // Write request to wire for PutImage
 // putImageRequest writes a PutImage request to a byte slice.
-func putImageRequest(opcode uint8, Format byte, Drawable Drawable, Gc Gcontext, Width uint16, Height uint16, DstX int16, DstY int16, LeftPad byte, Depth byte, Data []byte) []byte {
+func putImageRequest(Format byte, Drawable Drawable, Gc Gcontext, Width uint16, Height uint16, DstX int16, DstY int16, LeftPad byte, Depth byte, Data []byte) []byte {
 	size := internal.Pad4((24 + internal.Pad4((len(Data) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -11051,7 +10892,7 @@ func putImageRequest(opcode uint8, Format byte, Drawable Drawable, Gc Gcontext, 
 
 	b += 2 // padding
 
-	copy(buf[b:], Data[:len(Data)])
+	copy(buf[b:], Data[:])
 	b += int(len(Data))
 
 	return buf
@@ -11060,15 +10901,13 @@ func putImageRequest(opcode uint8, Format byte, Drawable Drawable, Gc Gcontext, 
 // QueryBestSize sends a checked request.
 func QueryBestSize(c *xgb.XConn, Class byte, Drawable Drawable, Width uint16, Height uint16) (QueryBestSizeReply, error) {
 	var reply QueryBestSizeReply
-	var op uint8
-	err := c.SendRecv(queryBestSizeRequest(op, Class, Drawable, Width, Height), &reply)
+	err := c.SendRecv(queryBestSizeRequest(Class, Drawable, Width, Height), &reply)
 	return reply, err
 }
 
 // QueryBestSizeUnchecked sends an unchecked request.
 func QueryBestSizeUnchecked(c *xgb.XConn, Class byte, Drawable Drawable, Width uint16, Height uint16) error {
-	var op uint8
-	return c.Send(queryBestSizeRequest(op, Class, Drawable, Width, Height))
+	return c.Send(queryBestSizeRequest(Class, Drawable, Width, Height))
 }
 
 // QueryBestSizeReply represents the data returned from a QueryBestSize request.
@@ -11082,7 +10921,8 @@ type QueryBestSizeReply struct {
 
 // Unmarshal reads a byte slice into a QueryBestSizeReply value.
 func (v *QueryBestSizeReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryBestSizeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -11107,8 +10947,8 @@ func (v *QueryBestSizeReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryBestSize
 // queryBestSizeRequest writes a QueryBestSize request to a byte slice.
-func queryBestSizeRequest(opcode uint8, Class byte, Drawable Drawable, Width uint16, Height uint16) []byte {
-	size := 12
+func queryBestSizeRequest(Class byte, Drawable Drawable, Width uint16, Height uint16) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -11136,15 +10976,13 @@ func queryBestSizeRequest(opcode uint8, Class byte, Drawable Drawable, Width uin
 // QueryColors sends a checked request.
 func QueryColors(c *xgb.XConn, Cmap Colormap, Pixels []uint32) (QueryColorsReply, error) {
 	var reply QueryColorsReply
-	var op uint8
-	err := c.SendRecv(queryColorsRequest(op, Cmap, Pixels), &reply)
+	err := c.SendRecv(queryColorsRequest(Cmap, Pixels), &reply)
 	return reply, err
 }
 
 // QueryColorsUnchecked sends an unchecked request.
 func QueryColorsUnchecked(c *xgb.XConn, Cmap Colormap, Pixels []uint32) error {
-	var op uint8
-	return c.Send(queryColorsRequest(op, Cmap, Pixels))
+	return c.Send(queryColorsRequest(Cmap, Pixels))
 }
 
 // QueryColorsReply represents the data returned from a QueryColors request.
@@ -11186,7 +11024,7 @@ func (v *QueryColorsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryColors
 // queryColorsRequest writes a QueryColors request to a byte slice.
-func queryColorsRequest(opcode uint8, Cmap Colormap, Pixels []uint32) []byte {
+func queryColorsRequest(Cmap Colormap, Pixels []uint32) []byte {
 	size := internal.Pad4((8 + internal.Pad4((len(Pixels) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -11213,15 +11051,13 @@ func queryColorsRequest(opcode uint8, Cmap Colormap, Pixels []uint32) []byte {
 // QueryExtension sends a checked request.
 func QueryExtension(c *xgb.XConn, NameLen uint16, Name string) (QueryExtensionReply, error) {
 	var reply QueryExtensionReply
-	var op uint8
-	err := c.SendRecv(queryExtensionRequest(op, NameLen, Name), &reply)
+	err := c.SendRecv(queryExtensionRequest(NameLen, Name), &reply)
 	return reply, err
 }
 
 // QueryExtensionUnchecked sends an unchecked request.
 func QueryExtensionUnchecked(c *xgb.XConn, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(queryExtensionRequest(op, NameLen, Name))
+	return c.Send(queryExtensionRequest(NameLen, Name))
 }
 
 // QueryExtensionReply represents the data returned from a QueryExtension request.
@@ -11237,7 +11073,8 @@ type QueryExtensionReply struct {
 
 // Unmarshal reads a byte slice into a QueryExtensionReply value.
 func (v *QueryExtensionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryExtensionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -11268,7 +11105,7 @@ func (v *QueryExtensionReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryExtension
 // queryExtensionRequest writes a QueryExtension request to a byte slice.
-func queryExtensionRequest(opcode uint8, NameLen uint16, Name string) []byte {
+func queryExtensionRequest(NameLen uint16, Name string) []byte {
 	size := internal.Pad4((8 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -11295,15 +11132,13 @@ func queryExtensionRequest(opcode uint8, NameLen uint16, Name string) []byte {
 // QueryFont sends a checked request.
 func QueryFont(c *xgb.XConn, Font Fontable) (QueryFontReply, error) {
 	var reply QueryFontReply
-	var op uint8
-	err := c.SendRecv(queryFontRequest(op, Font), &reply)
+	err := c.SendRecv(queryFontRequest(Font), &reply)
 	return reply, err
 }
 
 // QueryFontUnchecked sends an unchecked request.
 func QueryFontUnchecked(c *xgb.XConn, Font Fontable) error {
-	var op uint8
-	return c.Send(queryFontRequest(op, Font))
+	return c.Send(queryFontRequest(Font))
 }
 
 // QueryFontReply represents the data returned from a QueryFont request.
@@ -11403,8 +11238,8 @@ func (v *QueryFontReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryFont
 // queryFontRequest writes a QueryFont request to a byte slice.
-func queryFontRequest(opcode uint8, Font Fontable) []byte {
-	size := 8
+func queryFontRequest(Font Fontable) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -11425,15 +11260,13 @@ func queryFontRequest(opcode uint8, Font Fontable) []byte {
 // QueryKeymap sends a checked request.
 func QueryKeymap(c *xgb.XConn) (QueryKeymapReply, error) {
 	var reply QueryKeymapReply
-	var op uint8
-	err := c.SendRecv(queryKeymapRequest(op), &reply)
+	err := c.SendRecv(queryKeymapRequest(), &reply)
 	return reply, err
 }
 
 // QueryKeymapUnchecked sends an unchecked request.
 func QueryKeymapUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(queryKeymapRequest(op))
+	return c.Send(queryKeymapRequest())
 }
 
 // QueryKeymapReply represents the data returned from a QueryKeymap request.
@@ -11446,7 +11279,8 @@ type QueryKeymapReply struct {
 
 // Unmarshal reads a byte slice into a QueryKeymapReply value.
 func (v *QueryKeymapReply) Unmarshal(buf []byte) error {
-	if size := 40; len(buf) < size {
+	const size = 40
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryKeymapReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -11469,8 +11303,8 @@ func (v *QueryKeymapReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryKeymap
 // queryKeymapRequest writes a QueryKeymap request to a byte slice.
-func queryKeymapRequest(opcode uint8) []byte {
-	size := 4
+func queryKeymapRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -11487,15 +11321,13 @@ func queryKeymapRequest(opcode uint8) []byte {
 // QueryPointer sends a checked request.
 func QueryPointer(c *xgb.XConn, Window Window) (QueryPointerReply, error) {
 	var reply QueryPointerReply
-	var op uint8
-	err := c.SendRecv(queryPointerRequest(op, Window), &reply)
+	err := c.SendRecv(queryPointerRequest(Window), &reply)
 	return reply, err
 }
 
 // QueryPointerUnchecked sends an unchecked request.
 func QueryPointerUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(queryPointerRequest(op, Window))
+	return c.Send(queryPointerRequest(Window))
 }
 
 // QueryPointerReply represents the data returned from a QueryPointer request.
@@ -11515,7 +11347,8 @@ type QueryPointerReply struct {
 
 // Unmarshal reads a byte slice into a QueryPointerReply value.
 func (v *QueryPointerReply) Unmarshal(buf []byte) error {
-	if size := 28; len(buf) < size {
+	const size = 28
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryPointerReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -11558,8 +11391,8 @@ func (v *QueryPointerReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryPointer
 // queryPointerRequest writes a QueryPointer request to a byte slice.
-func queryPointerRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func queryPointerRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -11580,15 +11413,13 @@ func queryPointerRequest(opcode uint8, Window Window) []byte {
 // QueryTextExtents sends a checked request.
 func QueryTextExtents(c *xgb.XConn, Font Fontable, String []Char2b, StringLen uint16) (QueryTextExtentsReply, error) {
 	var reply QueryTextExtentsReply
-	var op uint8
-	err := c.SendRecv(queryTextExtentsRequest(op, Font, String, StringLen), &reply)
+	err := c.SendRecv(queryTextExtentsRequest(Font, String, StringLen), &reply)
 	return reply, err
 }
 
 // QueryTextExtentsUnchecked sends an unchecked request.
 func QueryTextExtentsUnchecked(c *xgb.XConn, Font Fontable, String []Char2b, StringLen uint16) error {
-	var op uint8
-	return c.Send(queryTextExtentsRequest(op, Font, String, StringLen))
+	return c.Send(queryTextExtentsRequest(Font, String, StringLen))
 }
 
 // QueryTextExtentsReply represents the data returned from a QueryTextExtents request.
@@ -11607,7 +11438,8 @@ type QueryTextExtentsReply struct {
 
 // Unmarshal reads a byte slice into a QueryTextExtentsReply value.
 func (v *QueryTextExtentsReply) Unmarshal(buf []byte) error {
-	if size := 28; len(buf) < size {
+	const size = 28
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryTextExtentsReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -11648,7 +11480,7 @@ func (v *QueryTextExtentsReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryTextExtents
 // queryTextExtentsRequest writes a QueryTextExtents request to a byte slice.
-func queryTextExtentsRequest(opcode uint8, Font Fontable, String []Char2b, StringLen uint16) []byte {
+func queryTextExtentsRequest(Font Fontable, String []Char2b, StringLen uint16) []byte {
 	size := internal.Pad4((8 + internal.Pad4((len(String) * 2))))
 	b := 0
 	buf := make([]byte, size)
@@ -11675,15 +11507,13 @@ func queryTextExtentsRequest(opcode uint8, Font Fontable, String []Char2b, Strin
 // QueryTree sends a checked request.
 func QueryTree(c *xgb.XConn, Window Window) (QueryTreeReply, error) {
 	var reply QueryTreeReply
-	var op uint8
-	err := c.SendRecv(queryTreeRequest(op, Window), &reply)
+	err := c.SendRecv(queryTreeRequest(Window), &reply)
 	return reply, err
 }
 
 // QueryTreeUnchecked sends an unchecked request.
 func QueryTreeUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(queryTreeRequest(op, Window))
+	return c.Send(queryTreeRequest(Window))
 }
 
 // QueryTreeReply represents the data returned from a QueryTree request.
@@ -11736,8 +11566,8 @@ func (v *QueryTreeReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for QueryTree
 // queryTreeRequest writes a QueryTree request to a byte slice.
-func queryTreeRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func queryTreeRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -11757,20 +11587,18 @@ func queryTreeRequest(opcode uint8, Window Window) []byte {
 
 // RecolorCursor sends a checked request.
 func RecolorCursor(c *xgb.XConn, Cursor Cursor, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) error {
-	var op uint8
-	return c.SendRecv(recolorCursorRequest(op, Cursor, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue), nil)
+	return c.SendRecv(recolorCursorRequest(Cursor, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue), nil)
 }
 
 // RecolorCursorUnchecked sends an unchecked request.
 func RecolorCursorUnchecked(c *xgb.XConn, Cursor Cursor, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) error {
-	var op uint8
-	return c.Send(recolorCursorRequest(op, Cursor, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue))
+	return c.Send(recolorCursorRequest(Cursor, ForeRed, ForeGreen, ForeBlue, BackRed, BackGreen, BackBlue))
 }
 
 // Write request to wire for RecolorCursor
 // recolorCursorRequest writes a RecolorCursor request to a byte slice.
-func recolorCursorRequest(opcode uint8, Cursor Cursor, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) []byte {
-	size := 20
+func recolorCursorRequest(Cursor Cursor, ForeRed uint16, ForeGreen uint16, ForeBlue uint16, BackRed uint16, BackGreen uint16, BackBlue uint16) []byte {
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -11808,20 +11636,18 @@ func recolorCursorRequest(opcode uint8, Cursor Cursor, ForeRed uint16, ForeGreen
 
 // ReparentWindow sends a checked request.
 func ReparentWindow(c *xgb.XConn, Window Window, Parent Window, X int16, Y int16) error {
-	var op uint8
-	return c.SendRecv(reparentWindowRequest(op, Window, Parent, X, Y), nil)
+	return c.SendRecv(reparentWindowRequest(Window, Parent, X, Y), nil)
 }
 
 // ReparentWindowUnchecked sends an unchecked request.
 func ReparentWindowUnchecked(c *xgb.XConn, Window Window, Parent Window, X int16, Y int16) error {
-	var op uint8
-	return c.Send(reparentWindowRequest(op, Window, Parent, X, Y))
+	return c.Send(reparentWindowRequest(Window, Parent, X, Y))
 }
 
 // Write request to wire for ReparentWindow
 // reparentWindowRequest writes a ReparentWindow request to a byte slice.
-func reparentWindowRequest(opcode uint8, Window Window, Parent Window, X int16, Y int16) []byte {
-	size := 16
+func reparentWindowRequest(Window Window, Parent Window, X int16, Y int16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -11850,19 +11676,17 @@ func reparentWindowRequest(opcode uint8, Window Window, Parent Window, X int16, 
 
 // RotateProperties sends a checked request.
 func RotateProperties(c *xgb.XConn, Window Window, AtomsLen uint16, Delta int16, Atoms []Atom) error {
-	var op uint8
-	return c.SendRecv(rotatePropertiesRequest(op, Window, AtomsLen, Delta, Atoms), nil)
+	return c.SendRecv(rotatePropertiesRequest(Window, AtomsLen, Delta, Atoms), nil)
 }
 
 // RotatePropertiesUnchecked sends an unchecked request.
 func RotatePropertiesUnchecked(c *xgb.XConn, Window Window, AtomsLen uint16, Delta int16, Atoms []Atom) error {
-	var op uint8
-	return c.Send(rotatePropertiesRequest(op, Window, AtomsLen, Delta, Atoms))
+	return c.Send(rotatePropertiesRequest(Window, AtomsLen, Delta, Atoms))
 }
 
 // Write request to wire for RotateProperties
 // rotatePropertiesRequest writes a RotateProperties request to a byte slice.
-func rotatePropertiesRequest(opcode uint8, Window Window, AtomsLen uint16, Delta int16, Atoms []Atom) []byte {
+func rotatePropertiesRequest(Window Window, AtomsLen uint16, Delta int16, Atoms []Atom) []byte {
 	size := internal.Pad4((12 + internal.Pad4((int(AtomsLen) * 4))))
 	b := 0
 	buf := make([]byte, size)
@@ -11894,20 +11718,18 @@ func rotatePropertiesRequest(opcode uint8, Window Window, AtomsLen uint16, Delta
 
 // SendEvent sends a checked request.
 func SendEvent(c *xgb.XConn, Propagate bool, Destination Window, EventMask uint32, Event string) error {
-	var op uint8
-	return c.SendRecv(sendEventRequest(op, Propagate, Destination, EventMask, Event), nil)
+	return c.SendRecv(sendEventRequest(Propagate, Destination, EventMask, Event), nil)
 }
 
 // SendEventUnchecked sends an unchecked request.
 func SendEventUnchecked(c *xgb.XConn, Propagate bool, Destination Window, EventMask uint32, Event string) error {
-	var op uint8
-	return c.Send(sendEventRequest(op, Propagate, Destination, EventMask, Event))
+	return c.Send(sendEventRequest(Propagate, Destination, EventMask, Event))
 }
 
 // Write request to wire for SendEvent
 // sendEventRequest writes a SendEvent request to a byte slice.
-func sendEventRequest(opcode uint8, Propagate bool, Destination Window, EventMask uint32, Event string) []byte {
-	size := 44
+func sendEventRequest(Propagate bool, Destination Window, EventMask uint32, Event string) []byte {
+	const size = 44
 	b := 0
 	buf := make([]byte, size)
 
@@ -11938,20 +11760,18 @@ func sendEventRequest(opcode uint8, Propagate bool, Destination Window, EventMas
 
 // SetAccessControl sends a checked request.
 func SetAccessControl(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.SendRecv(setAccessControlRequest(op, Mode), nil)
+	return c.SendRecv(setAccessControlRequest(Mode), nil)
 }
 
 // SetAccessControlUnchecked sends an unchecked request.
 func SetAccessControlUnchecked(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.Send(setAccessControlRequest(op, Mode))
+	return c.Send(setAccessControlRequest(Mode))
 }
 
 // Write request to wire for SetAccessControl
 // setAccessControlRequest writes a SetAccessControl request to a byte slice.
-func setAccessControlRequest(opcode uint8, Mode byte) []byte {
-	size := 4
+func setAccessControlRequest(Mode byte) []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -11969,19 +11789,17 @@ func setAccessControlRequest(opcode uint8, Mode byte) []byte {
 
 // SetClipRectangles sends a checked request.
 func SetClipRectangles(c *xgb.XConn, Ordering byte, Gc Gcontext, ClipXOrigin int16, ClipYOrigin int16, Rectangles []Rectangle) error {
-	var op uint8
-	return c.SendRecv(setClipRectanglesRequest(op, Ordering, Gc, ClipXOrigin, ClipYOrigin, Rectangles), nil)
+	return c.SendRecv(setClipRectanglesRequest(Ordering, Gc, ClipXOrigin, ClipYOrigin, Rectangles), nil)
 }
 
 // SetClipRectanglesUnchecked sends an unchecked request.
 func SetClipRectanglesUnchecked(c *xgb.XConn, Ordering byte, Gc Gcontext, ClipXOrigin int16, ClipYOrigin int16, Rectangles []Rectangle) error {
-	var op uint8
-	return c.Send(setClipRectanglesRequest(op, Ordering, Gc, ClipXOrigin, ClipYOrigin, Rectangles))
+	return c.Send(setClipRectanglesRequest(Ordering, Gc, ClipXOrigin, ClipYOrigin, Rectangles))
 }
 
 // Write request to wire for SetClipRectangles
 // setClipRectanglesRequest writes a SetClipRectangles request to a byte slice.
-func setClipRectanglesRequest(opcode uint8, Ordering byte, Gc Gcontext, ClipXOrigin int16, ClipYOrigin int16, Rectangles []Rectangle) []byte {
+func setClipRectanglesRequest(Ordering byte, Gc Gcontext, ClipXOrigin int16, ClipYOrigin int16, Rectangles []Rectangle) []byte {
 	size := internal.Pad4((12 + internal.Pad4((len(Rectangles) * 8))))
 	b := 0
 	buf := make([]byte, size)
@@ -12011,20 +11829,18 @@ func setClipRectanglesRequest(opcode uint8, Ordering byte, Gc Gcontext, ClipXOri
 
 // SetCloseDownMode sends a checked request.
 func SetCloseDownMode(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.SendRecv(setCloseDownModeRequest(op, Mode), nil)
+	return c.SendRecv(setCloseDownModeRequest(Mode), nil)
 }
 
 // SetCloseDownModeUnchecked sends an unchecked request.
 func SetCloseDownModeUnchecked(c *xgb.XConn, Mode byte) error {
-	var op uint8
-	return c.Send(setCloseDownModeRequest(op, Mode))
+	return c.Send(setCloseDownModeRequest(Mode))
 }
 
 // Write request to wire for SetCloseDownMode
 // setCloseDownModeRequest writes a SetCloseDownMode request to a byte slice.
-func setCloseDownModeRequest(opcode uint8, Mode byte) []byte {
-	size := 4
+func setCloseDownModeRequest(Mode byte) []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -12042,19 +11858,17 @@ func setCloseDownModeRequest(opcode uint8, Mode byte) []byte {
 
 // SetDashes sends a checked request.
 func SetDashes(c *xgb.XConn, Gc Gcontext, DashOffset uint16, DashesLen uint16, Dashes []byte) error {
-	var op uint8
-	return c.SendRecv(setDashesRequest(op, Gc, DashOffset, DashesLen, Dashes), nil)
+	return c.SendRecv(setDashesRequest(Gc, DashOffset, DashesLen, Dashes), nil)
 }
 
 // SetDashesUnchecked sends an unchecked request.
 func SetDashesUnchecked(c *xgb.XConn, Gc Gcontext, DashOffset uint16, DashesLen uint16, Dashes []byte) error {
-	var op uint8
-	return c.Send(setDashesRequest(op, Gc, DashOffset, DashesLen, Dashes))
+	return c.Send(setDashesRequest(Gc, DashOffset, DashesLen, Dashes))
 }
 
 // Write request to wire for SetDashes
 // setDashesRequest writes a SetDashes request to a byte slice.
-func setDashesRequest(opcode uint8, Gc Gcontext, DashOffset uint16, DashesLen uint16, Dashes []byte) []byte {
+func setDashesRequest(Gc Gcontext, DashOffset uint16, DashesLen uint16, Dashes []byte) []byte {
 	size := internal.Pad4((12 + internal.Pad4((int(DashesLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -12084,19 +11898,17 @@ func setDashesRequest(opcode uint8, Gc Gcontext, DashOffset uint16, DashesLen ui
 
 // SetFontPath sends a checked request.
 func SetFontPath(c *xgb.XConn, FontQty uint16, Font []Str) error {
-	var op uint8
-	return c.SendRecv(setFontPathRequest(op, FontQty, Font), nil)
+	return c.SendRecv(setFontPathRequest(FontQty, Font), nil)
 }
 
 // SetFontPathUnchecked sends an unchecked request.
 func SetFontPathUnchecked(c *xgb.XConn, FontQty uint16, Font []Str) error {
-	var op uint8
-	return c.Send(setFontPathRequest(op, FontQty, Font))
+	return c.Send(setFontPathRequest(FontQty, Font))
 }
 
 // Write request to wire for SetFontPath
 // setFontPathRequest writes a SetFontPath request to a byte slice.
-func setFontPathRequest(opcode uint8, FontQty uint16, Font []Str) []byte {
+func setFontPathRequest(FontQty uint16, Font []Str) []byte {
 	size := internal.Pad4((8 + StrListSize(Font)))
 	b := 0
 	buf := make([]byte, size)
@@ -12121,20 +11933,18 @@ func setFontPathRequest(opcode uint8, FontQty uint16, Font []Str) []byte {
 
 // SetInputFocus sends a checked request.
 func SetInputFocus(c *xgb.XConn, RevertTo byte, Focus Window, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(setInputFocusRequest(op, RevertTo, Focus, Time), nil)
+	return c.SendRecv(setInputFocusRequest(RevertTo, Focus, Time), nil)
 }
 
 // SetInputFocusUnchecked sends an unchecked request.
 func SetInputFocusUnchecked(c *xgb.XConn, RevertTo byte, Focus Window, Time Timestamp) error {
-	var op uint8
-	return c.Send(setInputFocusRequest(op, RevertTo, Focus, Time))
+	return c.Send(setInputFocusRequest(RevertTo, Focus, Time))
 }
 
 // Write request to wire for SetInputFocus
 // setInputFocusRequest writes a SetInputFocus request to a byte slice.
-func setInputFocusRequest(opcode uint8, RevertTo byte, Focus Window, Time Timestamp) []byte {
-	size := 12
+func setInputFocusRequest(RevertTo byte, Focus Window, Time Timestamp) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -12159,15 +11969,13 @@ func setInputFocusRequest(opcode uint8, RevertTo byte, Focus Window, Time Timest
 // SetModifierMapping sends a checked request.
 func SetModifierMapping(c *xgb.XConn, KeycodesPerModifier byte, Keycodes []Keycode) (SetModifierMappingReply, error) {
 	var reply SetModifierMappingReply
-	var op uint8
-	err := c.SendRecv(setModifierMappingRequest(op, KeycodesPerModifier, Keycodes), &reply)
+	err := c.SendRecv(setModifierMappingRequest(KeycodesPerModifier, Keycodes), &reply)
 	return reply, err
 }
 
 // SetModifierMappingUnchecked sends an unchecked request.
 func SetModifierMappingUnchecked(c *xgb.XConn, KeycodesPerModifier byte, Keycodes []Keycode) error {
-	var op uint8
-	return c.Send(setModifierMappingRequest(op, KeycodesPerModifier, Keycodes))
+	return c.Send(setModifierMappingRequest(KeycodesPerModifier, Keycodes))
 }
 
 // SetModifierMappingReply represents the data returned from a SetModifierMapping request.
@@ -12179,7 +11987,8 @@ type SetModifierMappingReply struct {
 
 // Unmarshal reads a byte slice into a SetModifierMappingReply value.
 func (v *SetModifierMappingReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SetModifierMappingReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -12199,7 +12008,7 @@ func (v *SetModifierMappingReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for SetModifierMapping
 // setModifierMappingRequest writes a SetModifierMapping request to a byte slice.
-func setModifierMappingRequest(opcode uint8, KeycodesPerModifier byte, Keycodes []Keycode) []byte {
+func setModifierMappingRequest(KeycodesPerModifier byte, Keycodes []Keycode) []byte {
 	size := internal.Pad4((4 + internal.Pad4(((int(KeycodesPerModifier) * 8) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -12224,15 +12033,13 @@ func setModifierMappingRequest(opcode uint8, KeycodesPerModifier byte, Keycodes 
 // SetPointerMapping sends a checked request.
 func SetPointerMapping(c *xgb.XConn, MapLen byte, Map []byte) (SetPointerMappingReply, error) {
 	var reply SetPointerMappingReply
-	var op uint8
-	err := c.SendRecv(setPointerMappingRequest(op, MapLen, Map), &reply)
+	err := c.SendRecv(setPointerMappingRequest(MapLen, Map), &reply)
 	return reply, err
 }
 
 // SetPointerMappingUnchecked sends an unchecked request.
 func SetPointerMappingUnchecked(c *xgb.XConn, MapLen byte, Map []byte) error {
-	var op uint8
-	return c.Send(setPointerMappingRequest(op, MapLen, Map))
+	return c.Send(setPointerMappingRequest(MapLen, Map))
 }
 
 // SetPointerMappingReply represents the data returned from a SetPointerMapping request.
@@ -12244,7 +12051,8 @@ type SetPointerMappingReply struct {
 
 // Unmarshal reads a byte slice into a SetPointerMappingReply value.
 func (v *SetPointerMappingReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"SetPointerMappingReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -12264,7 +12072,7 @@ func (v *SetPointerMappingReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for SetPointerMapping
 // setPointerMappingRequest writes a SetPointerMapping request to a byte slice.
-func setPointerMappingRequest(opcode uint8, MapLen byte, Map []byte) []byte {
+func setPointerMappingRequest(MapLen byte, Map []byte) []byte {
 	size := internal.Pad4((4 + internal.Pad4((int(MapLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -12286,20 +12094,18 @@ func setPointerMappingRequest(opcode uint8, MapLen byte, Map []byte) []byte {
 
 // SetScreenSaver sends a checked request.
 func SetScreenSaver(c *xgb.XConn, Timeout int16, Interval int16, PreferBlanking byte, AllowExposures byte) error {
-	var op uint8
-	return c.SendRecv(setScreenSaverRequest(op, Timeout, Interval, PreferBlanking, AllowExposures), nil)
+	return c.SendRecv(setScreenSaverRequest(Timeout, Interval, PreferBlanking, AllowExposures), nil)
 }
 
 // SetScreenSaverUnchecked sends an unchecked request.
 func SetScreenSaverUnchecked(c *xgb.XConn, Timeout int16, Interval int16, PreferBlanking byte, AllowExposures byte) error {
-	var op uint8
-	return c.Send(setScreenSaverRequest(op, Timeout, Interval, PreferBlanking, AllowExposures))
+	return c.Send(setScreenSaverRequest(Timeout, Interval, PreferBlanking, AllowExposures))
 }
 
 // Write request to wire for SetScreenSaver
 // setScreenSaverRequest writes a SetScreenSaver request to a byte slice.
-func setScreenSaverRequest(opcode uint8, Timeout int16, Interval int16, PreferBlanking byte, AllowExposures byte) []byte {
-	size := 12
+func setScreenSaverRequest(Timeout int16, Interval int16, PreferBlanking byte, AllowExposures byte) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -12328,20 +12134,18 @@ func setScreenSaverRequest(opcode uint8, Timeout int16, Interval int16, PreferBl
 
 // SetSelectionOwner sends a checked request.
 func SetSelectionOwner(c *xgb.XConn, Owner Window, Selection Atom, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(setSelectionOwnerRequest(op, Owner, Selection, Time), nil)
+	return c.SendRecv(setSelectionOwnerRequest(Owner, Selection, Time), nil)
 }
 
 // SetSelectionOwnerUnchecked sends an unchecked request.
 func SetSelectionOwnerUnchecked(c *xgb.XConn, Owner Window, Selection Atom, Time Timestamp) error {
-	var op uint8
-	return c.Send(setSelectionOwnerRequest(op, Owner, Selection, Time))
+	return c.Send(setSelectionOwnerRequest(Owner, Selection, Time))
 }
 
 // Write request to wire for SetSelectionOwner
 // setSelectionOwnerRequest writes a SetSelectionOwner request to a byte slice.
-func setSelectionOwnerRequest(opcode uint8, Owner Window, Selection Atom, Time Timestamp) []byte {
-	size := 16
+func setSelectionOwnerRequest(Owner Window, Selection Atom, Time Timestamp) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -12367,19 +12171,17 @@ func setSelectionOwnerRequest(opcode uint8, Owner Window, Selection Atom, Time T
 
 // StoreColors sends a checked request.
 func StoreColors(c *xgb.XConn, Cmap Colormap, Items []Coloritem) error {
-	var op uint8
-	return c.SendRecv(storeColorsRequest(op, Cmap, Items), nil)
+	return c.SendRecv(storeColorsRequest(Cmap, Items), nil)
 }
 
 // StoreColorsUnchecked sends an unchecked request.
 func StoreColorsUnchecked(c *xgb.XConn, Cmap Colormap, Items []Coloritem) error {
-	var op uint8
-	return c.Send(storeColorsRequest(op, Cmap, Items))
+	return c.Send(storeColorsRequest(Cmap, Items))
 }
 
 // Write request to wire for StoreColors
 // storeColorsRequest writes a StoreColors request to a byte slice.
-func storeColorsRequest(opcode uint8, Cmap Colormap, Items []Coloritem) []byte {
+func storeColorsRequest(Cmap Colormap, Items []Coloritem) []byte {
 	size := internal.Pad4((8 + internal.Pad4((len(Items) * 12))))
 	b := 0
 	buf := make([]byte, size)
@@ -12402,19 +12204,17 @@ func storeColorsRequest(opcode uint8, Cmap Colormap, Items []Coloritem) []byte {
 
 // StoreNamedColor sends a checked request.
 func StoreNamedColor(c *xgb.XConn, Flags byte, Cmap Colormap, Pixel uint32, NameLen uint16, Name string) error {
-	var op uint8
-	return c.SendRecv(storeNamedColorRequest(op, Flags, Cmap, Pixel, NameLen, Name), nil)
+	return c.SendRecv(storeNamedColorRequest(Flags, Cmap, Pixel, NameLen, Name), nil)
 }
 
 // StoreNamedColorUnchecked sends an unchecked request.
 func StoreNamedColorUnchecked(c *xgb.XConn, Flags byte, Cmap Colormap, Pixel uint32, NameLen uint16, Name string) error {
-	var op uint8
-	return c.Send(storeNamedColorRequest(op, Flags, Cmap, Pixel, NameLen, Name))
+	return c.Send(storeNamedColorRequest(Flags, Cmap, Pixel, NameLen, Name))
 }
 
 // Write request to wire for StoreNamedColor
 // storeNamedColorRequest writes a StoreNamedColor request to a byte slice.
-func storeNamedColorRequest(opcode uint8, Flags byte, Cmap Colormap, Pixel uint32, NameLen uint16, Name string) []byte {
+func storeNamedColorRequest(Flags byte, Cmap Colormap, Pixel uint32, NameLen uint16, Name string) []byte {
 	size := internal.Pad4((16 + internal.Pad4((int(NameLen) * 1))))
 	b := 0
 	buf := make([]byte, size)
@@ -12448,15 +12248,13 @@ func storeNamedColorRequest(opcode uint8, Flags byte, Cmap Colormap, Pixel uint3
 // TranslateCoordinates sends a checked request.
 func TranslateCoordinates(c *xgb.XConn, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16) (TranslateCoordinatesReply, error) {
 	var reply TranslateCoordinatesReply
-	var op uint8
-	err := c.SendRecv(translateCoordinatesRequest(op, SrcWindow, DstWindow, SrcX, SrcY), &reply)
+	err := c.SendRecv(translateCoordinatesRequest(SrcWindow, DstWindow, SrcX, SrcY), &reply)
 	return reply, err
 }
 
 // TranslateCoordinatesUnchecked sends an unchecked request.
 func TranslateCoordinatesUnchecked(c *xgb.XConn, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16) error {
-	var op uint8
-	return c.Send(translateCoordinatesRequest(op, SrcWindow, DstWindow, SrcX, SrcY))
+	return c.Send(translateCoordinatesRequest(SrcWindow, DstWindow, SrcX, SrcY))
 }
 
 // TranslateCoordinatesReply represents the data returned from a TranslateCoordinates request.
@@ -12471,7 +12269,8 @@ type TranslateCoordinatesReply struct {
 
 // Unmarshal reads a byte slice into a TranslateCoordinatesReply value.
 func (v *TranslateCoordinatesReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"TranslateCoordinatesReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -12500,8 +12299,8 @@ func (v *TranslateCoordinatesReply) Unmarshal(buf []byte) error {
 
 // Write request to wire for TranslateCoordinates
 // translateCoordinatesRequest writes a TranslateCoordinates request to a byte slice.
-func translateCoordinatesRequest(opcode uint8, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16) []byte {
-	size := 16
+func translateCoordinatesRequest(SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16) []byte {
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -12530,20 +12329,18 @@ func translateCoordinatesRequest(opcode uint8, SrcWindow Window, DstWindow Windo
 
 // UngrabButton sends a checked request.
 func UngrabButton(c *xgb.XConn, Button byte, GrabWindow Window, Modifiers uint16) error {
-	var op uint8
-	return c.SendRecv(ungrabButtonRequest(op, Button, GrabWindow, Modifiers), nil)
+	return c.SendRecv(ungrabButtonRequest(Button, GrabWindow, Modifiers), nil)
 }
 
 // UngrabButtonUnchecked sends an unchecked request.
 func UngrabButtonUnchecked(c *xgb.XConn, Button byte, GrabWindow Window, Modifiers uint16) error {
-	var op uint8
-	return c.Send(ungrabButtonRequest(op, Button, GrabWindow, Modifiers))
+	return c.Send(ungrabButtonRequest(Button, GrabWindow, Modifiers))
 }
 
 // Write request to wire for UngrabButton
 // ungrabButtonRequest writes a UngrabButton request to a byte slice.
-func ungrabButtonRequest(opcode uint8, Button byte, GrabWindow Window, Modifiers uint16) []byte {
-	size := 12
+func ungrabButtonRequest(Button byte, GrabWindow Window, Modifiers uint16) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -12569,20 +12366,18 @@ func ungrabButtonRequest(opcode uint8, Button byte, GrabWindow Window, Modifiers
 
 // UngrabKey sends a checked request.
 func UngrabKey(c *xgb.XConn, Key Keycode, GrabWindow Window, Modifiers uint16) error {
-	var op uint8
-	return c.SendRecv(ungrabKeyRequest(op, Key, GrabWindow, Modifiers), nil)
+	return c.SendRecv(ungrabKeyRequest(Key, GrabWindow, Modifiers), nil)
 }
 
 // UngrabKeyUnchecked sends an unchecked request.
 func UngrabKeyUnchecked(c *xgb.XConn, Key Keycode, GrabWindow Window, Modifiers uint16) error {
-	var op uint8
-	return c.Send(ungrabKeyRequest(op, Key, GrabWindow, Modifiers))
+	return c.Send(ungrabKeyRequest(Key, GrabWindow, Modifiers))
 }
 
 // Write request to wire for UngrabKey
 // ungrabKeyRequest writes a UngrabKey request to a byte slice.
-func ungrabKeyRequest(opcode uint8, Key Keycode, GrabWindow Window, Modifiers uint16) []byte {
-	size := 12
+func ungrabKeyRequest(Key Keycode, GrabWindow Window, Modifiers uint16) []byte {
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -12608,20 +12403,18 @@ func ungrabKeyRequest(opcode uint8, Key Keycode, GrabWindow Window, Modifiers ui
 
 // UngrabKeyboard sends a checked request.
 func UngrabKeyboard(c *xgb.XConn, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(ungrabKeyboardRequest(op, Time), nil)
+	return c.SendRecv(ungrabKeyboardRequest(Time), nil)
 }
 
 // UngrabKeyboardUnchecked sends an unchecked request.
 func UngrabKeyboardUnchecked(c *xgb.XConn, Time Timestamp) error {
-	var op uint8
-	return c.Send(ungrabKeyboardRequest(op, Time))
+	return c.Send(ungrabKeyboardRequest(Time))
 }
 
 // Write request to wire for UngrabKeyboard
 // ungrabKeyboardRequest writes a UngrabKeyboard request to a byte slice.
-func ungrabKeyboardRequest(opcode uint8, Time Timestamp) []byte {
-	size := 8
+func ungrabKeyboardRequest(Time Timestamp) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -12641,20 +12434,18 @@ func ungrabKeyboardRequest(opcode uint8, Time Timestamp) []byte {
 
 // UngrabPointer sends a checked request.
 func UngrabPointer(c *xgb.XConn, Time Timestamp) error {
-	var op uint8
-	return c.SendRecv(ungrabPointerRequest(op, Time), nil)
+	return c.SendRecv(ungrabPointerRequest(Time), nil)
 }
 
 // UngrabPointerUnchecked sends an unchecked request.
 func UngrabPointerUnchecked(c *xgb.XConn, Time Timestamp) error {
-	var op uint8
-	return c.Send(ungrabPointerRequest(op, Time))
+	return c.Send(ungrabPointerRequest(Time))
 }
 
 // Write request to wire for UngrabPointer
 // ungrabPointerRequest writes a UngrabPointer request to a byte slice.
-func ungrabPointerRequest(opcode uint8, Time Timestamp) []byte {
-	size := 8
+func ungrabPointerRequest(Time Timestamp) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -12674,20 +12465,18 @@ func ungrabPointerRequest(opcode uint8, Time Timestamp) []byte {
 
 // UngrabServer sends a checked request.
 func UngrabServer(c *xgb.XConn) error {
-	var op uint8
-	return c.SendRecv(ungrabServerRequest(op), nil)
+	return c.SendRecv(ungrabServerRequest(), nil)
 }
 
 // UngrabServerUnchecked sends an unchecked request.
 func UngrabServerUnchecked(c *xgb.XConn) error {
-	var op uint8
-	return c.Send(ungrabServerRequest(op))
+	return c.Send(ungrabServerRequest())
 }
 
 // Write request to wire for UngrabServer
 // ungrabServerRequest writes a UngrabServer request to a byte slice.
-func ungrabServerRequest(opcode uint8) []byte {
-	size := 4
+func ungrabServerRequest() []byte {
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -12703,20 +12492,18 @@ func ungrabServerRequest(opcode uint8) []byte {
 
 // UninstallColormap sends a checked request.
 func UninstallColormap(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.SendRecv(uninstallColormapRequest(op, Cmap), nil)
+	return c.SendRecv(uninstallColormapRequest(Cmap), nil)
 }
 
 // UninstallColormapUnchecked sends an unchecked request.
 func UninstallColormapUnchecked(c *xgb.XConn, Cmap Colormap) error {
-	var op uint8
-	return c.Send(uninstallColormapRequest(op, Cmap))
+	return c.Send(uninstallColormapRequest(Cmap))
 }
 
 // Write request to wire for UninstallColormap
 // uninstallColormapRequest writes a UninstallColormap request to a byte slice.
-func uninstallColormapRequest(opcode uint8, Cmap Colormap) []byte {
-	size := 8
+func uninstallColormapRequest(Cmap Colormap) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -12736,20 +12523,18 @@ func uninstallColormapRequest(opcode uint8, Cmap Colormap) []byte {
 
 // UnmapSubwindows sends a checked request.
 func UnmapSubwindows(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(unmapSubwindowsRequest(op, Window), nil)
+	return c.SendRecv(unmapSubwindowsRequest(Window), nil)
 }
 
 // UnmapSubwindowsUnchecked sends an unchecked request.
 func UnmapSubwindowsUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(unmapSubwindowsRequest(op, Window))
+	return c.Send(unmapSubwindowsRequest(Window))
 }
 
 // Write request to wire for UnmapSubwindows
 // unmapSubwindowsRequest writes a UnmapSubwindows request to a byte slice.
-func unmapSubwindowsRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func unmapSubwindowsRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -12769,20 +12554,18 @@ func unmapSubwindowsRequest(opcode uint8, Window Window) []byte {
 
 // UnmapWindow sends a checked request.
 func UnmapWindow(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.SendRecv(unmapWindowRequest(op, Window), nil)
+	return c.SendRecv(unmapWindowRequest(Window), nil)
 }
 
 // UnmapWindowUnchecked sends an unchecked request.
 func UnmapWindowUnchecked(c *xgb.XConn, Window Window) error {
-	var op uint8
-	return c.Send(unmapWindowRequest(op, Window))
+	return c.Send(unmapWindowRequest(Window))
 }
 
 // Write request to wire for UnmapWindow
 // unmapWindowRequest writes a UnmapWindow request to a byte slice.
-func unmapWindowRequest(opcode uint8, Window Window) []byte {
-	size := 8
+func unmapWindowRequest(Window Window) []byte {
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -12802,20 +12585,18 @@ func unmapWindowRequest(opcode uint8, Window Window) []byte {
 
 // WarpPointer sends a checked request.
 func WarpPointer(c *xgb.XConn, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16, SrcWidth uint16, SrcHeight uint16, DstX int16, DstY int16) error {
-	var op uint8
-	return c.SendRecv(warpPointerRequest(op, SrcWindow, DstWindow, SrcX, SrcY, SrcWidth, SrcHeight, DstX, DstY), nil)
+	return c.SendRecv(warpPointerRequest(SrcWindow, DstWindow, SrcX, SrcY, SrcWidth, SrcHeight, DstX, DstY), nil)
 }
 
 // WarpPointerUnchecked sends an unchecked request.
 func WarpPointerUnchecked(c *xgb.XConn, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16, SrcWidth uint16, SrcHeight uint16, DstX int16, DstY int16) error {
-	var op uint8
-	return c.Send(warpPointerRequest(op, SrcWindow, DstWindow, SrcX, SrcY, SrcWidth, SrcHeight, DstX, DstY))
+	return c.Send(warpPointerRequest(SrcWindow, DstWindow, SrcX, SrcY, SrcWidth, SrcHeight, DstX, DstY))
 }
 
 // Write request to wire for WarpPointer
 // warpPointerRequest writes a WarpPointer request to a byte slice.
-func warpPointerRequest(opcode uint8, SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16, SrcWidth uint16, SrcHeight uint16, DstX int16, DstY int16) []byte {
-	size := 24
+func warpPointerRequest(SrcWindow Window, DstWindow Window, SrcX int16, SrcY int16, SrcWidth uint16, SrcHeight uint16, DstX int16, DstY int16) []byte {
+	const size = 24
 	b := 0
 	buf := make([]byte, size)
 

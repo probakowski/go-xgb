@@ -192,7 +192,8 @@ type AuthConnectionReply struct {
 
 // Unmarshal reads a byte slice into a AuthConnectionReply value.
 func (v *AuthConnectionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"AuthConnectionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -215,7 +216,7 @@ func (v *AuthConnectionReply) Unmarshal(buf []byte) error {
 // Write request to wire for AuthConnection
 // authConnectionRequest writes a AuthConnection request to a byte slice.
 func authConnectionRequest(opcode uint8, Screen uint32, Magic uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -258,7 +259,7 @@ func CloseConnectionUnchecked(c *xgb.XConn, Screen uint32) error {
 // Write request to wire for CloseConnection
 // closeConnectionRequest writes a CloseConnection request to a byte slice.
 func closeConnectionRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -307,7 +308,8 @@ type CreateContextReply struct {
 
 // Unmarshal reads a byte slice into a CreateContextReply value.
 func (v *CreateContextReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CreateContextReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -330,7 +332,7 @@ func (v *CreateContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateContext
 // createContextRequest writes a CreateContext request to a byte slice.
 func createContextRequest(opcode uint8, Screen uint32, Visual uint32, Context uint32) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -385,7 +387,8 @@ type CreateDrawableReply struct {
 
 // Unmarshal reads a byte slice into a CreateDrawableReply value.
 func (v *CreateDrawableReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"CreateDrawableReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -408,7 +411,7 @@ func (v *CreateDrawableReply) Unmarshal(buf []byte) error {
 // Write request to wire for CreateDrawable
 // createDrawableRequest writes a CreateDrawable request to a byte slice.
 func createDrawableRequest(opcode uint8, Screen uint32, Drawable uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -451,7 +454,7 @@ func DestroyContextUnchecked(c *xgb.XConn, Screen uint32, Context uint32) error 
 // Write request to wire for DestroyContext
 // destroyContextRequest writes a DestroyContext request to a byte slice.
 func destroyContextRequest(opcode uint8, Screen uint32, Context uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -494,7 +497,7 @@ func DestroyDrawableUnchecked(c *xgb.XConn, Screen uint32, Drawable uint32) erro
 // Write request to wire for DestroyDrawable
 // destroyDrawableRequest writes a DestroyDrawable request to a byte slice.
 func destroyDrawableRequest(opcode uint8, Screen uint32, Drawable uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -592,7 +595,7 @@ func (v *GetClientDriverNameReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetClientDriverName
 // getClientDriverNameRequest writes a GetClientDriverName request to a byte slice.
 func getClientDriverNameRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -691,7 +694,7 @@ func (v *GetDeviceInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetDeviceInfo
 // getDeviceInfoRequest writes a GetDeviceInfo request to a byte slice.
 func getDeviceInfoRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -810,7 +813,7 @@ func (v *GetDrawableInfoReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetDrawableInfo
 // getDrawableInfoRequest writes a GetDrawableInfo request to a byte slice.
 func getDrawableInfoRequest(opcode uint8, Screen uint32, Drawable uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -904,7 +907,7 @@ func (v *OpenConnectionReply) Unmarshal(buf []byte) error {
 // Write request to wire for OpenConnection
 // openConnectionRequest writes a OpenConnection request to a byte slice.
 func openConnectionRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -953,7 +956,8 @@ type QueryDirectRenderingCapableReply struct {
 
 // Unmarshal reads a byte slice into a QueryDirectRenderingCapableReply value.
 func (v *QueryDirectRenderingCapableReply) Unmarshal(buf []byte) error {
-	if size := 9; len(buf) < size {
+	const size = 9
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryDirectRenderingCapableReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -976,7 +980,7 @@ func (v *QueryDirectRenderingCapableReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryDirectRenderingCapable
 // queryDirectRenderingCapableRequest writes a QueryDirectRenderingCapable request to a byte slice.
 func queryDirectRenderingCapableRequest(opcode uint8, Screen uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1027,7 +1031,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1056,7 +1061,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 

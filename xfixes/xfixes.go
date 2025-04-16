@@ -414,7 +414,7 @@ func ChangeCursorUnchecked(c *xgb.XConn, Source xproto.Cursor, Destination xprot
 // Write request to wire for ChangeCursor
 // changeCursorRequest writes a ChangeCursor request to a byte slice.
 func changeCursorRequest(opcode uint8, Source xproto.Cursor, Destination xproto.Cursor) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -505,7 +505,7 @@ func ChangeSaveSetUnchecked(c *xgb.XConn, Mode byte, Target byte, Map byte, Wind
 // Write request to wire for ChangeSaveSet
 // changeSaveSetRequest writes a ChangeSaveSet request to a byte slice.
 func changeSaveSetRequest(opcode uint8, Mode byte, Target byte, Map byte, Window xproto.Window) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -556,7 +556,7 @@ func CopyRegionUnchecked(c *xgb.XConn, Source Region, Destination Region) error 
 // Write request to wire for CopyRegion
 // copyRegionRequest writes a CopyRegion request to a byte slice.
 func copyRegionRequest(opcode uint8, Source Region, Destination Region) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -709,7 +709,7 @@ func CreateRegionFromBitmapUnchecked(c *xgb.XConn, Region Region, Bitmap xproto.
 // Write request to wire for CreateRegionFromBitmap
 // createRegionFromBitmapRequest writes a CreateRegionFromBitmap request to a byte slice.
 func createRegionFromBitmapRequest(opcode uint8, Region Region, Bitmap xproto.Pixmap) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -752,7 +752,7 @@ func CreateRegionFromGCUnchecked(c *xgb.XConn, Region Region, Gc xproto.Gcontext
 // Write request to wire for CreateRegionFromGC
 // createRegionFromGCRequest writes a CreateRegionFromGC request to a byte slice.
 func createRegionFromGCRequest(opcode uint8, Region Region, Gc xproto.Gcontext) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -795,7 +795,7 @@ func CreateRegionFromPictureUnchecked(c *xgb.XConn, Region Region, Picture rende
 // Write request to wire for CreateRegionFromPicture
 // createRegionFromPictureRequest writes a CreateRegionFromPicture request to a byte slice.
 func createRegionFromPictureRequest(opcode uint8, Region Region, Picture render.Picture) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -838,7 +838,7 @@ func CreateRegionFromWindowUnchecked(c *xgb.XConn, Region Region, Window xproto.
 // Write request to wire for CreateRegionFromWindow
 // createRegionFromWindowRequest writes a CreateRegionFromWindow request to a byte slice.
 func createRegionFromWindowRequest(opcode uint8, Region Region, Window xproto.Window, Kind shape.Kind) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -886,7 +886,7 @@ func DeletePointerBarrierUnchecked(c *xgb.XConn, Barrier Barrier) error {
 // Write request to wire for DeletePointerBarrier
 // deletePointerBarrierRequest writes a DeletePointerBarrier request to a byte slice.
 func deletePointerBarrierRequest(opcode uint8, Barrier Barrier) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -926,7 +926,7 @@ func DestroyRegionUnchecked(c *xgb.XConn, Region Region) error {
 // Write request to wire for DestroyRegion
 // destroyRegionRequest writes a DestroyRegion request to a byte slice.
 func destroyRegionRequest(opcode uint8, Region Region) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -966,7 +966,7 @@ func ExpandRegionUnchecked(c *xgb.XConn, Source Region, Destination Region, Left
 // Write request to wire for ExpandRegion
 // expandRegionRequest writes a ExpandRegion request to a byte slice.
 func expandRegionRequest(opcode uint8, Source Region, Destination Region, Left uint16, Right uint16, Top uint16, Bottom uint16) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -1060,7 +1060,7 @@ func (v *FetchRegionReply) Unmarshal(buf []byte) error {
 // Write request to wire for FetchRegion
 // fetchRegionRequest writes a FetchRegion request to a byte slice.
 func fetchRegionRequest(opcode uint8, Region Region) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1110,7 +1110,8 @@ type GetClientDisconnectModeReply struct {
 
 // Unmarshal reads a byte slice into a GetClientDisconnectModeReply value.
 func (v *GetClientDisconnectModeReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetClientDisconnectModeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1135,7 +1136,7 @@ func (v *GetClientDisconnectModeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetClientDisconnectMode
 // getClientDisconnectModeRequest writes a GetClientDisconnectMode request to a byte slice.
 func getClientDisconnectModeRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1238,7 +1239,7 @@ func (v *GetCursorImageReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCursorImage
 // getCursorImageRequest writes a GetCursorImage request to a byte slice.
 func getCursorImageRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1357,7 +1358,7 @@ func (v *GetCursorImageAndNameReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCursorImageAndName
 // getCursorImageAndNameRequest writes a GetCursorImageAndName request to a byte slice.
 func getCursorImageAndNameRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1441,7 +1442,7 @@ func (v *GetCursorNameReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetCursorName
 // getCursorNameRequest writes a GetCursorName request to a byte slice.
 func getCursorNameRequest(opcode uint8, Cursor xproto.Cursor) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1481,7 +1482,7 @@ func HideCursorUnchecked(c *xgb.XConn, Window xproto.Window) error {
 // Write request to wire for HideCursor
 // hideCursorRequest writes a HideCursor request to a byte slice.
 func hideCursorRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1521,7 +1522,7 @@ func IntersectRegionUnchecked(c *xgb.XConn, Source1 Region, Source2 Region, Dest
 // Write request to wire for IntersectRegion
 // intersectRegionRequest writes a IntersectRegion request to a byte slice.
 func intersectRegionRequest(opcode uint8, Source1 Region, Source2 Region, Destination Region) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -1567,7 +1568,7 @@ func InvertRegionUnchecked(c *xgb.XConn, Source Region, Bounds xproto.Rectangle,
 // Write request to wire for InvertRegion
 // invertRegionRequest writes a InvertRegion request to a byte slice.
 func invertRegionRequest(opcode uint8, Source Region, Bounds xproto.Rectangle, Destination Region) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -1627,7 +1628,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 32; len(buf) < size {
+	const size = 32
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1655,7 +1657,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, ClientMajorVersion uint32, ClientMinorVersion uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1698,7 +1700,7 @@ func RegionExtentsUnchecked(c *xgb.XConn, Source Region, Destination Region) err
 // Write request to wire for RegionExtents
 // regionExtentsRequest writes a RegionExtents request to a byte slice.
 func regionExtentsRequest(opcode uint8, Source Region, Destination Region) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1741,7 +1743,7 @@ func SelectCursorInputUnchecked(c *xgb.XConn, Window xproto.Window, EventMask ui
 // Write request to wire for SelectCursorInput
 // selectCursorInputRequest writes a SelectCursorInput request to a byte slice.
 func selectCursorInputRequest(opcode uint8, Window xproto.Window, EventMask uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1784,7 +1786,7 @@ func SelectSelectionInputUnchecked(c *xgb.XConn, Window xproto.Window, Selection
 // Write request to wire for SelectSelectionInput
 // selectSelectionInputRequest writes a SelectSelectionInput request to a byte slice.
 func selectSelectionInputRequest(opcode uint8, Window xproto.Window, Selection xproto.Atom, EventMask uint32) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -1830,7 +1832,7 @@ func SetClientDisconnectModeUnchecked(c *xgb.XConn, DisconnectMode uint32) error
 // Write request to wire for SetClientDisconnectMode
 // setClientDisconnectModeRequest writes a SetClientDisconnectMode request to a byte slice.
 func setClientDisconnectModeRequest(opcode uint8, DisconnectMode uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1918,7 +1920,7 @@ func SetGCClipRegionUnchecked(c *xgb.XConn, Gc xproto.Gcontext, Region Region, X
 // Write request to wire for SetGCClipRegion
 // setGCClipRegionRequest writes a SetGCClipRegion request to a byte slice.
 func setGCClipRegionRequest(opcode uint8, Gc xproto.Gcontext, Region Region, XOrigin int16, YOrigin int16) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -1967,7 +1969,7 @@ func SetPictureClipRegionUnchecked(c *xgb.XConn, Picture render.Picture, Region 
 // Write request to wire for SetPictureClipRegion
 // setPictureClipRegionRequest writes a SetPictureClipRegion request to a byte slice.
 func setPictureClipRegionRequest(opcode uint8, Picture render.Picture, Region Region, XOrigin int16, YOrigin int16) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2058,7 +2060,7 @@ func SetWindowShapeRegionUnchecked(c *xgb.XConn, Dest xproto.Window, DestKind sh
 // Write request to wire for SetWindowShapeRegion
 // setWindowShapeRegionRequest writes a SetWindowShapeRegion request to a byte slice.
 func setWindowShapeRegionRequest(opcode uint8, Dest xproto.Window, DestKind shape.Kind, XOffset int16, YOffset int16, Region Region) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -2112,7 +2114,7 @@ func ShowCursorUnchecked(c *xgb.XConn, Window xproto.Window) error {
 // Write request to wire for ShowCursor
 // showCursorRequest writes a ShowCursor request to a byte slice.
 func showCursorRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2152,7 +2154,7 @@ func SubtractRegionUnchecked(c *xgb.XConn, Source1 Region, Source2 Region, Desti
 // Write request to wire for SubtractRegion
 // subtractRegionRequest writes a SubtractRegion request to a byte slice.
 func subtractRegionRequest(opcode uint8, Source1 Region, Source2 Region, Destination Region) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -2198,7 +2200,7 @@ func TranslateRegionUnchecked(c *xgb.XConn, Region Region, Dx int16, Dy int16) e
 // Write request to wire for TranslateRegion
 // translateRegionRequest writes a TranslateRegion request to a byte slice.
 func translateRegionRequest(opcode uint8, Region Region, Dx int16, Dy int16) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -2244,7 +2246,7 @@ func UnionRegionUnchecked(c *xgb.XConn, Source1 Region, Source2 Region, Destinat
 // Write request to wire for UnionRegion
 // unionRegionRequest writes a UnionRegion request to a byte slice.
 func unionRegionRequest(opcode uint8, Source1 Region, Source2 Region, Destination Region) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 

@@ -11,7 +11,11 @@ func (r *Request) Define(c *Context) {
 		c.Putln("func %s(c *xgb.XConn, %s) (%s, error) {", r.SrcName(), r.ParamNameTypes(), r.ReplyTypeName())
 		c.Putln("	var reply %s", r.ReplyTypeName())
 		r.ReadOpcode(c, true)
-		c.Putln("	err := c.SendRecv(%s(op, %s), &reply)", r.ReqName(), r.ParamNames())
+		if c.protocol.isExt() {
+			c.Putln("	err := c.SendRecv(%s(op, %s), &reply)", r.ReqName(), r.ParamNames())
+		} else {
+			c.Putln("	err := c.SendRecv(%s(%s), &reply)", r.ReqName(), r.ParamNames())
+		}
 		c.Putln("	return reply, err")
 		c.Putln("}")
 		c.Putln("")
@@ -19,7 +23,11 @@ func (r *Request) Define(c *Context) {
 		c.Putln("// %sUnchecked sends an unchecked request.", r.SrcName())
 		c.Putln("func %sUnchecked(c *xgb.XConn, %s) error {", r.SrcName(), r.ParamNameTypes())
 		r.ReadOpcode(c, false)
-		c.Putln("	return c.Send(%s(op, %s))", r.ReqName(), r.ParamNames())
+		if c.protocol.isExt() {
+			c.Putln("	return c.Send(%s(op, %s))", r.ReqName(), r.ParamNames())
+		} else {
+			c.Putln("	return c.Send(%s(%s))", r.ReqName(), r.ParamNames())
+		}
 		c.Putln("}")
 		c.Putln("")
 
@@ -28,14 +36,22 @@ func (r *Request) Define(c *Context) {
 		c.Putln("// %s sends a checked request.", r.SrcName())
 		c.Putln("func %s(c *xgb.XConn, %s) error {", r.SrcName(), r.ParamNameTypes())
 		r.ReadOpcode(c, false)
-		c.Putln("	return c.SendRecv(%s(op, %s), nil)", r.ReqName(), r.ParamNames())
+		if c.protocol.isExt() {
+			c.Putln("	return c.SendRecv(%s(op, %s), nil)", r.ReqName(), r.ParamNames())
+		} else {
+			c.Putln("	return c.SendRecv(%s(%s), nil)", r.ReqName(), r.ParamNames())
+		}
 		c.Putln("}")
 		c.Putln("")
 
 		c.Putln("// %sUnchecked sends an unchecked request.", r.SrcName())
 		c.Putln("func %sUnchecked(c *xgb.XConn, %s) error {", r.SrcName(), r.ParamNameTypes())
 		r.ReadOpcode(c, false)
-		c.Putln("	return c.Send(%s(op, %s))", r.ReqName(), r.ParamNames())
+		if c.protocol.isExt() {
+			c.Putln("	return c.Send(%s(op, %s))", r.ReqName(), r.ParamNames())
+		} else {
+			c.Putln("	return c.Send(%s(%s))", r.ReqName(), r.ParamNames())
+		}
 		c.Putln("}")
 		c.Putln("")
 	}
@@ -56,7 +72,12 @@ func (r *Request) ReadReply(c *Context) {
 
 	c.Putln("// Unmarshal reads a byte slice into a %s value.", r.ReplyTypeName())
 	c.Putln("func (v *%s) Unmarshal(buf []byte) error {", r.ReplyTypeName())
-	c.Putln("	if size := %s; len(buf) < size {", r.Reply.Size().Reduce("v."))
+	if sz := r.Reply.Size().Reduce("v."); isNumber(sz) {
+		c.Putln("	const size = %s", sz)
+		c.Putln("	if len(buf) < size {")
+	} else {
+		c.Putln("	if size := %s; len(buf) < size {", r.Reply.Size().Reduce("v."))
+	}
 	c.Putln("		return fmt.Errorf(\"not enough data to unmarshal \\\"%s\\\": have=%%d need=%%d\", len(buf), size)", r.ReplyTypeName())
 	c.Putln("	}")
 	c.Putln("	")
@@ -101,8 +122,16 @@ func (r *Request) WriteRequest(c *Context) {
 	}
 	c.Putln("// Write request to wire for %s", r.SrcName())
 	c.Putln("// %s writes a %s request to a byte slice.", r.ReqName(), r.SrcName())
-	c.Putln("func %s(opcode uint8, %s) []byte {", r.ReqName(), r.ParamNameTypes())
-	c.Putln("	size := %s", sz)
+	if c.protocol.isExt() {
+		c.Putln("func %s(opcode uint8, %s) []byte {", r.ReqName(), r.ParamNameTypes())
+	} else {
+		c.Putln("func %s(%s) []byte {", r.ReqName(), r.ParamNameTypes())
+	}
+	if sz := sz.String(); isNumber(sz) {
+		c.Putln("	const size = %s", sz)
+	} else {
+		c.Putln("	size := %s", sz)
+	}
 	c.Putln("	b := 0")
 	c.Putln("	buf := make([]byte, size)")
 	c.Putln("	")
@@ -144,8 +173,6 @@ func (r *Request) ReadOpcode(c *Context, reply bool) {
 			c.Putln("		return errors.New(\"cannot issue request \\\"%s\\\" using the uninitialized extension \\\"%s\\\". %s.Register(xconn) must be called first.\")", r.SrcName(), c.protocol.ExtXName, c.protocol.PkgName())
 		}
 		c.Putln("	}")
-	} else {
-		c.Putln("	var op uint8")
 	}
 }
 
@@ -191,4 +218,15 @@ func (r *Request) ParamNameTypes() string {
 		}
 	}
 	return strings.Join(nameTypes, ", ")
+}
+
+func isNumber(str string) bool {
+	for _, c := range str {
+		switch {
+		case '0' <= c && c <= '9':
+		default:
+			return false
+		}
+	}
+	return true
 }

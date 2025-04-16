@@ -192,7 +192,8 @@ type GetScreenCountReply struct {
 
 // Unmarshal reads a byte slice into a GetScreenCountReply value.
 func (v *GetScreenCountReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetScreenCountReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -216,7 +217,7 @@ func (v *GetScreenCountReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenCount
 // getScreenCountRequest writes a GetScreenCount request to a byte slice.
 func getScreenCountRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -268,7 +269,8 @@ type GetScreenSizeReply struct {
 
 // Unmarshal reads a byte slice into a GetScreenSizeReply value.
 func (v *GetScreenSizeReply) Unmarshal(buf []byte) error {
-	if size := 24; len(buf) < size {
+	const size = 24
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetScreenSizeReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -300,7 +302,7 @@ func (v *GetScreenSizeReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetScreenSize
 // getScreenSizeRequest writes a GetScreenSize request to a byte slice.
 func getScreenSizeRequest(opcode uint8, Window xproto.Window, Screen uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -352,7 +354,8 @@ type GetStateReply struct {
 
 // Unmarshal reads a byte slice into a GetStateReply value.
 func (v *GetStateReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"GetStateReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -376,7 +379,7 @@ func (v *GetStateReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetState
 // getStateRequest writes a GetState request to a byte slice.
 func getStateRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -425,7 +428,8 @@ type IsActiveReply struct {
 
 // Unmarshal reads a byte slice into a IsActiveReply value.
 func (v *IsActiveReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"IsActiveReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -448,7 +452,7 @@ func (v *IsActiveReply) Unmarshal(buf []byte) error {
 // Write request to wire for IsActive
 // isActiveRequest writes a IsActive request to a byte slice.
 func isActiveRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -524,7 +528,7 @@ func (v *QueryScreensReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryScreens
 // queryScreensRequest writes a QueryScreens request to a byte slice.
 func queryScreensRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -571,7 +575,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -597,7 +602,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8, Major byte, Minor byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 

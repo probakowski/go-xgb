@@ -243,7 +243,7 @@ func CombineUnchecked(c *xgb.XConn, Operation Op, DestinationKind Kind, SourceKi
 // Write request to wire for Combine
 // combineRequest writes a Combine request to a byte slice.
 func combineRequest(opcode uint8, Operation Op, DestinationKind Kind, SourceKind Kind, DestinationWindow xproto.Window, XOffset int16, YOffset int16, SourceWindow xproto.Window) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -343,7 +343,7 @@ func (v *GetRectanglesReply) Unmarshal(buf []byte) error {
 // Write request to wire for GetRectangles
 // getRectanglesRequest writes a GetRectangles request to a byte slice.
 func getRectanglesRequest(opcode uint8, Window xproto.Window, SourceKind Kind) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -396,7 +396,8 @@ type InputSelectedReply struct {
 
 // Unmarshal reads a byte slice into a InputSelectedReply value.
 func (v *InputSelectedReply) Unmarshal(buf []byte) error {
-	if size := 8; len(buf) < size {
+	const size = 8
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"InputSelectedReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -417,7 +418,7 @@ func (v *InputSelectedReply) Unmarshal(buf []byte) error {
 // Write request to wire for InputSelected
 // inputSelectedRequest writes a InputSelected request to a byte slice.
 func inputSelectedRequest(opcode uint8, DestinationWindow xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -457,7 +458,7 @@ func MaskUnchecked(c *xgb.XConn, Operation Op, DestinationKind Kind, Destination
 // Write request to wire for Mask
 // maskRequest writes a Mask request to a byte slice.
 func maskRequest(opcode uint8, Operation Op, DestinationKind Kind, DestinationWindow xproto.Window, XOffset int16, YOffset int16, SourceBitmap xproto.Pixmap) []byte {
-	size := 20
+	const size = 20
 	b := 0
 	buf := make([]byte, size)
 
@@ -514,7 +515,7 @@ func OffsetUnchecked(c *xgb.XConn, DestinationKind Kind, DestinationWindow xprot
 // Write request to wire for Offset
 // offsetRequest writes a Offset request to a byte slice.
 func offsetRequest(opcode uint8, DestinationKind Kind, DestinationWindow xproto.Window, XOffset int16, YOffset int16) []byte {
-	size := 16
+	const size = 16
 	b := 0
 	buf := make([]byte, size)
 
@@ -584,7 +585,8 @@ type QueryExtentsReply struct {
 
 // Unmarshal reads a byte slice into a QueryExtentsReply value.
 func (v *QueryExtentsReply) Unmarshal(buf []byte) error {
-	if size := 28; len(buf) < size {
+	const size = 28
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryExtentsReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -636,7 +638,7 @@ func (v *QueryExtentsReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryExtents
 // queryExtentsRequest writes a QueryExtents request to a byte slice.
 func queryExtentsRequest(opcode uint8, DestinationWindow xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -686,7 +688,8 @@ type QueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a QueryVersionReply value.
 func (v *QueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"QueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -712,7 +715,7 @@ func (v *QueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for QueryVersion
 // queryVersionRequest writes a QueryVersion request to a byte slice.
 func queryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -808,7 +811,7 @@ func SelectInputUnchecked(c *xgb.XConn, DestinationWindow xproto.Window, Enable 
 // Write request to wire for SelectInput
 // selectInputRequest writes a SelectInput request to a byte slice.
 func selectInputRequest(opcode uint8, DestinationWindow xproto.Window, Enable bool) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 

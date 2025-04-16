@@ -546,7 +546,7 @@ func PrintDestroyContextUnchecked(c *xgb.XConn, Context uint32) error {
 // Write request to wire for PrintDestroyContext
 // printDestroyContextRequest writes a PrintDestroyContext request to a byte slice.
 func printDestroyContextRequest(opcode uint8, Context uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -586,7 +586,7 @@ func PrintEndDocUnchecked(c *xgb.XConn, Cancel bool) error {
 // Write request to wire for PrintEndDoc
 // printEndDocRequest writes a PrintEndDoc request to a byte slice.
 func printEndDocRequest(opcode uint8, Cancel bool) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -630,7 +630,7 @@ func PrintEndJobUnchecked(c *xgb.XConn, Cancel bool) error {
 // Write request to wire for PrintEndJob
 // printEndJobRequest writes a PrintEndJob request to a byte slice.
 func printEndJobRequest(opcode uint8, Cancel bool) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -674,7 +674,7 @@ func PrintEndPageUnchecked(c *xgb.XConn, Cancel bool) error {
 // Write request to wire for PrintEndPage
 // printEndPageRequest writes a PrintEndPage request to a byte slice.
 func printEndPageRequest(opcode uint8, Cancel bool) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -762,7 +762,7 @@ func (v *PrintGetAttributesReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetAttributes
 // printGetAttributesRequest writes a PrintGetAttributes request to a byte slice.
 func printGetAttributesRequest(opcode uint8, Context Pcontext, Pool byte) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -816,7 +816,8 @@ type PrintGetContextReply struct {
 
 // Unmarshal reads a byte slice into a PrintGetContextReply value.
 func (v *PrintGetContextReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintGetContextReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -839,7 +840,7 @@ func (v *PrintGetContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetContext
 // printGetContextRequest writes a PrintGetContext request to a byte slice.
 func printGetContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -924,7 +925,7 @@ func (v *PrintGetDocumentDataReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetDocumentData
 // printGetDocumentDataRequest writes a PrintGetDocumentData request to a byte slice.
 func printGetDocumentDataRequest(opcode uint8, Context Pcontext, MaxBytes uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -976,7 +977,8 @@ type PrintGetImageResolutionReply struct {
 
 // Unmarshal reads a byte slice into a PrintGetImageResolutionReply value.
 func (v *PrintGetImageResolutionReply) Unmarshal(buf []byte) error {
-	if size := 10; len(buf) < size {
+	const size = 10
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintGetImageResolutionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -999,7 +1001,7 @@ func (v *PrintGetImageResolutionReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetImageResolution
 // printGetImageResolutionRequest writes a PrintGetImageResolution request to a byte slice.
 func printGetImageResolutionRequest(opcode uint8, Context Pcontext) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1148,7 +1150,8 @@ type PrintGetPageDimensionsReply struct {
 
 // Unmarshal reads a byte slice into a PrintGetPageDimensionsReply value.
 func (v *PrintGetPageDimensionsReply) Unmarshal(buf []byte) error {
-	if size := 20; len(buf) < size {
+	const size = 20
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintGetPageDimensionsReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1186,7 +1189,7 @@ func (v *PrintGetPageDimensionsReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetPageDimensions
 // printGetPageDimensionsRequest writes a PrintGetPageDimensions request to a byte slice.
 func printGetPageDimensionsRequest(opcode uint8, Context Pcontext) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1329,7 +1332,8 @@ type PrintGetScreenOfContextReply struct {
 
 // Unmarshal reads a byte slice into a PrintGetScreenOfContextReply value.
 func (v *PrintGetScreenOfContextReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintGetScreenOfContextReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1352,7 +1356,7 @@ func (v *PrintGetScreenOfContextReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintGetScreenOfContext
 // printGetScreenOfContextRequest writes a PrintGetScreenOfContext request to a byte slice.
 func printGetScreenOfContextRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1399,7 +1403,8 @@ type PrintInputSelectedReply struct {
 
 // Unmarshal reads a byte slice into a PrintInputSelectedReply value.
 func (v *PrintInputSelectedReply) Unmarshal(buf []byte) error {
-	if size := 16; len(buf) < size {
+	const size = 16
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintInputSelectedReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1425,7 +1430,7 @@ func (v *PrintInputSelectedReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintInputSelected
 // printInputSelectedRequest writes a PrintInputSelected request to a byte slice.
 func printInputSelectedRequest(opcode uint8, Context Pcontext) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1573,7 +1578,7 @@ func (v *PrintQueryScreensReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintQueryScreens
 // printQueryScreensRequest writes a PrintQueryScreens request to a byte slice.
 func printQueryScreensRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1620,7 +1625,8 @@ type PrintQueryVersionReply struct {
 
 // Unmarshal reads a byte slice into a PrintQueryVersionReply value.
 func (v *PrintQueryVersionReply) Unmarshal(buf []byte) error {
-	if size := 12; len(buf) < size {
+	const size = 12
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintQueryVersionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1646,7 +1652,7 @@ func (v *PrintQueryVersionReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintQueryVersion
 // printQueryVersionRequest writes a PrintQueryVersion request to a byte slice.
 func printQueryVersionRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1683,7 +1689,7 @@ func PrintRehashPrinterListUnchecked(c *xgb.XConn) error {
 // Write request to wire for PrintRehashPrinterList
 // printRehashPrinterListRequest writes a PrintRehashPrinterList request to a byte slice.
 func printRehashPrinterListRequest(opcode uint8) []byte {
-	size := 4
+	const size = 4
 	b := 0
 	buf := make([]byte, size)
 
@@ -1720,7 +1726,7 @@ func PrintSelectInputUnchecked(c *xgb.XConn, Context Pcontext, EventMask uint32)
 // Write request to wire for PrintSelectInput
 // printSelectInputRequest writes a PrintSelectInput request to a byte slice.
 func printSelectInputRequest(opcode uint8, Context Pcontext, EventMask uint32) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1819,7 +1825,7 @@ func PrintSetContextUnchecked(c *xgb.XConn, Context uint32) error {
 // Write request to wire for PrintSetContext
 // printSetContextRequest writes a PrintSetContext request to a byte slice.
 func printSetContextRequest(opcode uint8, Context uint32) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1868,7 +1874,8 @@ type PrintSetImageResolutionReply struct {
 
 // Unmarshal reads a byte slice into a PrintSetImageResolutionReply value.
 func (v *PrintSetImageResolutionReply) Unmarshal(buf []byte) error {
-	if size := 10; len(buf) < size {
+	const size = 10
+	if len(buf) < size {
 		return fmt.Errorf("not enough data to unmarshal \"PrintSetImageResolutionReply\": have=%d need=%d", len(buf), size)
 	}
 
@@ -1892,7 +1899,7 @@ func (v *PrintSetImageResolutionReply) Unmarshal(buf []byte) error {
 // Write request to wire for PrintSetImageResolution
 // printSetImageResolutionRequest writes a PrintSetImageResolution request to a byte slice.
 func printSetImageResolutionRequest(opcode uint8, Context Pcontext, ImageResolution uint16) []byte {
-	size := 12
+	const size = 12
 	b := 0
 	buf := make([]byte, size)
 
@@ -1935,7 +1942,7 @@ func PrintStartDocUnchecked(c *xgb.XConn, DriverMode byte) error {
 // Write request to wire for PrintStartDoc
 // printStartDocRequest writes a PrintStartDoc request to a byte slice.
 func printStartDocRequest(opcode uint8, DriverMode byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -1975,7 +1982,7 @@ func PrintStartJobUnchecked(c *xgb.XConn, OutputMode byte) error {
 // Write request to wire for PrintStartJob
 // printStartJobRequest writes a PrintStartJob request to a byte slice.
 func printStartJobRequest(opcode uint8, OutputMode byte) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
@@ -2015,7 +2022,7 @@ func PrintStartPageUnchecked(c *xgb.XConn, Window xproto.Window) error {
 // Write request to wire for PrintStartPage
 // printStartPageRequest writes a PrintStartPage request to a byte slice.
 func printStartPageRequest(opcode uint8, Window xproto.Window) []byte {
-	size := 8
+	const size = 8
 	b := 0
 	buf := make([]byte, size)
 
