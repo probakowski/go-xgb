@@ -5,4 +5,4 @@ package xgb
 
 const debug = true
 
-func debugf(format string, args ...any) { logf(msg, args...) }
+func debugf(format string, args ...any) { logf(format, args...) }

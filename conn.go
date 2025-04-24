@@ -453,22 +453,11 @@ func (ck *cookie) waiting() bool {
 
 // acquireCookie will acquire a fresh cookie from the pool.
 func acquireCookie() *cookie {
-	v := cookiePool.Get()
-	if v == nil {
-		v = new(cookie)
-	}
-	return v.(*cookie)
+	return new(cookie)
 }
 
 // releaseCookie will reset the cookie, drain it and release to pool.
 func releaseCookie(ck *cookie) {
-	// Reset fields
-	ck.dst = nil
-	ck.err = nil
-	ck.seq = 0
-
-	// Place in pool
-	cookiePool.Put(ck)
 }
 
 func logf(format string, args ...any) {

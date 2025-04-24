@@ -5,6 +5,9 @@ XGB is the X protocol Go language Binding.
 It is the Go equivalent of XCB, the X protocol C-language Binding
 (http://xcb.freedesktop.org/).
 
+### probakowski's Fork
+This is a fork of gruf's `go-xgb` repository, aiming to fix some bugs encounter during testing
+
 ### gruf's Fork
 
 This is a fork of jezek's `go-xgb` repository. It is not yet complete... 
