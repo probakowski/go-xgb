@@ -63,11 +63,11 @@ func (c *Context) Morph(xmlBytes []byte) {
 	if !c.protocol.isExt() {
 		c.Putln("	_ \"unsafe\"")
 	}
-	c.Putln("	\"codeberg.org/gruf/go-xgb\"")
-	c.Putln("	\"codeberg.org/gruf/go-xgb/util\"")
+	c.Putln("	\"github.com/probakowski/go-xgb\"")
+	c.Putln("	\"github.com/probakowski/go-xgb/util\"")
 	sort.Sort(Protocols(c.protocol.Imports))
 	for _, imp := range c.protocol.Imports {
-		c.Putln("	\"codeberg.org/gruf/go-xgb/%s\"", imp.Name)
+		c.Putln("	\"github.com/probakowski/go-xgb/%s\"", imp.Name)
 	}
 	c.Putln(")")
 	c.Putln("")
@@ -159,7 +159,7 @@ func (c *Context) Morph(xmlBytes []byte) {
 		c.Putln("")
 		c.Putln("// sorcery to give us access to package-private functions.")
 		c.Putln("//")
-		c.Putln("//go:linkname xproto_init codeberg.org/gruf/go-xgb.xproto_init")
+		c.Putln("//go:linkname xproto_init github.com/probakowski/go-xgb.xproto_init")
 		c.Putln("func xproto_init(*xgb.XConn, map[uint8]xgb.EventUnmarshaler, map[uint8]xgb.ErrorUnmarshaler) error")
 		c.Putln("")
 		c.Putln("// Setup sets up the main xproto library handlers with the given XConn and initial setup bytes.")

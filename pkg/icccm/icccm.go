@@ -1,14 +1,14 @@
 package icccm
 
 import (
+	"codeberg.org/gruf/go-byteutil"
 	"encoding/binary"
 	"fmt"
 	"unsafe"
 
-	"codeberg.org/gruf/go-byteutil"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb/xproto"
 
-	"codeberg.org/gruf/go-xgb/pkg/xprop"
+	"github.com/probakowski/go-xgb/pkg/xprop"
 )
 
 const (

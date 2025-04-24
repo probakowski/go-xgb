@@ -3,9 +3,9 @@ package ewmh
 import (
 	xevent "fmt"
 
-	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/pkg/xprop"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb"
+	"github.com/probakowski/go-xgb/pkg/xprop"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 type EwmhConn struct {

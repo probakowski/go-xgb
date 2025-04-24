@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 func (conn *XPropConn) GetProp(win xproto.Window, atom xproto.Atom) (xproto.GetPropertyReply, error) {

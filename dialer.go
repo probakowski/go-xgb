@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"codeberg.org/gruf/go-xgb/internal"
+	"github.com/probakowski/go-xgb/internal"
 )
 
 // default net.Dialer.

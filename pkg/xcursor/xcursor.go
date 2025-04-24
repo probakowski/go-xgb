@@ -1,8 +1,8 @@
 package xcursor
 
 import (
-	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 // CreateCursor sets some default colors for nice and easy cursor creation.

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 const (

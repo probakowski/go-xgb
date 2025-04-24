@@ -1,11 +1,11 @@
 package xprop
 
 import (
+	"codeberg.org/gruf/go-byteutil"
 	"encoding/binary"
 	"fmt"
 
-	"codeberg.org/gruf/go-byteutil"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 // PropValAtom transforms a GetPropertyReply struct into an ATOM name. The property reply must be in 32 bit format.

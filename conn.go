@@ -1,6 +1,7 @@
 package xgb
 
 import (
+	"codeberg.org/gruf/go-byteutil"
 	"container/list"
 	"encoding/binary"
 	"errors"
@@ -11,8 +12,7 @@ import (
 	"sync"
 	"unsafe"
 
-	"codeberg.org/gruf/go-byteutil"
-	"codeberg.org/gruf/go-xgb/internal"
+	"github.com/probakowski/go-xgb/internal"
 )
 
 // le is a shorthand for the littleendian binary enc/dec.

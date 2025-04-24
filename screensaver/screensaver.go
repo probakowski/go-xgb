@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/internal"
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb"
+	"github.com/probakowski/go-xgb/internal"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 const (

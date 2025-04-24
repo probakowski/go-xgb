@@ -8,8 +8,8 @@ import (
 	"strings"
 	_ "unsafe"
 
-	"codeberg.org/gruf/go-xgb"
-	"codeberg.org/gruf/go-xgb/internal"
+	"github.com/probakowski/go-xgb"
+	"github.com/probakowski/go-xgb/internal"
 )
 
 var (
@@ -36,7 +36,7 @@ func registerError(n uint8, fn xgb.ErrorUnmarshaler) {
 
 // sorcery to give us access to package-private functions.
 //
-//go:linkname xproto_init codeberg.org/gruf/go-xgb.xproto_init
+//go:linkname xproto_init github.com/probakowski/go-xgb.xproto_init
 func xproto_init(*xgb.XConn, map[uint8]xgb.EventUnmarshaler, map[uint8]xgb.ErrorUnmarshaler) error
 
 // Setup sets up the main xproto library handlers with the given XConn and initial setup bytes.

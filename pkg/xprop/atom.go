@@ -12,7 +12,7 @@ request is sent for interning each atom.)
 import (
 	"fmt"
 
-	"codeberg.org/gruf/go-xgb/xproto"
+	"github.com/probakowski/go-xgb/xproto"
 )
 
 func (conn *XPropConn) Intern(name string, onlyIfExists bool) error {
