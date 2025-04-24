@@ -1,4 +1,4 @@
-module codeberg.org/gruf/go-xgb
+module github.com/probakowski/go-xgb
 
 go 1.18
 
